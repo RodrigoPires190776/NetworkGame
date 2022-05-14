@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Network.Components
 {
     public class Packet
     {
-        public static int TTL = 50;
+        public Guid NetworkID { get; }
         public int Source { get; }
         public int Destination { get; }
         public List<int> RouteTaken { get; }
@@ -13,8 +14,9 @@ namespace Network.Components
         public bool ReachedDestination { get { return RouteTaken.Last() == Destination; } }
         public int NumberOfSteps { get; private set; }
 
-        public Packet(int src, int dst)
+        public Packet(int src, int dst, Guid networkID)
         {
+            NetworkID = networkID;
             Source = src;
             Destination = dst;
             RouteTaken = new();

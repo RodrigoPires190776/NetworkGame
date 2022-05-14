@@ -1,4 +1,5 @@
 ﻿using Network.Strategies;
+using System;
 using System.Collections.Generic;
 
 namespace Network.Components
@@ -6,15 +7,17 @@ namespace Network.Components
     public class Router
     {
         public int ID { get; }
+        public Guid NetworkID { get; }
         public List<Link> Links { get; }
         public List<Packet> PacketQueue { get; }
         private IRoutingStrategy RoutingStrategy { get; }
         private IPacketPickingStrategy PacketPickingStrategy { get; }
         private IPacketCreationStrategy PacketCreationStrategy { get; }
 
-        public Router(int id, IRoutingStrategy routingStrategy, IPacketPickingStrategy packetPickingStrategy, IPacketCreationStrategy packetCreationStrategy)
+        public Router(int id, Guid networkID, IRoutingStrategy routingStrategy, IPacketPickingStrategy packetPickingStrategy, IPacketCreationStrategy packetCreationStrategy)
         {
             ID = id;
+            NetworkID = networkID;
             Links = new();
             PacketQueue = new();
             RoutingStrategy = routingStrategy;

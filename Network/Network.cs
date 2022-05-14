@@ -1,4 +1,5 @@
 ﻿using Network.Components;
+using System;
 using System.Collections.Generic;
 
 namespace Network
@@ -7,11 +8,13 @@ namespace Network
     {
         public Dictionary<int, Router> Routers { get; private set; }
         public List<Link> Links { get; private set; }
+        public Guid ID { get; private set; }
 
         public Network()
         {
             Routers = new();
             Links = new();
+            ID = new Guid();
         }
 
         public void Start()

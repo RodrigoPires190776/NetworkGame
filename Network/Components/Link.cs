@@ -5,15 +5,17 @@ namespace Network.Components
 {
     public class  Link
     {
+        public Guid NetworkID { get; }
         public Tuple<int, int> Routers { get; }
         public Dictionary<Packet, TransitInfo> PackagesInTransit { get; }
         private int LinkLength { get; }
 
-        public Link(int r1, int r2, int length)
+        public Link(int r1, int r2, int length, Guid networkID)
         {
             Routers = new(r1, r2);
             PackagesInTransit = new();
             LinkLength = length;
+            NetworkID = networkID;
         }
 
         public List<Packet> Step()
@@ -25,7 +27,7 @@ namespace Network.Components
             {
                 packet.Step();
                 if (ReachedEnd(PackagesInTransit[packet])) reachedRouter.Add(packet);
-                else if (packet.NumberOfSteps >= Packet.TTL) expired.Add(packet);
+                else if (packet.NumberOfSteps >= NetworkMaster.PacketTTL) expired.Add(packet);
             }
 
             foreach (Packet packet in reachedRouter)

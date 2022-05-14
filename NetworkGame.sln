@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31321.278
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkGenerator", "NetworkGenerator\NetworkGenerator.csproj", "{9D3DB2C5-1FC9-4D0A-A105-985F8821EB79}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetworkGenerator", "NetworkGenerator\NetworkGenerator.csproj", "{9D3DB2C5-1FC9-4D0A-A105-985F8821EB79}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Network", "Network\Network.csproj", "{7EDC026F-D672-4C5F-AA09-C8D7DD468064}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{9D3DB2C5-1FC9-4D0A-A105-985F8821EB79}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9D3DB2C5-1FC9-4D0A-A105-985F8821EB79}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9D3DB2C5-1FC9-4D0A-A105-985F8821EB79}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7EDC026F-D672-4C5F-AA09-C8D7DD468064}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EDC026F-D672-4C5F-AA09-C8D7DD468064}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EDC026F-D672-4C5F-AA09-C8D7DD468064}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EDC026F-D672-4C5F-AA09-C8D7DD468064}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

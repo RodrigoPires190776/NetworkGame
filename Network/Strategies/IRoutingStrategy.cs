@@ -4,6 +4,6 @@ namespace Network.Strategies
 {
     public interface IRoutingStrategy
     {
-        public Link NextLink(Router router, Packet packet);
+        Link NextLink(Router router, Packet packet);
     }
 }

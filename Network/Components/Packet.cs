@@ -18,10 +18,10 @@ namespace Network.Components
         public Packet(Guid src, Guid dst, Guid networkID)
         {
             NetworkID = networkID;
-            ID = new();
+            ID = new Guid();
             Source = src;
             Destination = dst;
-            RouteTaken = new();
+            RouteTaken = new List<Guid>();
             RouteTaken.Add(src);
             NumberOfSteps = 0;
         }

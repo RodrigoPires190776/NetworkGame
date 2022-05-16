@@ -1,10 +1,9 @@
-﻿#nullable enable
-using Network.Components;
+﻿using Network.Components;
 
 namespace Network.Strategies
 {
     public interface IPacketCreationStrategy
     {
-        public Packet? CreatePacket(Router router);
+        Packet CreatePacket(Router router);
     }
 }

@@ -1,4 +1,6 @@
 ﻿using Network.Components;
+using Network.UpdateNetwork;
+using Network.UpdateNetwork.UpdateObjects;
 using System;
 using System.Collections.Generic;
 
@@ -6,7 +8,7 @@ namespace Network
 {
     public class Network
     {
-        public Dictionary<int, Router> Routers { get; private set; }
+        public Dictionary<Guid, Router> Routers { get; private set; }
         public List<Link> Links { get; private set; }
         public Guid ID { get; private set; }
 
@@ -15,11 +17,6 @@ namespace Network
             Routers = new();
             Links = new();
             ID = new Guid();
-        }
-
-        public void Start()
-        {
-            
         }
 
         public void AddRouter(Router router)
@@ -34,14 +31,20 @@ namespace Network
             Routers[link.Routers.Item2].AddLink(link);
         }
 
-        public void Step()
+        public UpdatedState Step()
         {
+            var state = new UpdatedState(ID);
+
             foreach (Link link in Links)
             {
                 var reachedEnd = link.Step();
 
+                state.UpdatedLinks.Add(new UpdateLink(link.ID, link.PackagesInTransit));
+
                 foreach (Packet packet in reachedEnd)
                 {
+                    state.UpdatedPackets.Add(new UpdatePacket(packet.ID, packet.NumberOfSteps, packet.ReachedDestination));
+
                     if (!packet.ReachedDestination)
                     {
                         Routers[packet.CurrentRouter].AddPacket(packet);
@@ -52,7 +55,11 @@ namespace Network
             foreach(Router router in Routers.Values)
             {
                 router.Step();
+
+                state.UpdatedRouters.Add(new UpdateRouter(router.ID, router.PacketQueue.Count));
             }
+
+            return state;
         }
     }
 }

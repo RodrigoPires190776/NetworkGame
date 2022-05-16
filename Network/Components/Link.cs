@@ -6,16 +6,18 @@ namespace Network.Components
     public class  Link
     {
         public Guid NetworkID { get; }
-        public Tuple<int, int> Routers { get; }
+        public Guid ID { get; }
+        public Tuple<Guid, Guid> Routers { get; }
         public Dictionary<Packet, TransitInfo> PackagesInTransit { get; }
         private int LinkLength { get; }
 
-        public Link(int r1, int r2, int length, Guid networkID)
+        public Link(Guid r1, Guid r2, int length, Guid networkID)
         {
             Routers = new(r1, r2);
             PackagesInTransit = new();
             LinkLength = length;
             NetworkID = networkID;
+            ID = new();
         }
 
         public List<Packet> Step()

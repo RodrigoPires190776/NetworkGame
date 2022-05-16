@@ -6,7 +6,7 @@ namespace Network.Components
 {
     public class Router
     {
-        public int ID { get; }
+        public Guid ID { get; }
         public Guid NetworkID { get; }
         public List<Link> Links { get; }
         public List<Packet> PacketQueue { get; }
@@ -14,9 +14,9 @@ namespace Network.Components
         private IPacketPickingStrategy PacketPickingStrategy { get; }
         private IPacketCreationStrategy PacketCreationStrategy { get; }
 
-        public Router(int id, Guid networkID, IRoutingStrategy routingStrategy, IPacketPickingStrategy packetPickingStrategy, IPacketCreationStrategy packetCreationStrategy)
+        public Router(Guid networkID, IRoutingStrategy routingStrategy, IPacketPickingStrategy packetPickingStrategy, IPacketCreationStrategy packetCreationStrategy)
         {
-            ID = id;
+            ID = new();
             NetworkID = networkID;
             Links = new();
             PacketQueue = new();

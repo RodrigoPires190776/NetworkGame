@@ -8,7 +8,7 @@ namespace Network
 {
     public class NetworkMaster
     {
-        private static object InstanceLock = new();
+        private static object InstanceLock = new object();
         private static NetworkMaster Instance;
         private Dictionary<Guid, Network> Networks;
 
@@ -16,7 +16,7 @@ namespace Network
 
         private NetworkMaster()
         {
-            Networks = new();
+            Networks = new Dictionary<Guid, Network>();
             Instance = this;
         }
 
@@ -26,7 +26,7 @@ namespace Network
             {
                 lock (InstanceLock)
                 {
-                    if (Instance == null) Instance = new();
+                    if (Instance == null) Instance = new NetworkMaster();
                 }                
             }
             return Instance;

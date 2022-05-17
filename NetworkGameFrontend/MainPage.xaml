@@ -1,0 +1,33 @@
+﻿<Page
+    x:Class="NetworkGameFrontend.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:NetworkGameFrontend"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    
+    <Grid>
+        <CommandBar HorizontalAlignment="Left">
+            <AppBarButton Content="File" IsCompact="True"/>
+        </CommandBar>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="5*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Grid x:Name="NetworkViewer" Background="Moccasin" Grid.Column="0">
+                <Canvas x:Name="NetworkCanvas">
+                    
+                </Canvas>
+            </Grid>
+
+            <Grid x:Name="NetworkControls" Background="PaleTurquoise" Grid.Column="1">
+
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>

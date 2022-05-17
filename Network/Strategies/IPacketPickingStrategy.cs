@@ -4,6 +4,6 @@ namespace Network.Strategies
 {
     public interface IPacketPickingStrategy
     {
-        public Packet NextPacket(Router router);
+        Packet NextPacket(Router router);
     }
 }

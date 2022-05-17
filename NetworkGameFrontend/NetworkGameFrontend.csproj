@@ -123,8 +123,10 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VisualNetwork\UIElementBase.cs" />
     <Compile Include="VisualNetwork\VisualNetwork.cs" />
     <Compile Include="VisualNetwork\VisualPacket.cs" />
+    <Compile Include="VisualNetwork\VisualRouter.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">

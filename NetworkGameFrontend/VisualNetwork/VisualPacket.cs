@@ -4,17 +4,19 @@ using Windows.UI.Xaml.Shapes;
 
 namespace NetworkGameFrontend.VisualNetwork
 {
-    public class VisualPacket
+    public class VisualPacket : UIElementBase
     {
-        public Rectangle Rectangle { get; }
+        private Rectangle Rectangle;
         public VisualPacket()
         {
-            Rectangle =  new Rectangle()
+            Rectangle = new Rectangle()
             {
                 Width = 15,
                 Height = 10,
                 Fill = new SolidColorBrush(Colors.Black)
             };
+
+            UIElement.Children.Add(Rectangle);
         }
     }
 }

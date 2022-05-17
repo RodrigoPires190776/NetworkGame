@@ -52,9 +52,9 @@ namespace Network.Components
 
     public class Coordinates
     {
-        public decimal X { get; }
-        public decimal Y { get; }
-        public Coordinates(decimal x, decimal y)
+        public double X { get; }
+        public double Y { get; }
+        public Coordinates(double x, double y)
         {
             X = x;
             Y = y;

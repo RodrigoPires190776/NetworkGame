@@ -7,8 +7,18 @@ namespace Network.Strategies.PacketCreation
     {
         public Packet CreatePacket(Router router)
         {
-            var destination = new Random().Next(NetworkMaster.GetInstance().GetNetwork(router.NetworkID).Routers.Count);
-            return new Random().Next(2) == 1 ? new Packet(router.ID, destination, router.NetworkID) : null;
+            if (new Random().Next(2) == 1) return null;
+
+            Guid dstID = router.ID;
+            var network = NetworkMaster.GetInstance().GetNetwork(router.NetworkID);
+
+            while (dstID == router.ID)
+            {
+                var destination = new Random().Next(network.Routers.Count);
+                dstID = network.RouterIDList[destination];
+            }
+            
+            return new Packet(router.ID, dstID, router.NetworkID);
         }
     }
 }

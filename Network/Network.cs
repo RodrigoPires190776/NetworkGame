@@ -9,19 +9,22 @@ namespace Network
     public class Network
     {
         public Dictionary<Guid, Router> Routers { get; private set; }
+        public List<Guid> RouterIDList { get; private set; }
         public List<Link> Links { get; private set; }
         public Guid ID { get; private set; }
 
         public Network()
         {
-            Routers = new();
-            Links = new();
+            Routers = new Dictionary<Guid, Router>();
+            RouterIDList = new List<Guid>();
+            Links = new List<Link>();
             ID = new Guid();
         }
 
         public void AddRouter(Router router)
         {
             Routers.Add(router.ID, router);
+            RouterIDList.Add(router.ID);
         }
 
         public void AddLink(Link link)

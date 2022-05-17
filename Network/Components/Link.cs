@@ -13,17 +13,17 @@ namespace Network.Components
 
         public Link(Guid r1, Guid r2, int length, Guid networkID)
         {
-            Routers = new(r1, r2);
-            PackagesInTransit = new();
+            Routers = new Tuple<Guid, Guid>(r1, r2);
+            PackagesInTransit = new Dictionary<Packet, TransitInfo>();
             LinkLength = length;
             NetworkID = networkID;
-            ID = new();
+            ID = new Guid();
         }
 
         public List<Packet> Step()
         {
-            List<Packet> reachedRouter = new();
-            List<Packet> expired = new();
+            List<Packet> reachedRouter = new List<Packet>();
+            List<Packet> expired = new List<Packet>();
 
             foreach (Packet packet in PackagesInTransit.Keys)
             {
@@ -47,7 +47,7 @@ namespace Network.Components
 
         public void Send(Router router, Packet packet)
         {
-            TransitInfo info = router.ID == Routers.Item1 ? new(0, 1) : new(LinkLength, -1);
+            TransitInfo info = router.ID == Routers.Item1 ? new TransitInfo(0, 1) : new TransitInfo(LinkLength, -1);
             PackagesInTransit.Add(packet, info);
         }
 

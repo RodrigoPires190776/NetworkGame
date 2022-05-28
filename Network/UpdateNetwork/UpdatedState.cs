@@ -7,12 +7,15 @@ namespace Network.UpdateNetwork
     public class UpdatedState : EventArgs
     {
         public Guid NetworkID { get; }
-        public List<UpdateRouter> UpdatedRouters { get; }
-        public List<UpdateLink> UpdatedLinks { get; }
-        public List<UpdatePacket> UpdatedPackets { get; }
+        public Dictionary<Guid, UpdateRouter> UpdatedRouters { get; }
+        public Dictionary<Guid, UpdateLink> UpdatedLinks { get; }
+        public Dictionary<Guid, UpdatePacket> UpdatedPackets { get; }
         public UpdatedState(Guid networkID)
         {
             NetworkID = networkID;
+            UpdatedRouters = new Dictionary<Guid, UpdateRouter>();
+            UpdatedLinks = new Dictionary<Guid, UpdateLink>();
+            UpdatedPackets = new Dictionary<Guid, UpdatePacket>();
         }
     }
 }

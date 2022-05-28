@@ -18,7 +18,7 @@ namespace Network.Components
         public Packet(Guid src, Guid dst, Guid networkID)
         {
             NetworkID = networkID;
-            ID = new Guid();
+            ID = Guid.NewGuid();
             Source = src;
             Destination = dst;
             RouteTaken = new List<Guid>();

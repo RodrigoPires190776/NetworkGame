@@ -1,4 +1,7 @@
 ﻿using Network.Strategies;
+using Network.Strategies.PacketCreation;
+using Network.Strategies.PacketPicking;
+using Network.Strategies.Routing;
 using System;
 using System.Collections.Generic;
 
@@ -9,32 +12,40 @@ namespace Network.Components
         public Coordinates Coordinates { get; }
         public Guid ID { get; }
         public Guid NetworkID { get; }
-        public List<Link> Links { get; }
+        public Dictionary<Guid, Link> Links { get; }
         public List<Packet> PacketQueue { get; }
-        private IRoutingStrategy RoutingStrategy { get; }
-        private IPacketPickingStrategy PacketPickingStrategy { get; }
-        private IPacketCreationStrategy PacketCreationStrategy { get; }
+        public RoutingStrategy RoutingStrategy { get; private set; }
+        public PacketPickingStrategy PacketPickingStrategy { get; private set; }
+        public PacketCreationStrategy PacketCreationStrategy { get; private set; }
 
-        public Router(Guid networkID, Coordinates coordinates, IRoutingStrategy routingStrategy, IPacketPickingStrategy packetPickingStrategy, IPacketCreationStrategy packetCreationStrategy)
+        public Router(Guid networkID, Coordinates coordinates)
         {
-            ID = new Guid();
+            ID = Guid.NewGuid();
             Coordinates = coordinates;
             NetworkID = networkID;
-            Links = new List<Link>();
+            Links = new Dictionary<Guid, Link>();
             PacketQueue = new List<Packet>();
-            RoutingStrategy = routingStrategy;
-            PacketPickingStrategy = packetPickingStrategy;
-            PacketCreationStrategy = packetCreationStrategy;
+            RoutingStrategy = new RandomRoutingStrategy();
+            PacketPickingStrategy = new RandomPacketPickingStrategy();
+            PacketCreationStrategy = new RandomPacketCreationStrategy();
         }
 
         public void AddLink(Link link)
         {
-            Links.Add(link);
+            Links.Add(link.ID, link);
         }
 
         public void AddPacket(Packet packet)
         {
             PacketQueue.Add(packet);
+        }
+        
+        public void SetStrategies(RoutingStrategy routing, PacketCreationStrategy packetCreation, PacketPickingStrategy packetPicking)
+        {
+            RoutingStrategy = routing ?? RoutingStrategy;
+            RoutingStrategy.Initialize(NetworkMaster.GetInstance().GetNetwork(NetworkID), this);
+            PacketCreationStrategy = packetCreation ?? PacketCreationStrategy;
+            PacketPickingStrategy = packetPicking ?? PacketPickingStrategy;
         }
 
         public void Step()

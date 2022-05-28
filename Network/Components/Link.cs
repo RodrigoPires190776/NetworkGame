@@ -9,7 +9,7 @@ namespace Network.Components
         public Guid ID { get; }
         public Tuple<Guid, Guid> Routers { get; }
         public Dictionary<Packet, TransitInfo> PackagesInTransit { get; }
-        private int LinkLength { get; }
+        public int LinkLength { get; }
 
         public Link(Guid r1, Guid r2, int length, Guid networkID)
         {
@@ -17,7 +17,7 @@ namespace Network.Components
             PackagesInTransit = new Dictionary<Packet, TransitInfo>();
             LinkLength = length;
             NetworkID = networkID;
-            ID = new Guid();
+            ID = Guid.NewGuid();
         }
 
         public List<Packet> Step()
@@ -28,7 +28,12 @@ namespace Network.Components
             foreach (Packet packet in PackagesInTransit.Keys)
             {
                 packet.Step();
-                if (ReachedEnd(PackagesInTransit[packet])) reachedRouter.Add(packet);
+                PackagesInTransit[packet].PositionInLink += PackagesInTransit[packet].Direction;
+                if (ReachedEnd(PackagesInTransit[packet]))
+                {
+                    reachedRouter.Add(packet);
+                    packet.Send(packet.CurrentRouter == Routers.Item1 ? Routers.Item2 : Routers.Item1);
+                }
                 else if (packet.NumberOfSteps >= NetworkMaster.PacketTTL) expired.Add(packet);
             }
 
@@ -47,23 +52,26 @@ namespace Network.Components
 
         public void Send(Router router, Packet packet)
         {
-            TransitInfo info = router.ID == Routers.Item1 ? new TransitInfo(0, 1) : new TransitInfo(LinkLength, -1);
+            TransitInfo info = router.ID == Routers.Item1 ? 
+                new TransitInfo(0, 1, packet.NumberOfSteps) : new TransitInfo(LinkLength - 1, -1, packet.NumberOfSteps);
             PackagesInTransit.Add(packet, info);
         }
 
         private bool ReachedEnd(TransitInfo info)
         {
-            return info.Direction > 0 ? info.PositionInLink >= LinkLength : info.PositionInLink <= 0;
+            return info.Direction > 0 ? info.PositionInLink >= LinkLength - 1 : info.PositionInLink <= 0;
         }
 
         public class TransitInfo
         {
-            public int PositionInLink { get; }
+            public int PositionInLink { get; set;  }
             public int Direction { get; }
-            public TransitInfo (int position, int direction)
+            public int NrSteps { get; }
+            public TransitInfo (int position, int direction, int nrSteps)
             {
                 PositionInLink = position;
                 Direction = direction;
+                NrSteps = nrSteps;
             }
         }
     }

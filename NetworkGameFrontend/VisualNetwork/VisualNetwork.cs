@@ -72,17 +72,6 @@ namespace NetworkGameFrontend.VisualNetwork
                     PacketCanvas.Children.Add(vPacket.UIElement);
                 }
             }
-
-            
-            foreach(var packet in state.UpdatedPackets)
-            {
-               
-            }
-
-            foreach(var router in state.UpdatedRouters)
-            {
-
-            }
         }
 
         public void Draw()

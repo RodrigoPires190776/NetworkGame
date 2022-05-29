@@ -76,8 +76,10 @@ namespace NetworkGameFrontend.NetworkApplication
 
         private void UpdatedClickedRouter(object sender, ClickedRouterEventArgs eventArgs)
         {
-            var routerNumber = NetworkControlsGrid.FindName("RouterNumberTextBox") as TextBox;
-            routerNumber.Text = NetworkViewerController.VisualNetwork.Routers[eventArgs.ID].ID.ToString();
+            var tBox = NetworkControlsGrid.FindName("RouterNumberTextBox") as TextBox;
+            tBox.Text = NetworkViewerController.VisualNetwork.Routers[eventArgs.ID].ID.ToString();
+            tBox = NetworkControlsGrid.FindName("PacketsSentTextBox") as TextBox;
+            tBox.Text = NetworkViewerController.VisualNetwork.Routers[eventArgs.ID].ID.ToString();
         }
     }
 }

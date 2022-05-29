@@ -39,7 +39,7 @@ namespace Network.Components
         {
             PacketQueue.Add(packet);
         }
-        
+
         public void SetStrategies(RoutingStrategy routing, PacketCreationStrategy packetCreation, PacketPickingStrategy packetPicking)
         {
             RoutingStrategy = routing ?? RoutingStrategy;
@@ -52,7 +52,7 @@ namespace Network.Components
         {
             var newPacket = PacketCreationStrategy.CreatePacket(this);
             if (newPacket != null) PacketQueue.Add(newPacket);
-            if(PacketQueue.Count > 0)
+            if (PacketQueue.Count > 0)
             {
                 var nextPacket = PacketPickingStrategy.NextPacket(this);
                 RoutingStrategy.NextLink(this, nextPacket).Send(this, nextPacket);

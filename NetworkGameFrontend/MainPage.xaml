@@ -108,6 +108,14 @@
                         <TextBlock Grid.Column="0" Text="Router Number:" Foreground="Black" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                         <TextBox x:Name="RouterNumberTextBox" Grid.Column="1" Height="30" Width="50" HorizontalAlignment="Left" Foreground="Black" Background="White" IsEnabled="False"/>
                     </Grid>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Packets Sent:" Foreground="Black" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        <TextBox x:Name="PacketsSentTextBox" Grid.Column="1" Height="30" Width="50" HorizontalAlignment="Left" Foreground="Black" Background="White" IsEnabled="False"/>
+                    </Grid>
                 </Grid>
             </Grid>
         </Grid>

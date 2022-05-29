@@ -10,6 +10,7 @@ namespace Network.UpdateNetwork.UpdateObjects
         public Dictionary<Guid, TransitInfo> PackagesInTransit { get; }
         public UpdateLink(Guid id, Dictionary<Packet, TransitInfo> packets) : base(id) 
         {
+            PackagesInTransit = new Dictionary<Guid, TransitInfo>();
             foreach(var packet in packets.Keys)
             {
                 PackagesInTransit.Add(packet.ID, packets[packet]);

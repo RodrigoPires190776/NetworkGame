@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using NetworkGameFrontend.ApplicationWindows;
+using NetworkGameFrontend.NetworkApplication;
+using System;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
-using Windows.Foundation.Collections;
+using Windows.UI.Input.Inking;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
+
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -22,9 +20,89 @@ namespace NetworkGameFrontend
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        private readonly MainApplication app;
+        private double AverageVariance { get; }
         public MainPage()
         {
             this.InitializeComponent();
+            Window.Height = 1000;
+            app = new MainApplication(NetworkScrollViewer, NetworkControls);
+        }
+
+        async void File_ImportNetwork_Click(object sender, RoutedEventArgs e)
+        {
+            var picker = new Windows.Storage.Pickers.FileOpenPicker
+            {
+                ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail,
+                SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.PicturesLibrary
+            };
+            picker.FileTypeFilter.Add(".network");
+
+            Windows.Storage.StorageFile file = await picker.PickSingleFileAsync();
+            
+            if (file != null)
+            {
+                var networkNameDialog = new UserStringInput("Choose a name for the nextwork", "Name:", file.DisplayName);
+                await networkNameDialog.ShowAsync();
+                if(networkNameDialog.Ok)
+                {
+                    try
+                    {
+                        var stream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read);
+                        app.ImportNetwork(stream.AsStream(), networkNameDialog.Text);
+                    }
+                    catch (Exception ex)
+                    {
+                        var messageDialog = new MessageDialog(ex.Message, "Something went wrong!");
+                        await messageDialog.ShowAsync();
+                    }
+                }
+                else
+                {
+                    var messageDialog = new MessageDialog("Import canceled!");
+                    await messageDialog.ShowAsync();
+                }
+            }
+            else
+            {
+                var messageDialog = new MessageDialog("No file selected!");
+                await messageDialog.ShowAsync();
+            }
+        }
+
+        async void Network_LoadNetwork_Click(object sender, RoutedEventArgs e)
+        {
+            var networkSelectDialog = new UserListSelectOne(app.GetAllNetworksName());
+            await networkSelectDialog.ShowAsync();
+
+            if (networkSelectDialog.Ok)
+            {
+                try
+                {
+                    app.LoadNetwork(networkSelectDialog.Item);
+                }
+                catch(Exception ex)
+                {
+                    var messageDialog = new MessageDialog(ex.Message, "Something went wrong!");
+                    await messageDialog.ShowAsync();
+                }
+            }
+            else
+            {
+                var messageDialog = new MessageDialog("Load canceled!");
+                await messageDialog.ShowAsync();
+            }
+        }
+    
+        void Controls_StartDiscovery_Click(object sender, RoutedEventArgs e)
+        {
+            app.StartDiscovery();
+            StartDiscoveryButton.IsEnabled = false;
+        }
+
+        void TextBox_AllowOnlyInt(TextBox sender, TextBoxBeforeTextChangingEventArgs args)
+        {
+            args.Cancel = args.NewText.Any(c => !char.IsDigit(c));
         }
     }
 }

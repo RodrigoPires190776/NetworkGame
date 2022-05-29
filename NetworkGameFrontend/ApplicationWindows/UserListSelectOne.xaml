@@ -1,0 +1,24 @@
+﻿<ContentDialog
+    x:Class="NetworkGameFrontend.ApplicationWindows.UserListSelectOne"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:NetworkGameFrontend.ApplicationWindows"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="TITLE"
+    PrimaryButtonText="Cancel"
+    SecondaryButtonText="Ok"
+    PrimaryButtonClick="ContentDialog_CancelButtonClick"
+    SecondaryButtonClick="ContentDialog_OkButtonClick">
+
+    <Grid x:Name="Grid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <ComboBox x:Name="ListBox" VerticalAlignment="Bottom" Grid.Row="1" 
+                  Width="{Binding ActualWidth, ElementName=Grid}"
+                  ItemsSource="{x:Bind Itens}" SelectedItem="{x:Bind SelectedItem, Mode=TwoWay}"></ComboBox>
+    </Grid>
+</ContentDialog>

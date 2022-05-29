@@ -2,6 +2,7 @@
 using Network.Strategies.PacketCreation;
 using Network.Strategies.PacketPicking;
 using Network.Strategies.Routing;
+using Network.UpdateNetwork.UpdateObjects;
 using System;
 using System.Collections.Generic;
 
@@ -48,16 +49,20 @@ namespace Network.Components
             PacketPickingStrategy = packetPicking ?? PacketPickingStrategy;
         }
 
-        public void Step()
+        public UpdateRouter Step()
         {
             var newPacket = PacketCreationStrategy.CreatePacket(this);
             if (newPacket != null) PacketQueue.Add(newPacket);
+
+            Packet nextPacket = null;
             if (PacketQueue.Count > 0)
             {
-                var nextPacket = PacketPickingStrategy.NextPacket(this);
+                nextPacket = PacketPickingStrategy.NextPacket(this);
                 RoutingStrategy.NextLink(this, nextPacket).Send(this, nextPacket);
                 PacketQueue.Remove(nextPacket);
             }
+
+            return new UpdateRouter(ID, PacketQueue.Count, newPacket != null, nextPacket != null);
         }
     }
 

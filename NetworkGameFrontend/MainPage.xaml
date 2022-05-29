@@ -99,6 +99,10 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Grid Grid.Row="0">
                         <Grid.ColumnDefinitions>
@@ -113,8 +117,64 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Packets Created:" Foreground="Black" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        <TextBox x:Name="PacketsCreatedTextBox" Grid.Column="1" Height="30" Width="50" HorizontalAlignment="Left" Foreground="Black" Background="White" IsEnabled="False"/>
+                    </Grid>
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Packets Sent:" Foreground="Black" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                         <TextBox x:Name="PacketsSentTextBox" Grid.Column="1" Height="30" Width="50" HorizontalAlignment="Left" Foreground="Black" Background="White" IsEnabled="False"/>
+                    </Grid>
+                    <Grid Grid.Row="3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Packets Delivered:" Foreground="Black" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        <TextBox x:Name="PacketsDeliveredTextBox" Grid.Column="1" Height="30" Width="50" HorizontalAlignment="Left" Foreground="Black" Background="White" IsEnabled="False"/>
+                    </Grid>
+                    <Grid Grid.Row="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Packets Dropped:" Foreground="Black" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        <TextBox x:Name="PacketsDroppedTextBox" Grid.Column="1" Height="30" Width="50" HorizontalAlignment="Left" Foreground="Black" Background="White" IsEnabled="False"/>
+                    </Grid>
+                    <Grid Grid.Row="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Packets in Transit:" Foreground="Black" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        <TextBox x:Name="PacketsInTransitTextBox" Grid.Column="1" Height="30" Width="50" HorizontalAlignment="Left" Foreground="Black" Background="White" IsEnabled="False"/>
+                    </Grid>
+                    <Grid Grid.Row="6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Packets in Queue:" Foreground="Black" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        <TextBox x:Name="PacketsInQueueTextBox" Grid.Column="1" Height="30" Width="50" HorizontalAlignment="Left" Foreground="Black" Background="White" IsEnabled="False"/>
+                    </Grid>
+                    <Grid Grid.Row="7">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Packets Received:" Foreground="Black" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        <TextBox x:Name="PacketsReceivedTextBox" Grid.Column="1" Height="30" Width="50" HorizontalAlignment="Left" Foreground="Black" Background="White" IsEnabled="False"/>
+                    </Grid>
+                    <Grid Grid.Row="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Average Deliver Time:" Foreground="Black" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        <TextBox x:Name="PacketAverageDeliverTimeTextBox" Grid.Column="1" Height="30" Width="50" HorizontalAlignment="Left" Foreground="Black" Background="White" IsEnabled="False"/>
                     </Grid>
                 </Grid>
             </Grid>

@@ -13,7 +13,7 @@ namespace Network
         private readonly Dictionary<Guid, Network> Networks;
         private readonly Dictionary<string, Network> NetworksByName;
 
-        public static int PacketTTL = 50;
+        public static int PacketTTL = 100;
 
         private NetworkMaster()
         {

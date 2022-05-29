@@ -47,13 +47,18 @@ namespace Network
 
             foreach (Link link in Links)
             {
-                var reachedEnd = link.Step();
+                var result = link.Step();
 
-                state.UpdatedLinks.Add(link.ID, new UpdateLink(link.ID, link.PackagesInTransit));
+                state.UpdatedLinks.Add(link.ID, result.Item2);
 
-                foreach (Packet packet in reachedEnd)
+                foreach(var packet in result.Item3)
                 {
-                    state.UpdatedPackets.Add(packet.ID, new UpdatePacket(packet.ID, packet.NumberOfSteps, packet.ReachedDestination));
+                    state.UpdatedPackets.Add(packet.ID, packet);
+                }
+
+                foreach (Packet packet in result.Item1)
+                {
+                    state.UpdatedPackets.Add(packet.ID, new UpdatePacket(packet.ID, packet.NumberOfSteps, packet.ReachedDestination, false, packet.Source, packet.Destination));
 
                     if (!packet.ReachedDestination)
                     {
@@ -63,10 +68,8 @@ namespace Network
             }
 
             foreach(Router router in Routers.Values)
-            {
-                router.Step();
-
-                state.UpdatedRouters.Add(router.ID, new UpdateRouter(router.ID, router.PacketQueue.Count));
+            {              
+                state.UpdatedRouters.Add(router.ID, router.Step());
             }
 
             return state;

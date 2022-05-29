@@ -179,6 +179,10 @@
       <Project>{575e8a98-5fea-4bb1-8203-e2d559d3c5a4}</Project>
       <Name>NetworkGameBackend</Name>
     </ProjectReference>
+    <ProjectReference Include="..\NetworkGameDataCollector\NetworkGameDataCollector.csproj">
+      <Project>{23E681C9-198E-4D73-AFB4-8432FD73D479}</Project>
+      <Name>NetworkGameDataCollector</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NetworkGenerator\NetworkGenerator.csproj">
       <Project>{9D3DB2C5-1FC9-4D0A-A105-985F8821EB79}</Project>
       <Name>NetworkGenerator</Name>

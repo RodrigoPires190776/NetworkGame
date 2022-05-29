@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Network.UpdateNetwork.UpdateObjects;
+using System;
 using System.Collections.Generic;
 
 namespace Network.Components
@@ -20,7 +21,7 @@ namespace Network.Components
             ID = Guid.NewGuid();
         }
 
-        public List<Packet> Step()
+        public (List<Packet>, UpdateLink, List<UpdatePacket>) Step()
         {
             List<Packet> reachedRouter = new List<Packet>();
             List<Packet> expired = new List<Packet>();
@@ -42,12 +43,16 @@ namespace Network.Components
                 PackagesInTransit.Remove(packet);
             }
 
+            var expiredList = new List<UpdatePacket>();
             foreach (Packet packet in expired)
             {
                 PackagesInTransit.Remove(packet);
+                expiredList.Add(new UpdatePacket(packet.ID, packet.NumberOfSteps, false, true, packet.Source, packet.Destination));
             }
 
-            return reachedRouter;
+            var state = new UpdateLink(ID, PackagesInTransit, reachedRouter, expired);
+
+            return (reachedRouter, state, expiredList);
         }
 
         public void Send(Router router, Packet packet)

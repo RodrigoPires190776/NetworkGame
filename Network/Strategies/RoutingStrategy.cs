@@ -37,12 +37,13 @@ namespace Network.Strategies
                 if (routerID == router.ID) continue;
 
                 Sum.Add(routerID, 0);
+                
                 var routerProbabilities = new Dictionary<Guid, int>();
 
                 foreach (var link in router.Links.Keys)
                 {
                     routerProbabilities.Add(link, 1);
-                    Sum[routerID] += 1;
+                    Sum[routerID] = Sum[routerID] + 1;
                 }
 
                 Values.Add(routerID, routerProbabilities);
@@ -52,14 +53,14 @@ namespace Network.Strategies
         public virtual Guid GetLink(Guid router)
         {
             int random = new Random().Next(Sum[router]);
-            int sum = 0;
+            int sum = -1;
             Guid id;
 
             foreach(var i in Values[router].Keys)
             {
                 id = i;
                 sum += Values[router][id];
-                if (sum < random) return id; 
+                if (sum >= random) return id; 
             }
 
             return id;

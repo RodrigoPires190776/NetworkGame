@@ -22,7 +22,7 @@ namespace NetworkGameBackend
             Network = network;
             foreach(var router in network.RouterIDList)
             {
-                Network.SetStrategies(router, GetStrategy(routing), GetStrategy(packetCreation), GetStrategy(packetPicking));
+                Network.SetStrategies(router, GetStrategy(routing, router), GetStrategy(packetCreation), GetStrategy(packetPicking));
             }
             LoopTime = new TimeSpan(TimeSpan.TicksPerSecond / numberLoopsPerSecond);
         }
@@ -59,12 +59,14 @@ namespace NetworkGameBackend
             IsRunning = false;
         }
 
-        private RoutingStrategy GetStrategy(RoutingStrategies strat)
+        private RoutingStrategy GetStrategy(RoutingStrategies strat, Guid routerID)
         {
             switch (strat)
             {
                 case RoutingStrategies.Random:
-                    return new RandomRoutingStrategy();
+                    return new RandomRoutingStrategy(routerID, Network.ID);
+                case RoutingStrategies.LinearRewardInaction:
+                    return new LinearRewardInactionRoutingStrategy(routerID, Network.ID);
                 default:
                     throw new Exception("Invalid routing strategy");
             }
@@ -75,7 +77,7 @@ namespace NetworkGameBackend
             switch (strat)
             {
                 case PickingStrategies.Random:
-                    return new RandomPacketPickingStrategy();
+                    return new RandomPacketPickingStrategy(Network.ID);
                 default:
                     throw new Exception("Invalid packet picking strategy");
             }
@@ -86,13 +88,13 @@ namespace NetworkGameBackend
             switch (strat)
             {
                 case CreationStrategies.Random:
-                    return new RandomPacketCreationStrategy();
+                    return new RandomPacketCreationStrategy(Network.ID);
                 default:
                     throw new Exception("Invalid packet creation strategy");
             }
         }
     }
-    public enum RoutingStrategies { Random };
+    public enum RoutingStrategies { Random, LinearRewardInaction };
     public enum PickingStrategies { Random };
     public enum CreationStrategies { Random };
 }

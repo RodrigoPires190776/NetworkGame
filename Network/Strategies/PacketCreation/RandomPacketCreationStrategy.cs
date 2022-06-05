@@ -6,8 +6,8 @@ namespace Network.Strategies.PacketCreation
 {
     public sealed class RandomPacketCreationStrategy : PacketCreationStrategy
     {
-        public RandomPacketCreationStrategy() : 
-            base(new List<Tuple<string, Property.PropertyType, List<Tuple<string, object>>>>() 
+        public RandomPacketCreationStrategy(Guid networkID) : 
+            base(networkID, new List<Tuple<string, Property.PropertyType, List<Tuple<string, object>>>>() 
             {
                 new Tuple<string, Property.PropertyType, List<Tuple<string, object>>>("Probability", Property.PropertyType.Decimal,
                     new List<Tuple<string, object>>()

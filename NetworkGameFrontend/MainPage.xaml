@@ -54,6 +54,9 @@
             </Grid.ColumnDefinitions>
 
             <Grid x:Name="NetworkViewer" Background="Moccasin" Grid.Column="0">
+                <Grid Height="100" Width="200" Background="Black" HorizontalAlignment="Right" VerticalAlignment="Bottom" Visibility="Visible">
+                    
+                </Grid>
                 <ScrollViewer x:Name="NetworkScrollViewer"        
                      VerticalScrollMode="Disabled"
                      HorizontalScrollMode="Disabled"

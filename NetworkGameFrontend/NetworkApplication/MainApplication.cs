@@ -65,8 +65,8 @@ namespace NetworkGameFrontend.NetworkApplication
         public void StartDiscovery()
         {
             //TODO choose strategies
-            NetworkGame = new Game(NetworkMaster.GetInstance().GetNetwork(LoadedNetwork), 10, 
-                RoutingStrategies.Random, PickingStrategies.Random, CreationStrategies.Random);
+            NetworkGame = new Game(NetworkMaster.GetInstance().GetNetwork(LoadedNetwork), 25, 
+                RoutingStrategies.LinearRewardInaction, PickingStrategies.Random, CreationStrategies.Random);
             NetworkGame.GameStep += UpdateNetwork;
             NetworkDataCollector.GetInstance().AddEventHandler(LoadedNetwork, NetworkGame);
             Thread t = new Thread(NetworkGame.Run);
@@ -75,8 +75,7 @@ namespace NetworkGameFrontend.NetworkApplication
 
         private void UpdateNetwork(object sender, UpdatedState eventArgs)
         {
-            Debug.WriteLine("updated");
-            NetworkViewerController.Update(eventArgs);
+            NetworkViewerController.Update(eventArgs, LoadedRouter);
             if (LoadedRouter != Guid.Empty) UpdateRouterData(LoadedRouter);
         }
 

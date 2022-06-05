@@ -21,14 +21,13 @@ namespace Network.Components
             ID = Guid.NewGuid();
         }
 
-        public (List<Packet>, UpdateLink, List<UpdatePacket>) Step()
+        public (List<Packet>, UpdateLink, List<Packet>) Step()
         {
             List<Packet> reachedRouter = new List<Packet>();
             List<Packet> expired = new List<Packet>();
 
             foreach (Packet packet in PackagesInTransit.Keys)
             {
-                packet.Step();
                 PackagesInTransit[packet].PositionInLink += PackagesInTransit[packet].Direction;
                 if (ReachedEnd(PackagesInTransit[packet]))
                 {
@@ -43,11 +42,11 @@ namespace Network.Components
                 PackagesInTransit.Remove(packet);
             }
 
-            var expiredList = new List<UpdatePacket>();
+            var expiredList = new List<Packet>();
             foreach (Packet packet in expired)
             {
                 PackagesInTransit.Remove(packet);
-                expiredList.Add(new UpdatePacket(packet.ID, packet.NumberOfSteps, false, true, packet.Source, packet.Destination));
+                expiredList.Add(packet);
             }
 
             var state = new UpdateLink(ID, PackagesInTransit, reachedRouter, expired);
@@ -59,6 +58,7 @@ namespace Network.Components
         {
             TransitInfo info = router.ID == Routers.Item1 ? 
                 new TransitInfo(0, 1, packet.NumberOfSteps) : new TransitInfo(LinkLength - 1, -1, packet.NumberOfSteps);
+            packet.RouterSentToLink[router.ID] = ID;
             PackagesInTransit.Add(packet, info);
         }
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Windows.UI;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -13,7 +12,7 @@ namespace NetworkGameFrontend.VisualNetwork
     {
         private Ellipse Ellipse;
         private TextBlock TextBlock;
-        private Dictionary<Guid, TextBlock> LinkProbabilities;
+        private Dictionary<Guid, Border> LinkProbabilities;
         public const int RADIUS = 20;
         public int ID { get; }
         private Guid RouterID;
@@ -47,12 +46,17 @@ namespace NetworkGameFrontend.VisualNetwork
             UIElement.Width = RADIUS * 2;
             UIElement.Height = RADIUS * 2;
 
-            LinkProbabilities = new Dictionary<Guid, TextBlock>();
+            LinkProbabilities = new Dictionary<Guid, Border>();
             foreach(var link in links)
             {
                 var tBlock = CreateLinkProbability();
-                LinkProbabilities.Add(link, tBlock);
-                UIElement.Children.Add(tBlock);
+                Border border = new Border()
+                {
+                    Background = new SolidColorBrush(Colors.White)
+                };
+                border.Child = tBlock;
+                LinkProbabilities.Add(link, border);                
+                UIElement.Children.Add(border);
             }
 
             UIElement.PointerPressed += Clicked;
@@ -72,21 +76,37 @@ namespace NetworkGameFrontend.VisualNetwork
             var hipSquared = dirX * dirX + dirY * dirY;
             var hip = Math.Sqrt(hipSquared);
 
-            dirX = dirX / hip * 30;
-            dirY = dirY / hip * 30;
+            dirX = dirX / hip * 45;
+            dirY = dirY / hip * 45;
 
-            tBlock.SetValue(Canvas.LeftProperty, 16 + dirX);
-            tBlock.SetValue(Canvas.TopProperty, 8 + dirY);
+            tBlock.SetValue(Canvas.LeftProperty, 9 + dirX);
+            tBlock.SetValue(Canvas.TopProperty, 12 + dirY);
         }
 
         private TextBlock CreateLinkProbability()
         {
             return new TextBlock()
             {
-                Text = "...",
+                Text = "",
                 FontSize = 12,
                 Foreground = new SolidColorBrush(Colors.Black)
             };
+        }
+
+        public void UpdateProbabilities(Dictionary<Guid, decimal> values)
+        {
+            foreach(var link in values.Keys)
+            {
+                ((TextBlock)LinkProbabilities[link].Child).Text = values[link].ToString("#.##");
+            }
+        }
+
+        public void UpdateProbabilities()
+        {
+            foreach(var link in LinkProbabilities.Keys)
+            {
+                ((TextBlock)LinkProbabilities[link].Child).Text = "";
+            }          
         }
     }
 

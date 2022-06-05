@@ -7,8 +7,8 @@ namespace Network.Strategies
 {
     public abstract class PacketPickingStrategy : BaseStrategy
     {
-        public PacketPickingStrategy(List<Tuple<string, PropertyType, List<Tuple<string, object>>>> properties) :
-            base(properties)
+        public PacketPickingStrategy(Guid networkID, List<Tuple<string, PropertyType, List<Tuple<string, object>>>> properties) : 
+            base(networkID, properties)
         { }
         public abstract Packet NextPacket(Router router);
     }

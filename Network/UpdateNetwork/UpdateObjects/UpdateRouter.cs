@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Network.Strategies;
+using System;
 
 namespace Network.UpdateNetwork.UpdateObjects
 {
@@ -7,11 +8,13 @@ namespace Network.UpdateNetwork.UpdateObjects
         public int NumberPacketsInQueue { get; }
         public bool PacketCreated { get; }
         public bool PacketSent { get; }
-        public UpdateRouter(Guid id, int nPackets, bool created, bool sent) : base(id)
+        public RoutingTable RoutingTable { get; }
+        public UpdateRouter(Guid id, int nPackets, bool created, bool sent, RoutingTable table) : base(id)
         {
             NumberPacketsInQueue = nPackets;
             PacketCreated = created;
             PacketSent = sent;
+            RoutingTable = table;
         }
     }
 }

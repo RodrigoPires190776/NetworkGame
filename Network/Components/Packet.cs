@@ -11,6 +11,7 @@ namespace Network.Components
         public Guid Source { get; }
         public Guid Destination { get; }       
         public Guid CurrentRouter { get; private set; }
+        public Dictionary<Guid, Guid> RouterSentToLink { get; }
         public bool ReachedDestination { get { return CurrentRouter == Destination; } }
         public int NumberOfSteps { get; private set; }
 
@@ -21,6 +22,7 @@ namespace Network.Components
             Source = src;
             Destination = dst;
             CurrentRouter = src;
+            RouterSentToLink = new Dictionary<Guid, Guid>();
             NumberOfSteps = 0;
         }
 

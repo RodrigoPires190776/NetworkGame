@@ -58,7 +58,7 @@ namespace NetworkGameFrontend.VisualNetwork
             }
         }
 
-        public void Update(UpdatedState state)
+        public void Update(UpdatedState state, Guid loadedRouterID)
         {
             PacketCanvas.Children.Clear();
             foreach (var link in state.UpdatedLinks.Values)
@@ -72,6 +72,15 @@ namespace NetworkGameFrontend.VisualNetwork
                     PacketCanvas.Children.Add(vPacket.UIElement);
                 }
             }
+
+            if(loadedRouterID != Guid.Empty)
+            {
+                foreach (var router in Network.RouterIDList)
+                {
+                    if (router != loadedRouterID) Routers[router].UpdateProbabilities(state.UpdatedRouters[router].RoutingTable.GetPercentageValues(loadedRouterID));
+                    else Routers[router].UpdateProbabilities();
+                }
+            }            
         }
 
         public void Draw()

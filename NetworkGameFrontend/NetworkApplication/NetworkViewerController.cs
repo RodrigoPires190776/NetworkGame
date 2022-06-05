@@ -1,5 +1,6 @@
 ﻿using Network;
 using Network.UpdateNetwork;
+using System;
 using System.Diagnostics;
 using Windows.Foundation;
 using Windows.UI.Xaml.Controls;
@@ -43,12 +44,12 @@ namespace NetworkGameFrontend.NetworkApplication
 
         }
 
-        public void Update(UpdatedState state)
+        public void Update(UpdatedState state, Guid loadedRouterID)
         {
             _ = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
                () =>
                {
-                   VisualNetwork.Update(state);
+                   VisualNetwork.Update(state, loadedRouterID);
                });
         }
 

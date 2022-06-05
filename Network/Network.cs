@@ -13,6 +13,7 @@ namespace Network
         public Dictionary<Guid, Router> Routers { get; private set; }
         public List<Guid> RouterIDList { get; private set; }
         public List<Link> Links { get; private set; }
+        public Dictionary<Guid, Packet> Packets {get; private set;}
         public Guid ID { get; private set; }
 
         public Network()
@@ -20,6 +21,7 @@ namespace Network
             Routers = new Dictionary<Guid, Router>();
             RouterIDList = new List<Guid>();
             Links = new List<Link>();
+            Packets = new Dictionary<Guid, Packet>();
             ID = Guid.NewGuid();
         }
 
@@ -45,17 +47,30 @@ namespace Network
         {
             var state = new UpdatedState(ID);
 
+            foreach(var packet in Packets.Values)
+            {
+                packet.Step();
+            }
+
             foreach (Link link in Links)
             {
                 var result = link.Step();
 
                 state.UpdatedLinks.Add(link.ID, result.Item2);
 
+                //Expired
                 foreach(var packet in result.Item3)
                 {
-                    state.UpdatedPackets.Add(packet.ID, packet);
+                    state.UpdatedPackets.Add(packet.ID, new UpdatePacket(packet.ID, packet.NumberOfSteps, false, true, packet.Source, packet.Destination));
+                    Packets.Remove(packet.ID);
+
+                    foreach(var router in packet.RouterSentToLink.Keys)
+                    {
+                        Routers[router].Learn(packet);
+                    }
                 }
 
+                //Reached Router
                 foreach (Packet packet in result.Item1)
                 {
                     state.UpdatedPackets.Add(packet.ID, new UpdatePacket(packet.ID, packet.NumberOfSteps, packet.ReachedDestination, false, packet.Source, packet.Destination));
@@ -64,12 +79,21 @@ namespace Network
                     {
                         Routers[packet.CurrentRouter].AddPacket(packet);
                     }
-                }
+                    else
+                    {
+                        foreach (var router in packet.RouterSentToLink.Keys)
+                        {
+                            Routers[router].Learn(packet);
+                        }
+                    }
+                }                 
             }
 
             foreach(Router router in Routers.Values)
-            {              
-                state.UpdatedRouters.Add(router.ID, router.Step());
+            {
+                var updateRouter = router.Step();
+                if (updateRouter.Item2 != null) Packets.Add(updateRouter.Item2.ID, updateRouter.Item2);
+                state.UpdatedRouters.Add(router.ID, updateRouter.Item1);
             }
 
             return state;

@@ -26,9 +26,9 @@ namespace Network.Components
             NetworkID = networkID;
             Links = new Dictionary<Guid, Link>();
             PacketQueue = new List<Packet>();
-            RoutingStrategy = new RandomRoutingStrategy();
-            PacketPickingStrategy = new RandomPacketPickingStrategy();
-            PacketCreationStrategy = new RandomPacketCreationStrategy();
+            RoutingStrategy = new RandomRoutingStrategy(ID, networkID);
+            PacketPickingStrategy = new RandomPacketPickingStrategy(networkID);
+            PacketCreationStrategy = new RandomPacketCreationStrategy(networkID);
         }
 
         public void AddLink(Link link)
@@ -49,7 +49,7 @@ namespace Network.Components
             PacketPickingStrategy = packetPicking ?? PacketPickingStrategy;
         }
 
-        public UpdateRouter Step()
+        public (UpdateRouter, Packet) Step()
         {
             var newPacket = PacketCreationStrategy.CreatePacket(this);
             if (newPacket != null) PacketQueue.Add(newPacket);
@@ -62,7 +62,12 @@ namespace Network.Components
                 PacketQueue.Remove(nextPacket);
             }
 
-            return new UpdateRouter(ID, PacketQueue.Count, newPacket != null, nextPacket != null);
+            return (new UpdateRouter(ID, PacketQueue.Count, newPacket != null, nextPacket != null, RoutingStrategy.RoutingTable), newPacket);
+        }
+
+        public void Learn(Packet packet)
+        {
+            RoutingStrategy.Learn(packet);
         }
     }
 

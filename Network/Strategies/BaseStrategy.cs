@@ -6,10 +6,12 @@ namespace Network.Strategies
 {
     public abstract class BaseStrategy
     {
+        public Guid NetworkID { get; }
         public Dictionary<string, Property> Properties { get; }
 
-        public BaseStrategy(List<Tuple<string , PropertyType, List<Tuple<string, object>>>> properties)
+        public BaseStrategy(Guid networkID, List<Tuple<string , PropertyType, List<Tuple<string, object>>>> properties)
         {
+            NetworkID = networkID;
             Properties = new Dictionary<string, Property>();
 
             foreach(var property in properties)
@@ -53,6 +55,20 @@ namespace Network.Strategies
         }
         private void SetInteger(int value)
         {
+            foreach (var setting in Settings)
+            {
+                switch (setting.Item1)
+                {
+                    case INTEGER_MIN:
+                        if (value < (int)setting.Item2) throw new Exception();
+                        break;
+                    case INTEGER_MAX:
+                        if (value > (int)setting.Item2) throw new Exception();
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
             Value = value;
         }
         private void SetDecimal(decimal value)
@@ -76,5 +92,7 @@ namespace Network.Strategies
 
         public const string DECIMAL_MIN = "Min";
         public const string DECIMAL_MAX = "Max";
+        public const string INTEGER_MIN = "Min";
+        public const string INTEGER_MAX = "Max";
     }
 }

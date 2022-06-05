@@ -6,20 +6,11 @@ namespace Network.Strategies.Routing
 {
     public sealed class RandomRoutingStrategy : RoutingStrategy
     {
-        public RandomRoutingStrategy() :
-            base(new List<Tuple<string, Property.PropertyType, List<Tuple<string, object>>>>()
+        public RandomRoutingStrategy(Guid routerID, Guid networkID) :
+            base(routerID, networkID, new List<Tuple<string, Property.PropertyType, List<Tuple<string, object>>>>()
             {
                 
             })
         { }
-        public override Link NextLink(Router router, Packet packet)
-        {
-            return router.Links[RoutingTable.GetLink(packet.Destination)];
-        }
-
-        public override void Learn(object parameters)
-        {
-            
-        }
     }
 }

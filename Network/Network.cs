@@ -13,8 +13,9 @@ namespace Network
         public Dictionary<Guid, Router> Routers { get; private set; }
         public List<Guid> RouterIDList { get; private set; }
         public List<Link> Links { get; private set; }
-        public Dictionary<Guid, Packet> Packets {get; private set;}
+        public Dictionary<Guid, Packet> Packets { get; private set; }
         public Guid ID { get; private set; }
+        public int NumberOfSteps { get; private set; }
 
         public Network()
         {
@@ -23,6 +24,7 @@ namespace Network
             Links = new List<Link>();
             Packets = new Dictionary<Guid, Packet>();
             ID = Guid.NewGuid();
+            NumberOfSteps = 0;
         }
 
         public void AddRouter(Router router)
@@ -45,7 +47,7 @@ namespace Network
 
         public UpdatedState Step()
         {
-            var state = new UpdatedState(ID);
+            var state = new UpdatedState(ID, ++NumberOfSteps);
 
             foreach(var packet in Packets.Values)
             {

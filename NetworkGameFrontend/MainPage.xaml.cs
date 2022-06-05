@@ -26,7 +26,7 @@ namespace NetworkGameFrontend
         {
             this.InitializeComponent();
             Window.Height = 1000;
-            app = new MainApplication(NetworkScrollViewer, NetworkControls);
+            app = new MainApplication(NetworkViewer, NetworkControls);
         }
 
         async void File_ImportNetwork_Click(object sender, RoutedEventArgs e)
@@ -98,6 +98,21 @@ namespace NetworkGameFrontend
         {
             app.StartDiscovery();
             StartDiscoveryButton.IsEnabled = false;
+        }
+
+        void Viewer_StartPause_Click(object sender, RoutedEventArgs e)
+        {
+            app.ViewerStartPause();
+        }
+
+        void Viewer_SlowDown_Click(object sender, RoutedEventArgs e)
+        {
+            app.GameSpeedChange(-1);
+        }
+
+        void Viewer_SpeedUp_Click(object sender, RoutedEventArgs e)
+        {
+            app.GameSpeedChange(1);
         }
 
         void TextBox_AllowOnlyInt(TextBox sender, TextBoxBeforeTextChangingEventArgs args)

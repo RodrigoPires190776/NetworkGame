@@ -13,6 +13,7 @@ namespace NetworkGameFrontend.VisualNetwork
     public class VisualNetwork : UIElementBase
     {
         public readonly Canvas PacketCanvas;
+        private UpdatedState LastState;
         public readonly Dictionary<Guid, VisualRouter> Routers;
         private readonly Dictionary<Guid, List<Coordinates>> LinkPositions;
         private readonly Network.Network Network;
@@ -61,6 +62,8 @@ namespace NetworkGameFrontend.VisualNetwork
         public void Update(UpdatedState state, Guid loadedRouterID)
         {
             PacketCanvas.Children.Clear();
+            LastState = state;
+
             foreach (var link in state.UpdatedLinks.Values)
             {
                 foreach (var packet in link.PackagesInTransit)
@@ -72,15 +75,20 @@ namespace NetworkGameFrontend.VisualNetwork
                     PacketCanvas.Children.Add(vPacket.UIElement);
                 }
             }
+            
+            UpdateRouterData(loadedRouterID);           
+        }
 
-            if(loadedRouterID != Guid.Empty)
+        public void UpdateRouterData(Guid loadedRouterID)
+        {
+            if (loadedRouterID != Guid.Empty)
             {
                 foreach (var router in Network.RouterIDList)
                 {
-                    if (router != loadedRouterID) Routers[router].UpdateProbabilities(state.UpdatedRouters[router].RoutingTable.GetPercentageValues(loadedRouterID));
+                    if (router != loadedRouterID) Routers[router].UpdateProbabilities(LastState.UpdatedRouters[router].RoutingTable.GetPercentageValues(loadedRouterID));
                     else Routers[router].UpdateProbabilities();
                 }
-            }            
+            }
         }
 
         public void Draw()

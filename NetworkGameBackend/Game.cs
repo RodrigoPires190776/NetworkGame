@@ -4,6 +4,7 @@ using Network.Strategies.PacketPicking;
 using Network.Strategies.Routing;
 using Network.UpdateNetwork;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace NetworkGameBackend
@@ -15,8 +16,10 @@ namespace NetworkGameBackend
         public event EventHandler<UpdatedState> GameStep;
         public int LoopsPerSecond { get; private set; }
         private TimeSpan LoopTime { get; set; }
+        private readonly List<int> GameSpeeds = new List<int>() { 1, 2, 5, 10, 25, 50, 75, 100, 150, 250, 500};
+        private int CurrentSpeed;
 
-        public Game(Network.Network network, int numberLoopsPerSecond,
+        public Game(Network.Network network, int speed,
             RoutingStrategies routing, PickingStrategies packetPicking, CreationStrategies packetCreation)
         {
             Network = network;
@@ -24,7 +27,8 @@ namespace NetworkGameBackend
             {
                 Network.SetStrategies(router, GetStrategy(routing, router), GetStrategy(packetCreation), GetStrategy(packetPicking));
             }
-            LoopTime = new TimeSpan(TimeSpan.TicksPerSecond / numberLoopsPerSecond);
+            LoopTime = new TimeSpan(TimeSpan.TicksPerSecond / GameSpeeds[speed]);
+            CurrentSpeed = speed;
         }
 
         public async void Run()
@@ -41,7 +45,7 @@ namespace NetworkGameBackend
                 GameStep.Invoke(this, Network.Step());
 
                 elapsedTime = DateTime.Now - startLoopTime;
-                if(elapsedTime < LoopTime) await Task.Delay(LoopTime - elapsedTime);
+                if(elapsedTime < LoopTime) System.Threading.Thread.Sleep(LoopTime - elapsedTime);
 
                 loopsTimeCounter += DateTime.Now - startLoopTime;
                 loopCounter++;
@@ -54,9 +58,19 @@ namespace NetworkGameBackend
             }
         }
 
-        public void Stop()
+        public void Pause()
         {
+            LoopsPerSecond = 0;
             IsRunning = false;
+        }
+
+        public void ChangeSpeed(int speed)
+        {
+            var newSpeed = CurrentSpeed + speed;
+            if (newSpeed < 0 || newSpeed > GameSpeeds.Count - 1) return;
+
+            LoopTime = new TimeSpan(TimeSpan.TicksPerSecond / GameSpeeds[newSpeed]);
+            CurrentSpeed = newSpeed;
         }
 
         private RoutingStrategy GetStrategy(RoutingStrategies strat, Guid routerID)

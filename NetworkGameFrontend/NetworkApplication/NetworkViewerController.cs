@@ -46,10 +46,20 @@ namespace NetworkGameFrontend.NetworkApplication
 
         public void Update(UpdatedState state, Guid loadedRouterID)
         {
-            _ = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
+            var task = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
                () =>
                {
                    VisualNetwork.Update(state, loadedRouterID);
+               });
+            task.AsTask().Wait();
+        }
+
+        public void UpdateRouterData(Guid loadedRouterID)
+        {
+            _ = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
+               () =>
+               {
+                   VisualNetwork.UpdateRouterData(loadedRouterID);
                });
         }
 

@@ -54,9 +54,6 @@
             </Grid.ColumnDefinitions>
 
             <Grid x:Name="NetworkViewer" Background="Moccasin" Grid.Column="0">
-                <Grid Height="100" Width="200" Background="Black" HorizontalAlignment="Right" VerticalAlignment="Bottom" Visibility="Visible">
-                    
-                </Grid>
                 <ScrollViewer x:Name="NetworkScrollViewer"        
                      VerticalScrollMode="Disabled"
                      HorizontalScrollMode="Disabled"
@@ -69,6 +66,41 @@
                      VerticalAlignment="Center"
                      RelativePanel.Below="AddTextButton">
                 </ScrollViewer>
+                <Grid Height="70" Width="130" Background="Transparent" HorizontalAlignment="Right" VerticalAlignment="Top" Visibility="Visible">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" x:Name="FPSCounterGrid">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="35"/>
+                            <ColumnDefinition Width="75"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="1" Text="FPS:" Foreground="Black" HorizontalAlignment="Right"/>
+                        <TextBlock x:Name="FPSCounter" Grid.Column="2" Text="..." Foreground="Black"/>
+                    </Grid>
+                    <Grid Grid.Row="1" x:Name="GameLoopCounterGrid">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="35"/>
+                            <ColumnDefinition Width="75"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="1" Text="CPS:" Foreground="Black" HorizontalAlignment="Right"/>
+                        <TextBlock x:Name="LoopCounter" Grid.Column="2" Text="..." Foreground="Black"/>
+                    </Grid>
+                    <Grid Grid.Row="2" x:Name="FrameControls" Background="Gray">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Click="Viewer_SlowDown_Click" x:Name="NetworkViewerSlowDown" IsEnabled="False" FontFamily="Segoe MDL2 Assets" Content="&#xEB9E;" Width="40" Background="White" Foreground="Black" HorizontalAlignment="Center"/>
+                        <Button Grid.Column="1" Click="Viewer_StartPause_Click" x:Name="NetworkViewerStartPause" IsEnabled="False" FontFamily="Segoe MDL2 Assets" Content="&#xE102;" Width="40" Background="White" Foreground="Black"/>
+                        <Button Grid.Column="2" Click="Viewer_SpeedUp_Click" x:Name="NetworkViewerSpeedUp" IsEnabled="False" FontFamily="Segoe MDL2 Assets" Content="&#xEB9D;" Width="40" Background="White" Foreground="Black" HorizontalAlignment="Center"/>
+                    </Grid>
+                </Grid>
             </Grid>
 
             <Grid x:Name="NetworkControls" Background="PaleTurquoise" Grid.Column="1">

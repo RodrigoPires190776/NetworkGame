@@ -1,30 +1,39 @@
 ﻿using Network.Strategies;
+using Network.Strategies.PacketCreation;
+using Network.Strategies.PacketPicking;
+using Network.Strategies.Routing;
+using Network.UpdateNetwork.UpdateObjects;
+using System;
 using System.Collections.Generic;
 
 namespace Network.Components
 {
     public class Router
     {
-        public int ID { get; }
-        public List<Link> Links { get; }
+        public Coordinates Coordinates { get; }
+        public Guid ID { get; }
+        public Guid NetworkID { get; }
+        public Dictionary<Guid, Link> Links { get; }
         public List<Packet> PacketQueue { get; }
-        private IRoutingStrategy RoutingStrategy { get; }
-        private IPacketPickingStrategy PacketPickingStrategy { get; }
-        private IPacketCreationStrategy PacketCreationStrategy { get; }
+        public RoutingStrategy RoutingStrategy { get; private set; }
+        public PacketPickingStrategy PacketPickingStrategy { get; private set; }
+        public PacketCreationStrategy PacketCreationStrategy { get; private set; }
 
-        public Router(int id, IRoutingStrategy routingStrategy, IPacketPickingStrategy packetPickingStrategy, IPacketCreationStrategy packetCreationStrategy)
+        public Router(Guid networkID, Coordinates coordinates)
         {
-            ID = id;
-            Links = new();
-            PacketQueue = new();
-            RoutingStrategy = routingStrategy;
-            PacketPickingStrategy = packetPickingStrategy;
-            PacketCreationStrategy = packetCreationStrategy;
+            ID = Guid.NewGuid();
+            Coordinates = coordinates;
+            NetworkID = networkID;
+            Links = new Dictionary<Guid, Link>();
+            PacketQueue = new List<Packet>();
+            RoutingStrategy = new RandomRoutingStrategy(ID, networkID);
+            PacketPickingStrategy = new RandomPacketPickingStrategy(networkID);
+            PacketCreationStrategy = new RandomPacketCreationStrategy(networkID);
         }
 
         public void AddLink(Link link)
         {
-            Links.Add(link);
+            Links.Add(link.ID, link);
         }
 
         public void AddPacket(Packet packet)
@@ -32,16 +41,44 @@ namespace Network.Components
             PacketQueue.Add(packet);
         }
 
-        public void Step()
+        public void SetStrategies(RoutingStrategy routing, PacketCreationStrategy packetCreation, PacketPickingStrategy packetPicking)
+        {
+            RoutingStrategy = routing ?? RoutingStrategy;
+            RoutingStrategy.Initialize(NetworkMaster.GetInstance().GetNetwork(NetworkID), this);
+            PacketCreationStrategy = packetCreation ?? PacketCreationStrategy;
+            PacketPickingStrategy = packetPicking ?? PacketPickingStrategy;
+        }
+
+        public (UpdateRouter, Packet) Step()
         {
             var newPacket = PacketCreationStrategy.CreatePacket(this);
             if (newPacket != null) PacketQueue.Add(newPacket);
-            if(PacketQueue.Count > 0)
+
+            Packet nextPacket = null;
+            if (PacketQueue.Count > 0)
             {
-                var nextPacket = PacketPickingStrategy.NextPacket(this);
+                nextPacket = PacketPickingStrategy.NextPacket(this);
                 RoutingStrategy.NextLink(this, nextPacket).Send(this, nextPacket);
                 PacketQueue.Remove(nextPacket);
             }
+
+            return (new UpdateRouter(ID, PacketQueue.Count, newPacket != null, nextPacket != null, RoutingStrategy.RoutingTable), newPacket);
+        }
+
+        public void Learn(Packet packet)
+        {
+            RoutingStrategy.Learn(packet);
+        }
+    }
+
+    public class Coordinates
+    {
+        public double X { get; }
+        public double Y { get; }
+        public Coordinates(double x, double y)
+        {
+            X = x;
+            Y = y;
         }
     }
 }

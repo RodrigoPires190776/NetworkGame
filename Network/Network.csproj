@@ -1,13 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+	<TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Folder Include="Strategies\PacketCreation\" />
-    <Folder Include="Strategies\PacketPicking\" />
-    <Folder Include="Strategies\Routing\" />
-  </ItemGroup>
 
 </Project>

@@ -21,12 +21,12 @@ namespace Network.Strategies.Routing
             Properties["Learning Weight"].SetValue(1m); 
         }
 
-        public override void Learn(Packet packet)
+        public override decimal Learn(Packet packet)
         {
-            if (!packet.ReachedDestination) return;
+            if (!packet.ReachedDestination) return 0;
             var links = NetworkMaster.GetInstance().GetNetwork(NetworkID).Routers[RouterID].Links;
 
-            RoutingTable.UpdateValue(packet.Destination, packet.RouterSentToLink[RouterID], ((decimal)Properties["Learning Weight"].Value)/packet.NumberOfSteps);
+            return RoutingTable.UpdateValue(packet.Destination, packet.RouterSentToLink[RouterID], ((decimal)Properties["Learning Weight"].Value)/packet.NumberOfSteps);
         }
     }
 }

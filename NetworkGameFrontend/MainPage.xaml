@@ -66,8 +66,9 @@
                      VerticalAlignment="Center"
                      RelativePanel.Below="AddTextButton">
                 </ScrollViewer>
-                <Grid Height="70" Width="130" Background="Transparent" HorizontalAlignment="Right" VerticalAlignment="Top" Visibility="Visible">
+                <Grid Height="90" Width="160" Background="Transparent" HorizontalAlignment="Right" VerticalAlignment="Top" Visibility="Visible">
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="20"/>
                         <RowDefinition Height="20"/>
                         <RowDefinition Height="20"/>
                         <RowDefinition Height="*"/>
@@ -90,7 +91,15 @@
                         <TextBlock Grid.Column="1" Text="CPS:" Foreground="Black" HorizontalAlignment="Right"/>
                         <TextBlock x:Name="LoopCounter" Grid.Column="2" Text="..." Foreground="Black"/>
                     </Grid>
-                    <Grid Grid.Row="2" x:Name="FrameControls" Background="Gray">
+                    <Grid Grid.Row="2" x:Name="TotalGameLoopCounterGrid">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="75"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Total CPS:" Foreground="Black" HorizontalAlignment="Right"/>
+                        <TextBlock x:Name="TotalLoopCounter" Grid.Column="1" Text="..." Foreground="Black"/>
+                    </Grid>
+                    <Grid Grid.Row="3" x:Name="FrameControls" Background="Gray">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="40"/>
@@ -107,6 +116,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="100" MinHeight="50"/>
                     <RowDefinition Height="200" MinHeight="50"/>
+                    <RowDefinition Height="100" MinHeight="50"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
@@ -124,7 +134,7 @@
                             <RowDefinition Height="2*"/>
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Row="0" Text="Average Variance:" FontSize="13" Foreground="Black" VerticalAlignment="Bottom" TextWrapping="WrapWholeWords"/>
-                        <TextBox Text="{x:Bind AverageVariance}" Grid.Row="1" Height="30" Background="White" VerticalAlignment="Top" IsEnabled="False"/>
+                        <TextBox x:Name="AverageVarianceTextBox" Text="0" Grid.Row="1" Height="30" Background="White" VerticalAlignment="Top" IsEnabled="False"/>
                     </Grid>
                 </Grid>
                 <Grid Grid.Row="1">
@@ -211,6 +221,11 @@
                         <TextBlock Grid.Column="0" Text="Average Deliver Time:" Foreground="Black" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                         <TextBox x:Name="PacketAverageDeliverTimeTextBox" Grid.Column="1" Height="30" Width="50" HorizontalAlignment="Left" Foreground="Black" Background="White" IsEnabled="False"/>
                     </Grid>
+                </Grid>
+                <Grid Grid.Row="2">
+                    <Button x:Name="IntroduceAttackerButton" Background="Gray" Grid.Column="0" Click="Controls_IntroduceAttacker_Click">
+                        <TextBlock Text="Introduce Attacker" TextWrapping="WrapWholeWords"/>
+                    </Button>
                 </Grid>
             </Grid>
         </Grid>

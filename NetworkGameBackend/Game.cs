@@ -64,6 +64,11 @@ namespace NetworkGameBackend
             IsRunning = false;
         }
 
+        public void IntroduceAttacker(Guid defensorID, Guid destinationID, Guid attackerID)
+        {
+            Network.IntroduceAttacker(defensorID, destinationID, attackerID);
+        }
+
         public void ChangeSpeed(int speed)
         {
             var newSpeed = CurrentSpeed + speed;

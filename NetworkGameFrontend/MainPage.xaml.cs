@@ -21,7 +21,6 @@ namespace NetworkGameFrontend
     public sealed partial class MainPage : Page
     {
         private readonly MainApplication app;
-        private double AverageVariance { get; }
         public MainPage()
         {
             this.InitializeComponent();
@@ -98,6 +97,11 @@ namespace NetworkGameFrontend
         {
             app.StartDiscovery();
             StartDiscoveryButton.IsEnabled = false;
+        }
+        
+        void Controls_IntroduceAttacker_Click(object sender, RoutedEventArgs e)
+        {
+            app.IntroduceAttacker(3, 1, 4);
         }
 
         void Viewer_StartPause_Click(object sender, RoutedEventArgs e)

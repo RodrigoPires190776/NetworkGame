@@ -27,6 +27,7 @@ namespace NetworkGameFrontend.NetworkApplication
         private Grid NetworkFPSCounter;
         private DispatcherTimer FPSCounterTimer;
         private int NumberOfFrames = 0;
+        private int TotalNumberOfCycles = 0;
         private Guid LoadedNetwork;
         private Guid LoadedRouter;
         private Game NetworkGame;
@@ -43,7 +44,7 @@ namespace NetworkGameFrontend.NetworkApplication
         public void ImportNetwork(Stream fileStream, string networkName)
         {
             var importer = new NetworkFileImporter();
-            var network = importer.Import(fileStream, 10);
+            var network = importer.Import(fileStream, 5);
 
             NetworkMaster.GetInstance().AddNetwork(network, networkName);
             NetworkDataCollector.GetInstance().AddNetwork(network);
@@ -72,6 +73,7 @@ namespace NetworkGameFrontend.NetworkApplication
         public void StartDiscovery()
         {
             //TODO choose strategies
+            TotalNumberOfCycles = 0;
             NetworkGame = new Game(NetworkMaster.GetInstance().GetNetwork(LoadedNetwork), 5, 
                 RoutingStrategies.LinearRewardInaction, PickingStrategies.Random, CreationStrategies.Random);
             NetworkUpdateStateQueue = new NetworkUpdateStateQueue();
@@ -86,6 +88,16 @@ namespace NetworkGameFrontend.NetworkApplication
             EnableNetworkViewerControls();
         }
 
+        public void IntroduceAttacker(int defensor, int destination, int attacker)
+        {
+            var defensorID = NetworkViewerController.VisualNetwork.RouterIDs[defensor];
+            var destinationID = NetworkViewerController.VisualNetwork.RouterIDs[destination];
+            var attackerID = NetworkViewerController.VisualNetwork.RouterIDs[attacker];
+
+            NetworkGame.IntroduceAttacker(defensorID, destinationID, attackerID);
+            NetworkViewerController.VisualNetwork.IntroduceAttacker(defensorID, destinationID, attackerID);
+        }
+
         private void UpdateNetwork(object sender, UpdatedState eventArgs)
         {
             NetworkUpdateStateQueue.AddState(eventArgs);
@@ -96,6 +108,7 @@ namespace NetworkGameFrontend.NetworkApplication
                 {
                     NetworkViewerController.Update(state, LoadedRouter);
                     if (LoadedRouter != Guid.Empty) UpdateRouterData(LoadedRouter);
+                    UpdateNetworkData(state);
                     NumberOfFrames++;
                 }
                 else
@@ -139,11 +152,22 @@ namespace NetworkGameFrontend.NetworkApplication
             NetworkViewerController.UpdateRouterData(routerID);
         }
 
+        private void UpdateNetworkData(UpdatedState state)
+        {
+            _ = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
+               () =>
+               {
+                   ((TextBox)NetworkControlsGrid.FindName("AverageVarianceTextBox")).Text = state.AverageVarience.ToString();
+               });           
+        }
+
         private void UpdateFPSCounter(object sender, object eventArgs)
         {
             ((TextBlock)NetworkFPSCounter.FindName("FPSCounter")).Text = NumberOfFrames.ToString();
             NumberOfFrames = 0;
             ((TextBlock)NetworkFPSCounter.FindName("LoopCounter")).Text = NetworkGame.LoopsPerSecond.ToString();
+            TotalNumberOfCycles += NetworkGame.LoopsPerSecond;
+            ((TextBlock)NetworkFPSCounter.FindName("TotalLoopCounter")).Text = TotalNumberOfCycles.ToString();
         }
 
         private void EnableNetworkViewerControls()

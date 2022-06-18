@@ -16,6 +16,9 @@ namespace Network
         public Dictionary<Guid, Packet> Packets { get; private set; }
         public Guid ID { get; private set; }
         public int NumberOfSteps { get; private set; }
+        private decimal AverageVariance { get; set; }
+        private decimal CurrentVariance { get; set; }
+        private int StepsVariance { get; set; }
 
         public Network()
         {
@@ -25,6 +28,9 @@ namespace Network
             Packets = new Dictionary<Guid, Packet>();
             ID = Guid.NewGuid();
             NumberOfSteps = 0;
+            AverageVariance = 0;
+            CurrentVariance = 0;
+            StepsVariance = 0;
         }
 
         public void AddRouter(Router router)
@@ -45,9 +51,16 @@ namespace Network
             Routers[routerID].SetStrategies(routing, packetCreation, packetPicking);
         }
 
+        public void IntroduceAttacker(Guid defensorID, Guid destinationID, Guid attackerID)
+        {
+            Routers[defensorID].SetAgentDefensor(destinationID);
+            Routers[attackerID].SetAgentAttacker(defensorID);
+        }
+
         public UpdatedState Step()
         {
             var state = new UpdatedState(ID, ++NumberOfSteps);
+            var variancePerRouter = new Dictionary<Guid, decimal>();
 
             foreach(var packet in Packets.Values)
             {
@@ -68,7 +81,7 @@ namespace Network
 
                     foreach(var router in packet.RouterSentToLink.Keys)
                     {
-                        Routers[router].Learn(packet);
+                        variancePerRouter[router] = Routers[router].Learn(packet);                       
                     }
                 }
 
@@ -85,19 +98,52 @@ namespace Network
                     {
                         foreach (var router in packet.RouterSentToLink.Keys)
                         {
-                            Routers[router].Learn(packet);
+                            variancePerRouter[router] = Routers[router].Learn(packet);
                         }
                     }
                 }                 
             }
 
+            
             foreach(Router router in Routers.Values)
             {
-                var updateRouter = router.Step();
+                var updateRouter = router.Step(); //UpdateRouter, NewPacket, DroppedPacket
                 if (updateRouter.Item2 != null) Packets.Add(updateRouter.Item2.ID, updateRouter.Item2);
                 state.UpdatedRouters.Add(router.ID, updateRouter.Item1);
+                if (updateRouter.Item3 != null)
+                {
+                    state.UpdatedPackets[updateRouter.Item3.ID] = new UpdatePacket(updateRouter.Item3.ID,
+                    updateRouter.Item3.NumberOfSteps, false, true, updateRouter.Item3.Source, updateRouter.Item3.Destination);
+                    foreach (var routerID in updateRouter.Item3.RouterSentToLink.Keys)
+                    {
+                        variancePerRouter[routerID] = Routers[routerID].Learn(updateRouter.Item3);
+                    }
+                }
+
             }
 
+            decimal averageVarience = 0m;
+            decimal variance;
+            foreach (var router in RouterIDList)
+            {
+                if (!variancePerRouter.TryGetValue(router, out variance)) 
+                {
+                    variance = 0m;
+                }
+                averageVarience += variance;
+            }
+            averageVarience = averageVarience / Routers.Count;
+            CurrentVariance += averageVarience;
+            StepsVariance++;
+
+            if(StepsVariance >= 100)
+            {
+                AverageVariance = CurrentVariance;
+                CurrentVariance = 0;
+                StepsVariance = 0;
+            }
+            
+            state.AverageVarience = AverageVariance;
             return state;
         }
     }

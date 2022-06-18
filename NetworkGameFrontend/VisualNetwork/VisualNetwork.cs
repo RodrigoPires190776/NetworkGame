@@ -16,6 +16,7 @@ namespace NetworkGameFrontend.VisualNetwork
         private UpdatedState LastState;
         public readonly Dictionary<Guid, VisualRouter> Routers;
         private readonly Dictionary<Guid, List<Coordinates>> LinkPositions;
+        public readonly Dictionary<int, Guid> RouterIDs;
         private readonly Network.Network Network;
         public const int WIDTH = 2000; 
         public const int HEIGHT = 2000;
@@ -28,12 +29,14 @@ namespace NetworkGameFrontend.VisualNetwork
             PacketCanvas.Width = WIDTH;
 
             Routers = new Dictionary<Guid, VisualRouter>();
+            RouterIDs = new Dictionary<int, Guid>();
 
             int id = 0;
             foreach(var router in network.Routers.Keys)
             {
                 List<Guid> links = network.Routers[router].Links.Keys.ToList();
                 Routers.Add(router, new VisualRouter(id, links, router));
+                RouterIDs.Add(id, router);
                 id++;
             }
 
@@ -85,10 +88,17 @@ namespace NetworkGameFrontend.VisualNetwork
             {
                 foreach (var router in Network.RouterIDList)
                 {
-                    if (router != loadedRouterID) Routers[router].UpdateProbabilities(LastState.UpdatedRouters[router].RoutingTable.GetPercentageValues(loadedRouterID));
+                    if (router != loadedRouterID && LastState != null) Routers[router].UpdateProbabilities(LastState.UpdatedRouters[router].RoutingTable.GetPercentageValues(loadedRouterID));
                     else Routers[router].UpdateProbabilities();
                 }
             }
+        }
+
+        public void IntroduceAttacker(Guid defensorID, Guid destinationID, Guid attackerID)
+        {
+            Routers[defensorID].SetState(RouterState.Defensor);
+            Routers[destinationID].SetState(RouterState.Destination);
+            Routers[attackerID].SetState(RouterState.Attacker);
         }
 
         public void Draw()

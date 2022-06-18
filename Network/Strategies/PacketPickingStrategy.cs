@@ -10,6 +10,6 @@ namespace Network.Strategies
         public PacketPickingStrategy(Guid networkID, List<Tuple<string, PropertyType, List<Tuple<string, object>>>> properties) : 
             base(networkID, properties)
         { }
-        public abstract Packet NextPacket(Router router);
+        public abstract (Packet, bool) NextPacket(Router router);
     }
 }

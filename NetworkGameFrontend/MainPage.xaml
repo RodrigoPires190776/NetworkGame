@@ -117,6 +117,7 @@
                     <RowDefinition Height="100" MinHeight="50"/>
                     <RowDefinition Height="200" MinHeight="50"/>
                     <RowDefinition Height="100" MinHeight="50"/>
+                    <RowDefinition Height="100" MinHeight="50"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
@@ -225,6 +226,11 @@
                 <Grid Grid.Row="2">
                     <Button x:Name="IntroduceAttackerButton" Background="Gray" Grid.Column="0" Click="Controls_IntroduceAttacker_Click">
                         <TextBlock Text="Introduce Attacker" TextWrapping="WrapWholeWords"/>
+                    </Button>
+                </Grid>
+                <Grid Grid.Row="3">
+                    <Button x:Name="PlotViewerButton" Background="Gray" Grid.Column="0" Click="Controls_PlotViewer_Click">
+                        <TextBlock Text="Plot Viewer" TextWrapping="WrapWholeWords"/>
                     </Button>
                 </Grid>
             </Grid>

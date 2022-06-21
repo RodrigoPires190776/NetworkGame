@@ -12,11 +12,15 @@ namespace NetworkGameDataCollector
     {
         public Dictionary<Guid, RouterData> RouterData { get; }
         private Network.Network Network;
+        public Dictionary<int, UpdatedState> States { get; }
+        private int NumberOfSteps;
 
         public NetworkData(Network.Network network)
         {
             Network = network;
             RouterData = new Dictionary<Guid, RouterData>();
+            States = new Dictionary<int, UpdatedState>();
+            NumberOfSteps = 0;
 
             foreach(var router in network.RouterIDList)
             {
@@ -41,6 +45,8 @@ namespace NetworkGameDataCollector
                 RouterData[packet.Source].Update(packet);
                 RouterData[packet.Destination].Update(packet);
             }
+            States.Add(state.NumberOfSteps, state);
+            NumberOfSteps = state.NumberOfSteps > NumberOfSteps ? state.NumberOfSteps : NumberOfSteps;
         }
     }
 }

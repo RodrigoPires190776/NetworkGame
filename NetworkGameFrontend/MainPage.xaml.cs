@@ -1,12 +1,17 @@
 ﻿using NetworkGameFrontend.ApplicationWindows;
 using NetworkGameFrontend.NetworkApplication;
+using NetworkGameFrontend.VisualData;
 using System;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
+using Windows.ApplicationModel.Core;
 using Windows.Foundation;
+using Windows.UI.Core;
 using Windows.UI.Input.Inking;
 using Windows.UI.Popups;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -104,6 +109,10 @@ namespace NetworkGameFrontend
             app.IntroduceAttacker(3, 1, 4);
         }
 
+        async void Controls_PlotViewer_Click(object sender, RoutedEventArgs e)
+        {
+            await app.OpenPageAsWindowAsync(typeof(PlotViewer));
+        }
         void Viewer_StartPause_Click(object sender, RoutedEventArgs e)
         {
             app.ViewerStartPause();
@@ -122,6 +131,6 @@ namespace NetworkGameFrontend
         void TextBox_AllowOnlyInt(TextBox sender, TextBoxBeforeTextChangingEventArgs args)
         {
             args.Cancel = args.NewText.Any(c => !char.IsDigit(c));
-        }
+        }       
     }
 }

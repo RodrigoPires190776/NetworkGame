@@ -132,6 +132,9 @@
     <Compile Include="NetworkApplication\NetworkUpdateStateQueue.cs" />
     <Compile Include="NetworkApplication\NetworkViewerController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VisualData\PlotViewer.xaml.cs">
+      <DependentUpon>PlotViewer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="VisualNetwork\UIElementBase.cs" />
     <Compile Include="VisualNetwork\VisualNetwork.cs" />
     <Compile Include="VisualNetwork\VisualPacket.cs" />
@@ -169,6 +172,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="VisualData\PlotViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
@@ -193,6 +200,7 @@
       <Name>Network</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

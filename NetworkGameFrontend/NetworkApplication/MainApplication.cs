@@ -5,6 +5,7 @@ using Network.Strategies.Routing;
 using Network.UpdateNetwork;
 using NetworkGameBackend;
 using NetworkGameDataCollector;
+using NetworkGameFrontend.VisualData;
 using NetworkGameFrontend.VisualNetwork;
 using NetworkGenerator.NetworkImporter.NetworkFile;
 using System;
@@ -12,7 +13,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
+using Windows.ApplicationModel.Core;
 using Windows.Foundation;
+using Windows.UI.Core;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -205,6 +210,28 @@ namespace NetworkGameFrontend.NetworkApplication
         public void GameSpeedChange(int speed)
         {
             NetworkGame.ChangeSpeed(speed);
+        }
+
+        /// <summary>
+        /// Opens a page given the page type as a new window.
+        /// </summary>
+        /// <param name="t"></param>
+        public async Task<bool> OpenPageAsWindowAsync(Type t)
+        {
+            var view = CoreApplication.CreateNewView();
+            int id = 0;
+
+            await view.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                var frame = new Frame();
+                frame.Navigate(t);
+                //((PlotViewer)frame.Content).Initialize("Teste");
+                Window.Current.Content = frame;
+                Window.Current.Activate();
+                id = ApplicationView.GetForCurrentView().Id;
+            });
+
+            return await ApplicationViewSwitcher.TryShowAsStandaloneAsync(id);
         }
     }
 }

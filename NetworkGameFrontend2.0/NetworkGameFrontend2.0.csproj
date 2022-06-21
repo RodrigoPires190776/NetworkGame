@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>NetworkGameFrontend2._0</RootNamespace>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NetworkGameBackend\NetworkGameBackend.csproj" />
+    <ProjectReference Include="..\NetworkGameDataCollector\NetworkGameDataCollector.csproj" />
+    <ProjectReference Include="..\NetworkGenerator\NetworkGenerator.csproj" />
+    <ProjectReference Include="..\Network\Network.csproj" />
+  </ItemGroup>
+
+</Project>

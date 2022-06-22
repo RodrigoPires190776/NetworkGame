@@ -1,10 +1,11 @@
 ﻿using Network.Components;
 using Network.UpdateNetwork.UpdateObjects;
+using NetworkUtils;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using static Network.Strategies.Property;
+using static NetworkUtils.Property;
 
 namespace Network.Strategies
 {

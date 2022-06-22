@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using NetworkGameFrontend.ApplicationWindows;
 using NetworkGameFrontend.NetworkApplication;
+using NetworkGameFrontend.VisualData;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -66,7 +67,7 @@ namespace NetworkGameFrontend
 
         async void Network_LoadNetwork_Click(object sender, RoutedEventArgs e)
         {
-            var networkSelectDialog = new UserListSelectOne(app.GetAllNetworksName());
+            var networkSelectDialog = new UserListSelectOne(app.GetAllNetworksName(), this);
             _ = networkSelectDialog.ShowDialog();
 
             if (networkSelectDialog.Ok)
@@ -99,7 +100,9 @@ namespace NetworkGameFrontend
 
         async void Controls_PlotViewer_Click(object sender, RoutedEventArgs e)
         {
-            //await app.OpenPageAsWindowAsync(typeof(PlotViewer));
+            var plot = app.GetPlot(PlotType.RouterCreatedPackets);
+            var plotViewer = new PlotViewer(this, plot);
+            plotViewer.Show();
         }
         void Viewer_StartPause_Click(object sender, RoutedEventArgs e)
         {

@@ -5,6 +5,8 @@ using Network.Strategies.Routing;
 using Network.UpdateNetwork;
 using NetworkGameBackend;
 using NetworkGameDataCollector;
+using NetworkGameFrontend.VisualData;
+using NetworkGameFrontend.VisualData.Options.Base;
 using NetworkGameFrontend.VisualNetwork;
 using NetworkGenerator.NetworkImporter.NetworkFile;
 using System;
@@ -213,26 +215,11 @@ namespace NetworkGameFrontend.NetworkApplication
             NetworkGame.ChangeSpeed(speed);
         }
 
-        /// <summary>
-        /// Opens a page given the page type as a new window.
-        /// </summary>
-        /// <param name="t"></param>
-        /*public async Task<bool> OpenPageAsWindowAsync(Type t)
+        public BasePlot GetPlot(PlotType type)
         {
-            var view = CoreApplication.CreateNewView();
-            int id = 0;
-
-            await view.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            {
-                var frame = new Frame();
-                frame.Navigate(t);
-                //((PlotViewer)frame.Content).Initialize("Teste");
-                Window.Current.Content = frame;
-                Window.Current.Activate();
-                id = ApplicationView.GetForCurrentView().Id;
-            });
-
-            return await ApplicationViewSwitcher.TryShowAsStandaloneAsync(id);
-        }*/
+            var plot = PlotFactory.GetPlot(type, LoadedNetwork, NetworkGame);
+            plot.Properties["Router"].SetValue(0);
+            return plot.Initialize(NetworkViewerController.VisualNetwork);
+        }
     }
 }

@@ -33,8 +33,9 @@ namespace NetworkGameFrontend.ApplicationWindows
         public string Item { get { return SelectedItem; } }
         private readonly List<string> Itens;
         private string SelectedItem;
-        public UserListSelectOne(List<string> itens)
+        public UserListSelectOne(List<string> itens, Window owner)
         {
+            Owner = owner;
             InitializeComponent();
             Itens = new List<string>() { DefaultValue };
             Itens.AddRange(itens);

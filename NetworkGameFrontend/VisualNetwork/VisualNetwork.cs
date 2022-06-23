@@ -1,12 +1,10 @@
 ﻿using Network.UpdateNetwork;
-using Network.UpdateNetwork.UpdateObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Windows.UI;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Shapes;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace NetworkGameFrontend.VisualNetwork
 {
@@ -122,10 +120,10 @@ namespace NetworkGameFrontend.VisualNetwork
         {
             Line line = new Line()
             {
-                X1 = Network.Routers[link.Item1].Coordinates.X * UIElement.ActualWidth + VisualRouter.RADIUS,
-                X2 = Network.Routers[link.Item2].Coordinates.X * UIElement.ActualWidth + VisualRouter.RADIUS,
-                Y1 = Network.Routers[link.Item1].Coordinates.Y * UIElement.ActualHeight + VisualRouter.RADIUS,
-                Y2 = Network.Routers[link.Item2].Coordinates.Y * UIElement.ActualHeight + VisualRouter.RADIUS,
+                X1 = Network.Routers[link.Item1].Coordinates.X * UIElement.Width + VisualRouter.RADIUS,
+                X2 = Network.Routers[link.Item2].Coordinates.X * UIElement.Width + VisualRouter.RADIUS,
+                Y1 = Network.Routers[link.Item1].Coordinates.Y * UIElement.Height + VisualRouter.RADIUS,
+                Y2 = Network.Routers[link.Item2].Coordinates.Y * UIElement.Height + VisualRouter.RADIUS,
                 Stroke = new SolidColorBrush(Colors.Black),
                 StrokeThickness = 2
             };

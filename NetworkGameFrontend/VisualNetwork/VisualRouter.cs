@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Windows.UI;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Shapes;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace NetworkGameFrontend.VisualNetwork
 {
@@ -71,10 +70,10 @@ namespace NetworkGameFrontend.VisualNetwork
                 UIElement.Children.Add(border);
             }
 
-            UIElement.PointerPressed += Clicked;
+            UIElement.PreviewMouseLeftButtonDown += Clicked;
         }
 
-        private void Clicked(object sender, PointerRoutedEventArgs e)
+        private void Clicked(object sender, MouseButtonEventArgs e)
         {
             ClickedRouter.Invoke(this, new ClickedRouterEventArgs(RouterID));
         }

@@ -1,4 +1,4 @@
-﻿using Windows.UI.Xaml.Controls;
+﻿using System.Windows.Controls;
 
 namespace NetworkGameFrontend.VisualNetwork
 {

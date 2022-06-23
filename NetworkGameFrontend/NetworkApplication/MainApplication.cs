@@ -6,6 +6,7 @@ using Network.UpdateNetwork;
 using NetworkGameBackend;
 using NetworkGameDataCollector;
 using NetworkGameFrontend.VisualData;
+using NetworkGameFrontend.VisualData.Options.Base;
 using NetworkGameFrontend.VisualNetwork;
 using NetworkGenerator.NetworkImporter.NetworkFile;
 using System;
@@ -14,14 +15,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.ApplicationModel.Core;
-using Windows.Foundation;
-using Windows.UI.Core;
-using Windows.UI.ViewManagement;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace NetworkGameFrontend.NetworkApplication
 {
@@ -41,7 +38,13 @@ namespace NetworkGameFrontend.NetworkApplication
 
         public MainApplication(Grid networkViewer, Grid networkControlsGrid)
         {
-            NetworkViewerController = new NetworkViewerController((ScrollViewer)networkViewer.FindName("NetworkScrollViewer"));
+            NetworkViewerController = new NetworkViewerController(
+                (ScrollViewer)networkViewer.FindName("NetworkScrollViewer"),
+                (Slider)networkViewer.FindName("NetworkScrollViewerSlider"),
+                (Grid)networkViewer.FindName("NetworkScrollViewerGrid"),
+                (ScaleTransform)networkViewer.FindName("NetworkScrollViewerGridScaleTransform"),
+                (ContentPresenter)networkViewer.FindName("NetworkScrollViewerContent")
+                );
             NetworkFPSCounter = (Grid)networkViewer.FindName("FPSCounterGrid");
             NetworkControlsGrid = networkControlsGrid;
             LoadedRouter = Guid.Empty;
@@ -133,7 +136,7 @@ namespace NetworkGameFrontend.NetworkApplication
 
         private void UpdateRouterData(Guid routerID)
         {
-            _ = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
+            Application.Current.Dispatcher.Invoke(
                 () =>
                 {
                     var routerData = NetworkDataCollector.GetInstance().GetRouterData(LoadedNetwork, routerID);
@@ -159,11 +162,11 @@ namespace NetworkGameFrontend.NetworkApplication
 
         private void UpdateNetworkData(UpdatedState state)
         {
-            _ = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
+            Application.Current.Dispatcher.Invoke(
                () =>
                {
                    ((TextBox)NetworkControlsGrid.FindName("AverageVarianceTextBox")).Text = state.AverageVarience.ToString();
-               });           
+               });       
         }
 
         private void UpdateFPSCounter(object sender, object eventArgs)
@@ -188,7 +191,7 @@ namespace NetworkGameFrontend.NetworkApplication
             if (NetworkGame.IsRunning)
             {
                 NetworkGame.Pause();
-                _ = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
+                Application.Current.Dispatcher.Invoke(
                 () =>
                 {
                     NetworkGame.Pause();
@@ -197,7 +200,7 @@ namespace NetworkGameFrontend.NetworkApplication
             }
             else
             {
-                _ = Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
+                Application.Current.Dispatcher.Invoke(
                 () =>
                 {
                     Thread t = new Thread(NetworkGame.Run);
@@ -212,26 +215,11 @@ namespace NetworkGameFrontend.NetworkApplication
             NetworkGame.ChangeSpeed(speed);
         }
 
-        /// <summary>
-        /// Opens a page given the page type as a new window.
-        /// </summary>
-        /// <param name="t"></param>
-        public async Task<bool> OpenPageAsWindowAsync(Type t)
+        public BasePlot GetPlot(PlotType type)
         {
-            var view = CoreApplication.CreateNewView();
-            int id = 0;
-
-            await view.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            {
-                var frame = new Frame();
-                frame.Navigate(t);
-                //((PlotViewer)frame.Content).Initialize("Teste");
-                Window.Current.Content = frame;
-                Window.Current.Activate();
-                id = ApplicationView.GetForCurrentView().Id;
-            });
-
-            return await ApplicationViewSwitcher.TryShowAsStandaloneAsync(id);
+            var plot = PlotFactory.GetPlot(type, LoadedNetwork, NetworkGame);
+            plot.Properties["Router"].SetValue(0);
+            return plot.Initialize(NetworkViewerController.VisualNetwork);
         }
     }
 }

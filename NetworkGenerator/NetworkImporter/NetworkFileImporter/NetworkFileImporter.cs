@@ -2,6 +2,7 @@
 using Network.Strategies;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 
 namespace NetworkGenerator.NetworkImporter.NetworkFile
@@ -30,7 +31,9 @@ namespace NetworkGenerator.NetworkImporter.NetworkFile
                 else if (state == ImportState.COORDINATES)
                 {
                     var coordinates = line.Split(',');
-                    var router = new Router(network.ID, new Coordinates(double.Parse(coordinates[0]), double.Parse(coordinates[1])));
+                    var router = new Router(network.ID, new Coordinates(
+                        double.Parse(coordinates[0], CultureInfo.InvariantCulture), 
+                        double.Parse(coordinates[1], CultureInfo.InvariantCulture)));
                     network.AddRouter(router);
 
                     currentRouter++;

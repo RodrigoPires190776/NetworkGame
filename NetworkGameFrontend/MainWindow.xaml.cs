@@ -32,11 +32,12 @@ namespace NetworkGameFrontend
             app = new MainApplication(NetworkViewer, NetworkControls);
         }
 
-        async void File_ImportNetwork_Click(object sender, RoutedEventArgs e)
+        void File_ImportNetwork_Click(object sender, RoutedEventArgs e)
         {
-            var picker = new OpenFileDialog();
-            picker.Filter = "Network files (*.NETWORK)|*.NETWORK";
-
+            var picker = new OpenFileDialog
+            {
+                Filter = "Network files (*.NETWORK)|*.NETWORK"
+            };
 
             if (picker.ShowDialog() == true)
             {
@@ -65,7 +66,7 @@ namespace NetworkGameFrontend
             }
         }
 
-        async void Network_LoadNetwork_Click(object sender, RoutedEventArgs e)
+        void Network_LoadNetwork_Click(object sender, RoutedEventArgs e)
         {
             var networkSelectDialog = new UserListSelectOne(app.GetAllNetworksName(), this);
             _ = networkSelectDialog.ShowDialog();
@@ -75,6 +76,7 @@ namespace NetworkGameFrontend
                 try
                 {
                     app.LoadNetwork(networkSelectDialog.Item);
+                    StartDiscoveryButton.IsEnabled = true;
                 }
                 catch (Exception ex)
                 {
@@ -91,6 +93,8 @@ namespace NetworkGameFrontend
         {
             app.StartDiscovery();
             StartDiscoveryButton.IsEnabled = false;
+            IntroduceAttackerButton.IsEnabled = true;
+            PlotViewerButton.IsEnabled = true;
         }
 
         void Controls_IntroduceAttacker_Click(object sender, RoutedEventArgs e)
@@ -98,9 +102,15 @@ namespace NetworkGameFrontend
             app.IntroduceAttacker(3, 1, 4);
         }
 
-        async void Controls_PlotViewer_Click(object sender, RoutedEventArgs e)
+        void Controls_PlotViewer_Click(object sender, RoutedEventArgs e)
         {
-            var plot = app.GetPlot(PlotType.RouterCreatedPackets);
+            var plot = app.GetPlot(PlotType.RouterCreatedPacketsLineChart);
+
+            var propertiesEditor = new UserPropertyConfiguration(PlotType.RouterCreatedPacketsLineChart.ToString() + " Properties", plot.Properties);
+            propertiesEditor.ShowDialog();
+
+            plot = app.InitializePlot(plot, propertiesEditor.Properties);
+
             var plotViewer = new PlotViewer(this, plot);
             plotViewer.Show();
         }

@@ -64,5 +64,21 @@ namespace NetworkGameDataCollector.NetworkDataComponents
                 PacketsInTransit--;
             }
         }
+
+        public RouterData Copy()
+        {
+            return new RouterData(RouterID) 
+            {
+                PacketsCreated = PacketsCreated,
+                PacketsSent = PacketsSent,
+                PacketsDelivered = PacketsDelivered,
+                PacketsDropped = PacketsDropped,
+                PacketsInTransit = PacketsInTransit,
+                PacketsInQueue = PacketsInQueue,
+                PacketsReceived = PacketsReceived,
+                //PacketDeliverTimes = PacketDeliverTimes,
+                PacketAverageDeliverTime = PacketAverageDeliverTime
+            };
+        }
     }
 }

@@ -119,7 +119,7 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Button x:Name="StartDiscoveryButton" Background="Gray" Grid.Column="0" Click="Controls_StartDiscovery_Click" Height="40" Margin="10">
+                    <Button x:Name="StartDiscoveryButton" Background="Gray" Grid.Column="0" Click="Controls_StartDiscovery_Click" IsEnabled="False" Height="40" Margin="10">
                         <TextBlock Text="Start Discovery" TextWrapping="Wrap"/>
                     </Button>
                     <Grid Grid.Column="1">
@@ -217,12 +217,12 @@
                     </Grid>
                 </Grid>
                 <Grid Grid.Row="2">
-                    <Button x:Name="IntroduceAttackerButton" Background="Gray" Grid.Column="0" Click="Controls_IntroduceAttacker_Click" Height="40" Width="150">
+                    <Button x:Name="IntroduceAttackerButton" Background="Gray" Grid.Column="0" Click="Controls_IntroduceAttacker_Click" IsEnabled="False" Height="40" Width="150">
                         <TextBlock Text="Introduce Attacker" TextWrapping="Wrap"/>
                     </Button>
                 </Grid>
                 <Grid Grid.Row="3">
-                    <Button x:Name="PlotViewerButton" Background="Gray" Grid.Column="0" Click="Controls_PlotViewer_Click" Height="40" Width="150">
+                    <Button x:Name="PlotViewerButton" Background="Gray" Grid.Column="0" Click="Controls_PlotViewer_Click" IsEnabled="False" Height="40" Width="150">
                         <TextBlock Text="Plot Viewer" TextWrapping="Wrap"/>
                     </Button>
                 </Grid>

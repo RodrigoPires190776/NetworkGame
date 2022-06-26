@@ -1,5 +1,4 @@
-﻿using Network.UpdateNetwork;
-using NetworkGameBackend;
+﻿using NetworkGameBackend;
 using ScottPlot.Plottable;
 using System;
 using System.Collections.Generic;
@@ -15,7 +14,8 @@ namespace NetworkGameFrontend.VisualData.Options.Base
             base(800, 600, title, game)
         {
             Labels = labels;
-            Values = new List<double>() { 0, 0, 0 };
+            Values = new List<double>();
+            for (int i = 0; i < labels.Count; i++) Values.Add(0);
             PiePlot = Plot.AddPie(Values.ToArray());
             PiePlot.SliceLabels = Labels.ToArray();
         }

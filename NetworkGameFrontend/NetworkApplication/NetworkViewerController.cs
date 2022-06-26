@@ -11,11 +11,11 @@ namespace NetworkGameFrontend.NetworkApplication
     public class NetworkViewerController
     {
         public VisualNetwork.VisualNetwork VisualNetwork { get; private set; }
-        private ScrollViewer NetworkScrollViewer;
-        private Slider Slider;
-        private Grid NetworkScrollViewerGrid;
-        private ScaleTransform NetworkScrollViewerScaleTransform;
-        private ContentPresenter NetworkScrollViewerContent;
+        private readonly ScrollViewer NetworkScrollViewer;
+        private readonly Slider Slider;
+        private readonly Grid NetworkScrollViewerGrid;
+        private readonly ScaleTransform NetworkScrollViewerScaleTransform;
+        private readonly ContentPresenter NetworkScrollViewerContent;
         private Point? lastCenterPositionOnTarget;
         private Point? lastMousePositionOnTarget;
         private Point? lastDragPoint;
@@ -43,9 +43,11 @@ namespace NetworkGameFrontend.NetworkApplication
             Slider.ValueChanged += OnSliderValueChanged;
 
             Application.Current.Dispatcher.Invoke(() => {
-                var canvas = new Canvas();
-                canvas.Height = 2000;
-                canvas.Width = 2000;
+                var canvas = new Canvas
+                {
+                    Height = 2000,
+                    Width = 2000
+                };
                 canvas.Children.Add(VisualNetwork.UIElement);
                 canvas.Children.Add(VisualNetwork.PacketCanvas);
                 NetworkScrollViewerContent.Content = canvas;

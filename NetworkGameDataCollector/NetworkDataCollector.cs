@@ -1,4 +1,5 @@
-﻿using Network.UpdateNetwork;
+﻿using Network;
+using Network.UpdateNetwork;
 using NetworkGameBackend;
 using NetworkGameDataCollector.NetworkDataComponents;
 using System;
@@ -43,7 +44,22 @@ namespace NetworkGameDataCollector
 
         public RouterData GetRouterData(Guid networkID, Guid routerID)
         {
-            return Networks[networkID].RouterData[routerID];
+            return Networks[networkID].RouterData[routerID].Copy();
+        }
+
+        public List<RouterData> GetPreviousRouterData(Guid networkID, Guid routerID)
+        {
+            var list = new List<RouterData>();
+
+            var tempNetwork = new NetworkData(NetworkMaster.GetInstance().GetNetwork(networkID));
+
+            foreach(var state in Networks[networkID].States.Values)
+            {
+                tempNetwork.Update(state);
+                list.Add(tempNetwork.RouterData[routerID].Copy());
+            }
+
+            return list;
         }
     }
 }

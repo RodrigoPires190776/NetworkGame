@@ -31,7 +31,7 @@ namespace NetworkGameBackend
             CurrentSpeed = speed;
         }
 
-        public async void Run()
+        public void Run()
         {
             int loopCounter = 0;
             TimeSpan loopsTimeCounter = new TimeSpan(0);
@@ -56,6 +56,7 @@ namespace NetworkGameBackend
                     loopsTimeCounter = new TimeSpan(0);
                 }
             }
+            LoopsPerSecond = 0;
         }
 
         public void Pause()

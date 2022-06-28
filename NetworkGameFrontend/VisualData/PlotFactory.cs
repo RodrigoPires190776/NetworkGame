@@ -12,11 +12,12 @@ namespace NetworkGameFrontend.VisualData
         {
             return type switch
             {
-                PlotType.RouterCreatedPackets => new RouterCreatedPacketsPieChart(network, game),
+                PlotType.RouterCreatedPacketsPieChart => new RouterCreatedPacketsPieChart(network, game),
+                PlotType.RouterCreatedPacketsLineChart => new RouterCreatedPacketsLineChart(network, game),
                 _ => throw new NotImplementedException()
             };
         }
     }
 
-    public enum PlotType { RouterCreatedPackets }
+    public enum PlotType { RouterCreatedPacketsPieChart, RouterCreatedPacketsLineChart }
 }

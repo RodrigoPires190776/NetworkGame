@@ -5,7 +5,6 @@ using NetworkGameDataCollector;
 using NetworkGameDataCollector.NetworkDataComponents;
 using NetworkGameFrontend.VisualData.Options.Base;
 using NetworkUtils;
-using ScottPlot;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,17 +12,17 @@ using System.Windows;
 
 namespace NetworkGameFrontend.VisualData.Options.Graphs
 {
-    public class RouterCreatedPacketsPieChart : PieChart
+    public class RouterCreatedPacketsLineChart : MultipleLineChart
     {
         private Guid Network;
         private Guid Router;
         private readonly List<RouterData> RouterDataOnHold;
 
-        public RouterCreatedPacketsPieChart(Guid network, Game game) :
-            base("Router Created Packets Pie Chart", new List<string>() { "Delivered", "InTransit", "Dropped" }, game)
+        public RouterCreatedPacketsLineChart(Guid network, Game game) :
+            base("Router Created Packets Line Chart", new List<string>() { "InTransit", "Dropped", "Delivered" }, game)
         {
             Network = network;
-            Properties.Add(Property.Router, new Property(Property.PropertyType.Integer, 
+            Properties.Add(Property.Router, new Property(Property.PropertyType.Integer,
                     new List<Tuple<string, object>>()
                     {
                         new Tuple<string, object>(Property.INTEGER_MIN, 0),
@@ -37,13 +36,8 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
         {
             Router = visualNetwork.RouterIDs[(int)Properties[Property.Router].Value];
             base.Initialize(visualNetwork, properties);
-            
-            SetRouterValues(NetworkDataCollector.GetInstance().GetRouterData(Network, Router));
-            
-            PiePlot.ShowPercentages = true;
-            PiePlot.ShowValues = true;
-            PiePlot.ShowLabels = true;
-            Plot.Legend();
+
+            Plot.Legend(location: ScottPlot.Alignment.UpperLeft);
 
             WpfPlot.Reset(Plot);
             WpfPlot.Refresh();
@@ -58,7 +52,7 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
 
         protected override void Update()
         {
-            foreach (var routerData in RouterDataOnHold)
+            foreach(var routerData in RouterDataOnHold)
             {
                 SetRouterValues(routerData);
             }
@@ -66,13 +60,13 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
             Application.Current.Dispatcher.Invoke(
                 () =>
                 {
-                    WpfPlot.Refresh();
+                    WpfPlot.Render();
                 });
         }
 
         private void SetRouterValues(RouterData routerData)
         {
-            SetValues(new List<double> { routerData.PacketsDelivered, routerData.PacketsInTransit, routerData.PacketsDropped });
+            AddValues(new List<double> { routerData.PacketsInTransit, routerData.PacketsDropped, routerData.PacketsDelivered });
         }
 
         protected override void LoadPreviousData()

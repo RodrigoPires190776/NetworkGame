@@ -9,6 +9,7 @@ using NetworkGameFrontend.VisualData;
 using NetworkGameFrontend.VisualData.Options.Base;
 using NetworkGameFrontend.VisualNetwork;
 using NetworkGenerator.NetworkImporter.NetworkFile;
+using NetworkUtils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,9 +25,9 @@ namespace NetworkGameFrontend.NetworkApplication
 {
     public class MainApplication
     {
-        private NetworkViewerController NetworkViewerController;
-        private Grid NetworkControlsGrid;
-        private Grid NetworkFPSCounter;
+        private readonly NetworkViewerController NetworkViewerController;
+        private readonly Grid NetworkControlsGrid;
+        private readonly Grid NetworkFPSCounter;
         private DispatcherTimer FPSCounterTimer;
         private int NumberOfFrames = 0;
         private int TotalNumberOfCycles = 0;
@@ -34,7 +35,7 @@ namespace NetworkGameFrontend.NetworkApplication
         private Guid LoadedRouter;
         private Game NetworkGame;
         private NetworkUpdateStateQueue NetworkUpdateStateQueue;
-        private object _UpdateLock = new object();
+        private readonly object _UpdateLock = new object();
 
         public MainApplication(Grid networkViewer, Grid networkControlsGrid)
         {
@@ -89,8 +90,10 @@ namespace NetworkGameFrontend.NetworkApplication
             NetworkDataCollector.GetInstance().AddEventHandler(LoadedNetwork, NetworkGame);
             Thread t = new Thread(NetworkGame.Run);
             t.Start();
-            FPSCounterTimer = new DispatcherTimer();
-            FPSCounterTimer.Interval = TimeSpan.FromSeconds(1);
+            FPSCounterTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(1)
+            };
             FPSCounterTimer.Tick += UpdateFPSCounter;
             FPSCounterTimer.Start();
             EnableNetworkViewerControls();
@@ -190,12 +193,13 @@ namespace NetworkGameFrontend.NetworkApplication
         {
             if (NetworkGame.IsRunning)
             {
+                TotalNumberOfCycles += NetworkGame.LoopsPerSecond;
                 NetworkGame.Pause();
                 Application.Current.Dispatcher.Invoke(
                 () =>
                 {
-                    NetworkGame.Pause();
-                    ((Button)NetworkFPSCounter.FindName("NetworkViewerStartPause")).Content = "\uE102";
+                    ((Button)NetworkFPSCounter.FindName("NetworkViewerStartPause")).Content = "\uE102";                    
+                    ((TextBlock)NetworkFPSCounter.FindName("TotalLoopCounter")).Text = TotalNumberOfCycles.ToString();
                 });                    
             }
             else
@@ -218,8 +222,12 @@ namespace NetworkGameFrontend.NetworkApplication
         public BasePlot GetPlot(PlotType type)
         {
             var plot = PlotFactory.GetPlot(type, LoadedNetwork, NetworkGame);
-            plot.Properties["Router"].SetValue(0);
-            return plot.Initialize(NetworkViewerController.VisualNetwork);
+            return plot;
+        }
+
+        public BasePlot InitializePlot(BasePlot plot, Dictionary<string, Property> properties)
+        {
+            return plot.Initialize(NetworkViewerController.VisualNetwork, properties);
         }
     }
 }

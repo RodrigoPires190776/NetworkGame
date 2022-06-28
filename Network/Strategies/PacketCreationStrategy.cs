@@ -1,7 +1,7 @@
 ﻿using Network.Components;
 using System;
 using System.Collections.Generic;
-using static Network.Strategies.Property;
+using static NetworkUtils.Property;
 
 namespace Network.Strategies
 {

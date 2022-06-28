@@ -1,7 +1,6 @@
 ﻿using Network;
-using Windows.UI;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Shapes;
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace NetworkGameFrontend.VisualNetwork
 {

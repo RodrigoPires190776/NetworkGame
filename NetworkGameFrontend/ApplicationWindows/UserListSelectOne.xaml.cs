@@ -1,23 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
-
-// The Content Dialog item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
+using System.Text;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 
 namespace NetworkGameFrontend.ApplicationWindows
 {
-    public sealed partial class UserListSelectOne : ContentDialog
+    /// <summary>
+    /// Interaction logic for UserListSelectOne.xaml
+    /// </summary>
+    public partial class UserListSelectOne : Window
     {
         private const string DefaultValue = "...";
         private bool _ok;
@@ -35,23 +33,28 @@ namespace NetworkGameFrontend.ApplicationWindows
         public string Item { get { return SelectedItem; } }
         private readonly List<string> Itens;
         private string SelectedItem;
-
-        public UserListSelectOne(List<string> itens)
+        public UserListSelectOne(List<string> itens, Window owner)
         {
+            Owner = owner;
             InitializeComponent();
             Itens = new List<string>() { DefaultValue };
             Itens.AddRange(itens);
             SelectedItem = Itens[0];
+            ListBox.ItemsSource = Itens;
+            ListBox.SelectedItem = SelectedItem;
             Ok = false;
         }
 
-        private void ContentDialog_CancelButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
-        {
-        }
-
-        private void ContentDialog_OkButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        private void Clicked_Ok(object sender, RoutedEventArgs e)
         {
             Ok = true;
+            SelectedItem = (string)ListBox.SelectedItem;
+            Close();
+        }
+
+        private void Clicked_Cancel(object sender, RoutedEventArgs e)
+        {
+            Close();
         }
     }
 }

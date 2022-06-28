@@ -31,7 +31,7 @@ namespace NetworkGameBackend
             CurrentSpeed = speed;
         }
 
-        public async void Run()
+        public void Run()
         {
             int loopCounter = 0;
             TimeSpan loopsTimeCounter = new TimeSpan(0);
@@ -56,12 +56,18 @@ namespace NetworkGameBackend
                     loopsTimeCounter = new TimeSpan(0);
                 }
             }
+            LoopsPerSecond = 0;
         }
 
         public void Pause()
         {
             LoopsPerSecond = 0;
             IsRunning = false;
+        }
+
+        public void IntroduceAttacker(Guid defensorID, Guid destinationID, Guid attackerID)
+        {
+            Network.IntroduceAttacker(defensorID, destinationID, attackerID);
         }
 
         public void ChangeSpeed(int speed)

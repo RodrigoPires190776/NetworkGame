@@ -1,4 +1,5 @@
 ﻿using Network.Components;
+using NetworkUtils;
 using System;
 using System.Collections.Generic;
 
@@ -12,9 +13,9 @@ namespace Network.Strategies.PacketPicking
                 
             })
         { }
-        public override Packet NextPacket(Router router)
+        public override (Packet, bool) NextPacket(Router router)
         {
-            return router.PacketQueue.Count > 0 ? router.PacketQueue[new Random().Next(router.PacketQueue.Count)] : null;
+            return router.PacketQueue.Count > 0 ? (router.PacketQueue[new Random().Next(router.PacketQueue.Count)], true) : (null, true);
         }
     }
 }

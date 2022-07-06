@@ -1,4 +1,6 @@
 ﻿using Network.Strategies;
+using Network.Strategies.AttackerStrategies;
+using Network.Strategies.DefenderStrategies;
 using Network.Strategies.PacketCreation;
 using Network.Strategies.PacketPicking;
 using Network.Strategies.Routing;

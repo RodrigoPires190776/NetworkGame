@@ -6,6 +6,7 @@ using Network.UpdateNetwork;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using static Network.Strategies.BaseStrategy;
 
 namespace NetworkGameBackend
 {
@@ -114,7 +115,5 @@ namespace NetworkGameBackend
             }
         }
     }
-    public enum RoutingStrategies { Random, LinearRewardInaction };
-    public enum PickingStrategies { Random };
-    public enum CreationStrategies { Random };
+    
 }

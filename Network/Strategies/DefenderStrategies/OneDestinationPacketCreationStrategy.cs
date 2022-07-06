@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Network.Strategies.PacketCreation
+namespace Network.Strategies.DefenderStrategies
 {
     public class OneDestinationPacketCreationStrategy : PacketCreationStrategy
     {

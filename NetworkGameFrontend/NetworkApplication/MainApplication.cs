@@ -20,6 +20,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
+using static Network.Strategies.BaseStrategy;
 
 namespace NetworkGameFrontend.NetworkApplication
 {
@@ -79,12 +80,11 @@ namespace NetworkGameFrontend.NetworkApplication
             return NetworkMaster.GetInstance().GetNetwork(LoadedNetwork).RouterIDList.Count;
         }
 
-        public void StartDiscovery()
+        public void StartDiscovery(RoutingStrategies routingStrategy, PickingStrategies pickingStrategy, CreationStrategies creationStrategy)
         {
-            //TODO choose strategies
             TotalNumberOfCycles = 0;
-            NetworkGame = new Game(NetworkMaster.GetInstance().GetNetwork(LoadedNetwork), 5, 
-                RoutingStrategies.LinearRewardInaction, PickingStrategies.Random, CreationStrategies.Random);
+            NetworkGame = new Game(NetworkMaster.GetInstance().GetNetwork(LoadedNetwork), 5,
+                routingStrategy, pickingStrategy, creationStrategy);
             NetworkUpdateStateQueue = new NetworkUpdateStateQueue();
             NetworkGame.GameStep += UpdateNetwork;
             NetworkDataCollector.GetInstance().AddEventHandler(LoadedNetwork, NetworkGame);

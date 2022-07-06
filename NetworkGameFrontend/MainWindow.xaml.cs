@@ -1,7 +1,10 @@
 ﻿using Microsoft.Win32;
+using Network.Strategies;
+using NetworkGameBackend;
 using NetworkGameFrontend.ApplicationWindows;
 using NetworkGameFrontend.NetworkApplication;
 using NetworkGameFrontend.VisualData;
+using NetworkUtils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,6 +20,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static Network.Strategies.BaseStrategy;
 
 namespace NetworkGameFrontend
 {
@@ -26,10 +30,14 @@ namespace NetworkGameFrontend
     public partial class MainWindow : Window
     {
         private readonly MainApplication app;
+        private Dictionary<string, Property> RoutingStrategyProperties; 
+        private Dictionary<string, Property> PickingStrategyProperties;
+        private Dictionary<string, Property> CreationStrategyProperties;
         public MainWindow()
         {
             InitializeComponent();
             app = new MainApplication(NetworkViewer, NetworkControls);
+            InitializeStrategies();           
         }
 
         void File_ImportNetwork_Click(object sender, RoutedEventArgs e)
@@ -77,6 +85,9 @@ namespace NetworkGameFrontend
                 {
                     app.LoadNetwork(networkSelectDialog.Item);
                     StartDiscoveryButton.IsEnabled = true;
+                    RoutingStrategyListBox.IsEnabled = true;
+                    PickingStrategyListBox.IsEnabled = true;
+                    CreationStrategyListBox.IsEnabled = true;
                 }
                 catch (Exception ex)
                 {
@@ -91,7 +102,8 @@ namespace NetworkGameFrontend
 
         void Controls_StartDiscovery_Click(object sender, RoutedEventArgs e)
         {
-            app.StartDiscovery();
+            var strategies = GetStrategies();
+            app.StartDiscovery(strategies.Item1, strategies.Item2, strategies.Item3);
             StartDiscoveryButton.IsEnabled = false;
             IntroduceAttackerButton.IsEnabled = true;
             PlotViewerButton.IsEnabled = true;
@@ -129,9 +141,74 @@ namespace NetworkGameFrontend
             app.GameSpeedChange(1);
         }
 
+        void Controls_RoutingStrategyPropertiesEditor_Click(object sender, RoutedEventArgs e)
+        {
+            var propertiesEditor = new UserPropertyConfiguration(
+                RoutingStrategyListBox.Items.GetItemAt(RoutingStrategyListBox.SelectedIndex) + " Properties",
+                RoutingStrategyProperties);
+            propertiesEditor.ShowDialog();
+        }
+
+        void Controls_UpdateRoutingStrategy(object sender, SelectionChangedEventArgs e)
+        {
+            RoutingStrategyProperties = BaseStrategy.GetRoutingStrategyProperties(
+                RoutingStrategyListBox.Items.GetItemAt(RoutingStrategyListBox.SelectedIndex).ToString());
+        }
+
+        void Controls_PacketPickingPropertiesEditor_Click(object sender, RoutedEventArgs e)
+        {
+            var propertiesEditor = new UserPropertyConfiguration(
+                PickingStrategyListBox.Items.GetItemAt(PickingStrategyListBox.SelectedIndex) + " Properties",
+                PickingStrategyProperties);
+            propertiesEditor.ShowDialog();
+        }
+
+        void Controls_PacketPickingStrategy(object sender, SelectionChangedEventArgs e)
+        {
+            PickingStrategyProperties = BaseStrategy.GetPickingStrategyProperties(
+                PickingStrategyListBox.Items.GetItemAt(PickingStrategyListBox.SelectedIndex).ToString());
+        }
+
+        void Controls_PacketCreationPropertiesEditor_Click(object sender, RoutedEventArgs e)
+        {
+            var propertiesEditor = new UserPropertyConfiguration(
+                CreationStrategyListBox.Items.GetItemAt(CreationStrategyListBox.SelectedIndex) + " Properties",
+                CreationStrategyProperties);
+            propertiesEditor.ShowDialog();
+        }
+
+        void Controls_PacketCreationStrategy(object sender, SelectionChangedEventArgs e)
+        {
+            CreationStrategyProperties = BaseStrategy.GetCreationStrategyProperties(
+                CreationStrategyListBox.Items.GetItemAt(CreationStrategyListBox.SelectedIndex).ToString());
+        }
+
         /*void TextBox_AllowOnlyInt(TextBox sender, TextBoxBeforeTextChangingEventArgs args)
         {
             args.Cancel = args.NewText.Any(c => !char.IsDigit(c));
         }*/
+
+        private void InitializeStrategies()
+        {
+            RoutingStrategyListBox.ItemsSource = BaseStrategy.RoutingStrategiesList;
+            RoutingStrategyListBox.SelectedIndex = 0;
+            RoutingStrategyProperties = BaseStrategy.GetRoutingStrategyProperties(RoutingStrategyListBox.Items[0].ToString());
+
+            PickingStrategyListBox.ItemsSource = BaseStrategy.PickingStrategiesList;
+            PickingStrategyListBox.SelectedIndex = 0;
+            PickingStrategyProperties = BaseStrategy.GetPickingStrategyProperties(PickingStrategyListBox.Items[0].ToString());
+
+            CreationStrategyListBox.ItemsSource = BaseStrategy.CreationStrategiesList;
+            CreationStrategyListBox.SelectedIndex = 0;
+            CreationStrategyProperties = BaseStrategy.GetCreationStrategyProperties(CreationStrategyListBox.Items[0].ToString());
+        }
+
+        private (RoutingStrategies, PickingStrategies, CreationStrategies) GetStrategies()
+        {
+            var routing = BaseStrategy.GetRoutingStrategiesEnum(RoutingStrategyListBox.SelectedItem.ToString());
+            var picking = BaseStrategy.GetPickingStrategiesEnum(PickingStrategyListBox.SelectedItem.ToString());
+            var creation = BaseStrategy.GetCreationStrategiesEnum(CreationStrategyListBox.SelectedItem.ToString());
+            return (routing, picking, creation);
+        }
     }
 }

@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Network.Strategies.PacketPicking
+namespace Network.Strategies.AttackerStrategies
 {
     public class OneSourceRemovePacketPickingStrategy : PacketPickingStrategy
     {

@@ -13,6 +13,10 @@ namespace Network.Strategies
     {
         public RoutingTable RoutingTable { get; protected set; }
         public Guid RouterID { get; }
+        protected static Dictionary<string, Property> GetProperties(List<Tuple<string, Property.PropertyType, List<Tuple<string, object>>>> properties)
+        {
+            return BaseStrategy.GetProperties(properties);
+        }
         public RoutingStrategy(Guid routerID, Guid networkID, List<Tuple<string, PropertyType, List<Tuple<string, object>>>> properties) :
             base(networkID, properties)
         { 

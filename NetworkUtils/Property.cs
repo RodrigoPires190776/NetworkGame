@@ -14,6 +14,24 @@ namespace NetworkUtils
             ValueType = type;
             if (settings == null) Settings = new List<Tuple<string, object>>();
             else Settings = settings;
+            SetInitValue();
+        }
+
+        private void SetInitValue()
+        {
+            switch (ValueType)
+            {
+                case PropertyType.String:
+                    SetString(""); break;
+                case PropertyType.Integer:
+                    SetInteger(0); break;
+                case PropertyType.Decimal:
+                    SetDecimal(0m); break;
+                case PropertyType.Bool:
+                    SetBool(false); break;
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
         public void SetValue(object value)
@@ -121,5 +139,8 @@ namespace NetworkUtils
         public const string Probability = "Probability";
         public const string LearningWeight = "LearningWeight";
         public const string LoadAllValues = "LoadAllValues";
+        public const string Attacker = "Attacker";
+        public const string Defensor = "Defensor";
+        public const string Destination = "Destination";
     }
 }

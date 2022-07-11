@@ -111,7 +111,15 @@ namespace NetworkGameFrontend
 
         void Controls_IntroduceAttacker_Click(object sender, RoutedEventArgs e)
         {
-            app.IntroduceAttacker(3, 1, 4);
+            var properties = app.GetIntroduceAttackerProperties();
+
+            var propertiesEditor = new UserPropertyConfiguration("IntroduceAttacker", properties);
+            propertiesEditor.ShowDialog();
+            
+            app.IntroduceAttacker(
+                (int)properties[Property.Defensor].Value, 
+                (int)properties[Property.Destination].Value, 
+                (int)properties[Property.Attacker].Value);
         }
 
         void Controls_PlotViewer_Click(object sender, RoutedEventArgs e)

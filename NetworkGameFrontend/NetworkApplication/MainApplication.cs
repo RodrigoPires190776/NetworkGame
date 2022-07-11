@@ -99,6 +99,28 @@ namespace NetworkGameFrontend.NetworkApplication
             EnableNetworkViewerControls();
         }
 
+        public Dictionary<string, Property> GetIntroduceAttackerProperties()
+        {
+            var properties = new Dictionary<string, Property>();
+            properties.Add(Property.Attacker, new Property(Property.PropertyType.Integer, new List<Tuple<string, object>>()
+                    {
+                        new Tuple<string, object>(Property.INTEGER_MIN, 0),
+                        new Tuple<string, object>(Property.INTEGER_MAX, NetworkMaster.GetInstance().GetNetwork(LoadedNetwork).Routers.Count - 1)
+                    }));
+            properties.Add(Property.Defensor, new Property(Property.PropertyType.Integer, new List<Tuple<string, object>>()
+                    {
+                        new Tuple<string, object>(Property.INTEGER_MIN, 0),
+                        new Tuple<string, object>(Property.INTEGER_MAX, NetworkMaster.GetInstance().GetNetwork(LoadedNetwork).Routers.Count - 1)
+                    }));
+            properties.Add(Property.Destination, new Property(Property.PropertyType.Integer, new List<Tuple<string, object>>()
+                    {
+                        new Tuple<string, object>(Property.INTEGER_MIN, 0),
+                        new Tuple<string, object>(Property.INTEGER_MAX, NetworkMaster.GetInstance().GetNetwork(LoadedNetwork).Routers.Count - 1)
+                    }));
+
+            return properties;
+        }
+
         public void IntroduceAttacker(int defensor, int destination, int attacker)
         {
             var defensorID = NetworkViewerController.VisualNetwork.RouterIDs[defensor];

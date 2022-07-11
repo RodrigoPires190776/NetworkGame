@@ -1,4 +1,10 @@
 ﻿using Network.Strategies;
+using Network.Strategies.AttackerStrategies;
+using Network.Strategies.DefenderStrategies;
+using Network.Strategies.PacketCreation;
+using Network.Strategies.PacketPicking;
+using Network.Strategies.Routing;
+using Network.UpdateNetwork.UpdateObjects;
 using System;
 using System.Collections.Generic;
 
@@ -6,28 +12,34 @@ namespace Network.Components
 {
     public class Router
     {
-        public int ID { get; }
+        public Coordinates Coordinates { get; private set; }
+        public Guid ID { get; }
         public Guid NetworkID { get; }
-        public List<Link> Links { get; }
-        public List<Packet> PacketQueue { get; }
-        private IRoutingStrategy RoutingStrategy { get; }
-        private IPacketPickingStrategy PacketPickingStrategy { get; }
-        private IPacketCreationStrategy PacketCreationStrategy { get; }
+        public Dictionary<Guid, Link> Links { get; }
+        public List<Packet> PacketQueue { get;  }
+        public RoutingStrategy RoutingStrategy { get; private set; }
+        public PacketPickingStrategy PacketPickingStrategy { get; private set; }
+        public PacketCreationStrategy PacketCreationStrategy { get; private set; }
+        public RouterAgent RouterAgent { get; private set; }
 
-        public Router(int id, Guid networkID, IRoutingStrategy routingStrategy, IPacketPickingStrategy packetPickingStrategy, IPacketCreationStrategy packetCreationStrategy)
+        public Router(Guid networkID, Coordinates coordinates)
         {
-            ID = id;
+            ID = Guid.NewGuid();
+            Coordinates = coordinates;
             NetworkID = networkID;
-            Links = new();
-            PacketQueue = new();
-            RoutingStrategy = routingStrategy;
-            PacketPickingStrategy = packetPickingStrategy;
-            PacketCreationStrategy = packetCreationStrategy;
+            Links = new Dictionary<Guid, Link>();
+            PacketQueue = new List<Packet>();
+            RoutingStrategy = new RandomRoutingStrategy(ID, networkID);
+            PacketPickingStrategy = new RandomPacketPickingStrategy(networkID);
+            PacketCreationStrategy = new RandomPacketCreationStrategy(networkID);
+            RouterAgent = RouterAgent.Normal;
         }
+
+        protected Router() { }
 
         public void AddLink(Link link)
         {
-            Links.Add(link);
+            Links.Add(link.ID, link);
         }
 
         public void AddPacket(Packet packet)
@@ -35,16 +47,74 @@ namespace Network.Components
             PacketQueue.Add(packet);
         }
 
-        public void Step()
+        public void SetStrategies(RoutingStrategy routing, PacketCreationStrategy packetCreation, PacketPickingStrategy packetPicking)
+        {
+            RoutingStrategy = routing ?? RoutingStrategy;
+            RoutingStrategy.Initialize(NetworkMaster.GetInstance().GetNetwork(NetworkID), this);
+            PacketCreationStrategy = packetCreation ?? PacketCreationStrategy;
+            PacketPickingStrategy = packetPicking ?? PacketPickingStrategy;
+        }
+
+        public (UpdateRouter, Packet, Packet) Step()
         {
             var newPacket = PacketCreationStrategy.CreatePacket(this);
             if (newPacket != null) PacketQueue.Add(newPacket);
-            if(PacketQueue.Count > 0)
+
+            (Packet, bool) nextPacket = (null, false);
+            Packet dropped = null;
+            if (PacketQueue.Count > 0)
             {
-                var nextPacket = PacketPickingStrategy.NextPacket(this);
-                RoutingStrategy.NextLink(this, nextPacket).Send(this, nextPacket);
-                PacketQueue.Remove(nextPacket);
+                nextPacket = PacketPickingStrategy.NextPacket(this);
+                if(nextPacket.Item2)
+                {
+                    RoutingStrategy.NextLink(this, nextPacket.Item1).Send(this, nextPacket.Item1);
+                    PacketQueue.Remove(nextPacket.Item1);
+                }
+                else
+                {
+                    PacketQueue.Remove(nextPacket.Item1);
+                    dropped = nextPacket.Item1;
+                }
             }
+           
+            return (new UpdateRouter(ID, PacketQueue.Count, newPacket != null, nextPacket.Item2, RoutingStrategy.RoutingTable), newPacket, dropped);
+        }
+
+        public decimal Learn(Packet packet)
+        {
+            return RoutingStrategy.Learn(packet);
+        }
+
+        public void SetAgentNormal()
+        {
+            RouterAgent = RouterAgent.Normal;
+        }
+
+        public void SetAgentDefensor(Guid destinationID)
+        {
+            PacketCreationStrategy = new OneDestinationPacketCreationStrategy(NetworkID, destinationID);
+            PacketCreationStrategy.Properties["Probability"].SetValue(20m);
+            RouterAgent = RouterAgent.Defensor;
+        }
+
+        public void SetAgentAttacker(Guid defensorID)
+        {
+            PacketPickingStrategy = new OneSourceRemovePacketPickingStrategy(NetworkID, defensorID);
+            PacketPickingStrategy.Properties["Probability"].SetValue(100m);
+            RouterAgent = RouterAgent.Attacker;
         }
     }
+
+    public class Coordinates
+    {
+        public double X { get; }
+        public double Y { get; }
+        public Coordinates(double x, double y)
+        {
+            X = x;
+            Y = y;
+        }
+    }
+
+    public enum RouterAgent { Normal, Defensor, Attacker }
 }

@@ -1,0 +1,41 @@
+﻿<Window x:Class="NetworkGameFrontend.ApplicationWindows.UserPropertyConfiguration"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:NetworkGameFrontend.ApplicationWindows"
+        mc:Ignorable="d"
+        Title="UserPropertyConfiguration" Height="700" Width="500">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="100"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <TextBlock x:Name="DialogTitle" Text="" FontSize="20" Margin="10"/>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="20"/>
+            </Grid.ColumnDefinitions>
+            <ListBox Grid.Column="1" x:Name="PropertyListBox" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                
+            </ListBox>
+        </Grid>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="1" Margin="5,25,50,25" Click="Clicked_Ok">
+                <TextBlock Text="OK" FontSize="18"/>
+            </Button>
+            <Button Margin="50,25,5,25" Click="Clicked_Cancel">
+                <TextBlock Text="Cancel" FontSize="18"/>
+            </Button>
+        </Grid>
+    </Grid>
+</Window>

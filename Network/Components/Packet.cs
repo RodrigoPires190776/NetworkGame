@@ -7,26 +7,28 @@ namespace Network.Components
     public class Packet
     {
         public Guid NetworkID { get; }
-        public int Source { get; }
-        public int Destination { get; }
-        public List<int> RouteTaken { get; }
-        public int CurrentRouter { get { return RouteTaken.Last(); } }
-        public bool ReachedDestination { get { return RouteTaken.Last() == Destination; } }
+        public Guid ID { get; }
+        public Guid Source { get; }
+        public Guid Destination { get; }       
+        public Guid CurrentRouter { get; private set; }
+        public Dictionary<Guid, Guid> RouterSentToLink { get; }
+        public bool ReachedDestination { get { return CurrentRouter == Destination; } }
         public int NumberOfSteps { get; private set; }
 
-        public Packet(int src, int dst, Guid networkID)
+        public Packet(Guid src, Guid dst, Guid networkID)
         {
             NetworkID = networkID;
+            ID = Guid.NewGuid();
             Source = src;
             Destination = dst;
-            RouteTaken = new();
-            RouteTaken.Add(src);
+            CurrentRouter = src;
+            RouterSentToLink = new Dictionary<Guid, Guid>();
             NumberOfSteps = 0;
         }
 
-        public void Send(int curr)
+        public void Send(Guid curr)
         {
-            RouteTaken.Add(curr);
+            CurrentRouter = curr;
         }
 
         public void Step()

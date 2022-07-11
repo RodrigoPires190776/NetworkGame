@@ -1,13 +1,21 @@
 ﻿using Network.Components;
+using NetworkUtils;
 using System;
+using System.Collections.Generic;
 
 namespace Network.Strategies.Routing
 {
-    public class RandomRoutingStrategy : IRoutingStrategy
+    public sealed class RandomRoutingStrategy : RoutingStrategy
     {
-        public Link NextLink(Router router, Packet packet)
+        public static Dictionary<string, Property> GetProperties()
         {
-            return router.Links[new Random().Next(router.Links.Count)];
+            return RoutingStrategy.GetProperties(new List<Tuple<string, Property.PropertyType, List<Tuple<string, object>>>>()); ;
         }
+        public RandomRoutingStrategy(Guid routerID, Guid networkID) :
+            base(routerID, networkID, new List<Tuple<string, Property.PropertyType, List<Tuple<string, object>>>>()
+            {
+                
+            })
+        { }
     }
 }

@@ -1,13 +1,25 @@
 ﻿using Network.Components;
+using NetworkUtils;
 using System;
+using System.Collections.Generic;
 
 namespace Network.Strategies.PacketPicking
 {
-    public class RandomPacketPickingStrategy : IPacketPickingStrategy
+    public sealed class RandomPacketPickingStrategy : PacketPickingStrategy
     {
-        public Packet NextPacket(Router router)
+        public static Dictionary<string, Property> GetProperties()
         {
-            return router.PacketQueue.Count > 0 ? router.PacketQueue[new Random().Next(router.PacketQueue.Count)] : null;
+            return PacketPickingStrategy.GetProperties(new List<Tuple<string, Property.PropertyType, List<Tuple<string, object>>>>()); ;
+        }
+        public RandomPacketPickingStrategy(Guid networkID) :
+            base(networkID, new List<Tuple<string, Property.PropertyType, List<Tuple<string, object>>>>()
+            {
+                
+            })
+        { }
+        public override (Packet, bool) NextPacket(Router router)
+        {
+            return router.PacketQueue.Count > 0 ? (router.PacketQueue[new Random().Next(router.PacketQueue.Count)], true) : (null, true);
         }
     }
 }

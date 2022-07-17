@@ -176,7 +176,7 @@
                 </Grid>
                 <Grid Grid.Row="1">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="2*"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
@@ -193,7 +193,7 @@
                             <ColumnDefinition Width ="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Average Variance:" Foreground="Black" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                        <TextBox x:Name="AverageVarianceTextBox" Text="0" Grid.Column="1" Height="30" Background="White" VerticalAlignment="Top" IsEnabled="False" VerticalContentAlignment="Center"/>
+                        <TextBox x:Name="AverageVarianceTextBox" Text="0" Grid.Column="1" Height="30" Background="White" VerticalAlignment="Center" IsEnabled="False" VerticalContentAlignment="Center"/>
                     </Grid>
                     <Grid Grid.Row="1">
                         <Grid.ColumnDefinitions>
@@ -274,9 +274,22 @@
                     </Button>
                 </Grid>
                 <Grid Grid.Row="3">
-                    <Button x:Name="PlotViewerButton" Background="Gray" Grid.Column="0" Click="Controls_PlotViewer_Click" IsEnabled="False" Height="40" Width="150">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="3*"/>
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="1" x:Name="PlotViewerButton" Background="Gray" Grid.Column="0" Click="Controls_PlotViewer_Click" VerticalAlignment="Top" IsEnabled="False" Height="40" Width="150">
                         <TextBlock Text="Plot Viewer" TextWrapping="Wrap"/>
                     </Button>
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="5*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <ComboBox x:Name="PlotTypeListBox" Grid.Row="1" MaxWidth="250" Margin="25,0,0,5" IsEnabled="False" SelectionChanged="Controls_UpdatePlotSelected"/>
+                        <Button Grid.Column="1" Height="20" Width="30" VerticalAlignment="Top" HorizontalAlignment="Left" Content="..." 
+                                    Click="Controls_PlotPropertiesEditor_Click" IsEnabled="{Binding ElementName=PlotTypeListBox, Path=IsEnabled, Mode=OneWay}"/>
+                    </Grid>
                 </Grid>
             </Grid>
         </Grid>

@@ -17,5 +17,9 @@ namespace Network.Strategies.Routing
                 
             })
         { }
+
+        public RandomRoutingStrategy(Guid routerID, Guid networkID, Dictionary<string, Property> properties) :
+            base(routerID, networkID, properties)
+        { }
     }
 }

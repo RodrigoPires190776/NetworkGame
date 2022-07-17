@@ -80,9 +80,14 @@ namespace Network.Components
             return (new UpdateRouter(ID, PacketQueue.Count, newPacket != null, nextPacket.Item2, RoutingStrategy.RoutingTable), newPacket, dropped);
         }
 
-        public decimal Learn(Packet packet)
+        public void Learn(Packet packet)
         {
-            return RoutingStrategy.Learn(packet);
+            RoutingStrategy.Learn(packet);
+        }
+
+        public decimal GetVariance()
+        {
+            return RoutingStrategy.RoutingTable.GetVariance();
         }
 
         public void SetAgentNormal()

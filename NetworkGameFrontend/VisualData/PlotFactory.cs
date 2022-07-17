@@ -3,6 +3,7 @@ using NetworkGameBackend;
 using NetworkGameFrontend.VisualData.Options.Base;
 using NetworkGameFrontend.VisualData.Options.Graphs;
 using System;
+using static NetworkGameFrontend.VisualData.Options.Base.BasePlot;
 
 namespace NetworkGameFrontend.VisualData
 {
@@ -14,10 +15,9 @@ namespace NetworkGameFrontend.VisualData
             {
                 PlotType.RouterCreatedPacketsPieChart => new RouterCreatedPacketsPieChart(network, game),
                 PlotType.RouterCreatedPacketsLineChart => new RouterCreatedPacketsLineChart(network, game),
+                PlotType.AverageVarianceLineChart => new AverageVarianceLineChart(network, game),
                 _ => throw new NotImplementedException()
             };
         }
     }
-
-    public enum PlotType { RouterCreatedPacketsPieChart, RouterCreatedPacketsLineChart }
 }

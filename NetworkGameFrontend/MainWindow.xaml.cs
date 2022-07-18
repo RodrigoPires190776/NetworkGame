@@ -131,12 +131,12 @@ namespace NetworkGameFrontend
 
         void Controls_PlotViewer_Click(object sender, RoutedEventArgs e)
         {
-            var plot = app.GetPlot(PlotType.AverageVarianceLineChart);
+            var plot = app.GetPlot(BasePlot.GetPlotTypeEnum(PlotTypeListBox.SelectedItem.ToString()));
 
-            var propertiesEditor = new UserPropertyConfiguration(PlotType.AverageVarianceLineChart.ToString() + " Properties", plot.Properties);
-            propertiesEditor.ShowDialog();
+            //var propertiesEditor = new UserPropertyConfiguration(PlotTypeListBox.SelectedItem.ToString() + " Properties", plot.Properties);
+            //propertiesEditor.ShowDialog();
 
-            plot = app.InitializePlot(plot, propertiesEditor.Properties);
+            plot = app.InitializePlot(plot, PlotProperties);//propertiesEditor.Properties);
 
             var plotViewer = new PlotViewer(this, plot);
             plotViewer.Show();

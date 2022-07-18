@@ -38,7 +38,7 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
         }
 
         public RouterCreatedPacketsPieChart(Guid network, Game game) :
-            base("Router Created Packets Pie Chart", new List<string>() { "Delivered", "InTransit", "Dropped" }, game)
+            base("Router Created Packets Pie Chart", new List<string>() { "InTransit", "Dropped", "Delivered" }, game)
         {
             Network = network;
             Properties.Add(Property.Router, new Property(Property.PropertyType.Integer, 
@@ -53,7 +53,8 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
 
         public override BasePlot Initialize(VisualNetwork.VisualNetwork visualNetwork, Dictionary<string, Property> properties)
         {
-            Router = visualNetwork.RouterIDs[(int)Properties[Property.Router].Value];
+            Router = visualNetwork.RouterIDs[(int)properties[Property.Router].Value];
+            base.Initialize(visualNetwork, properties);           
              
             SetRouterValues(NetworkDataCollector.GetInstance().GetRouterData(Network, Router));
             
@@ -61,9 +62,7 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
             PiePlot.ShowValues = true;
             PiePlot.ShowLabels = true;
             Plot.Legend();
-
-            base.Initialize(visualNetwork, properties);
-
+          
             return this;
         }
 
@@ -88,7 +87,7 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
 
         private void SetRouterValues(RouterData routerData)
         {
-            SetValues(new List<double> { routerData.PacketsDelivered, routerData.PacketsInTransit, routerData.PacketsDropped });
+            SetValues(new List<double> { routerData.PacketsInTransit, routerData.PacketsDropped, routerData.PacketsDelivered });
         }
 
         protected override void LoadPreviousData()

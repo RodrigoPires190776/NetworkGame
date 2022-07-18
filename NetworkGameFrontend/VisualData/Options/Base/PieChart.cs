@@ -2,6 +2,7 @@
 using ScottPlot.Plottable;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace NetworkGameFrontend.VisualData.Options.Base
 {
@@ -18,6 +19,10 @@ namespace NetworkGameFrontend.VisualData.Options.Base
             for (int i = 0; i < labels.Count; i++) Values.Add(0);
             PiePlot = Plot.AddPie(Values.ToArray());
             PiePlot.SliceLabels = Labels.ToArray();
+
+            var sliceColors = new Color[labels.Count];
+            for (int i = 0; i < labels.Count; i++) sliceColors[i] = GetColor();
+            PiePlot.SliceFillColors = sliceColors;
         }
 
         protected void SetValues(List<double> values)

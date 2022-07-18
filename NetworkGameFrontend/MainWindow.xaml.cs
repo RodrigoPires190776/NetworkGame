@@ -4,6 +4,7 @@ using NetworkGameBackend;
 using NetworkGameFrontend.ApplicationWindows;
 using NetworkGameFrontend.NetworkApplication;
 using NetworkGameFrontend.VisualData;
+using NetworkGameFrontend.VisualData.Options.Base;
 using NetworkUtils;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using static Network.Strategies.BaseStrategy;
+using static NetworkGameFrontend.VisualData.Options.Base.BasePlot;
 
 namespace NetworkGameFrontend
 {
@@ -33,6 +35,7 @@ namespace NetworkGameFrontend
         private Dictionary<string, Property> RoutingStrategyProperties; 
         private Dictionary<string, Property> PickingStrategyProperties;
         private Dictionary<string, Property> CreationStrategyProperties;
+        private Dictionary<string, Property> PlotProperties;
         public MainWindow()
         {
             InitializeComponent();
@@ -88,6 +91,8 @@ namespace NetworkGameFrontend
                     RoutingStrategyListBox.IsEnabled = true;
                     PickingStrategyListBox.IsEnabled = true;
                     CreationStrategyListBox.IsEnabled = true;
+                    InitializePlotTypes();
+                    PlotTypeListBox.IsEnabled = true;
                 }
                 catch (Exception ex)
                 {
@@ -103,7 +108,9 @@ namespace NetworkGameFrontend
         void Controls_StartDiscovery_Click(object sender, RoutedEventArgs e)
         {
             var strategies = GetStrategies();
-            app.StartDiscovery(strategies.Item1, strategies.Item2, strategies.Item3);
+            app.StartDiscovery(new Tuple<RoutingStrategies, Dictionary<string, Property>>(strategies.Item1, RoutingStrategyProperties), 
+                               new Tuple<PickingStrategies, Dictionary<string, Property>>(strategies.Item2, PickingStrategyProperties), 
+                               new Tuple<CreationStrategies, Dictionary<string, Property>>(strategies.Item3, CreationStrategyProperties));
             StartDiscoveryButton.IsEnabled = false;
             IntroduceAttackerButton.IsEnabled = true;
             PlotViewerButton.IsEnabled = true;
@@ -124,9 +131,9 @@ namespace NetworkGameFrontend
 
         void Controls_PlotViewer_Click(object sender, RoutedEventArgs e)
         {
-            var plot = app.GetPlot(PlotType.RouterCreatedPacketsLineChart);
+            var plot = app.GetPlot(PlotType.AverageVarianceLineChart);
 
-            var propertiesEditor = new UserPropertyConfiguration(PlotType.RouterCreatedPacketsLineChart.ToString() + " Properties", plot.Properties);
+            var propertiesEditor = new UserPropertyConfiguration(PlotType.AverageVarianceLineChart.ToString() + " Properties", plot.Properties);
             propertiesEditor.ShowDialog();
 
             plot = app.InitializePlot(plot, propertiesEditor.Properties);
@@ -149,6 +156,7 @@ namespace NetworkGameFrontend
             app.GameSpeedChange(1);
         }
 
+    #region Strategies
         void Controls_RoutingStrategyPropertiesEditor_Click(object sender, RoutedEventArgs e)
         {
             var propertiesEditor = new UserPropertyConfiguration(
@@ -217,6 +225,28 @@ namespace NetworkGameFrontend
             var picking = BaseStrategy.GetPickingStrategiesEnum(PickingStrategyListBox.SelectedItem.ToString());
             var creation = BaseStrategy.GetCreationStrategiesEnum(CreationStrategyListBox.SelectedItem.ToString());
             return (routing, picking, creation);
+        }
+        #endregion
+
+        private void InitializePlotTypes()
+        {
+            PlotTypeListBox.ItemsSource = BasePlot.PlotTypeList;
+            PlotTypeListBox.SelectedIndex = 0;
+            PlotProperties = BasePlot.GetPlotProperties(PlotTypeListBox.Items[0].ToString(), app.LoadedNetwork);
+        }
+
+        void Controls_PlotPropertiesEditor_Click(object sender, RoutedEventArgs e)
+        {
+            var propertiesEditor = new UserPropertyConfiguration(
+                PlotTypeListBox.Items.GetItemAt(PlotTypeListBox.SelectedIndex) + " Properties",
+                PlotProperties);
+            propertiesEditor.ShowDialog();
+        }
+
+        void Controls_UpdatePlotSelected(object sender, SelectionChangedEventArgs e)
+        {
+            PlotProperties = BasePlot.GetPlotProperties(
+                PlotTypeListBox.Items.GetItemAt(PlotTypeListBox.SelectedIndex).ToString(), app.LoadedNetwork);
         }
     }
 }

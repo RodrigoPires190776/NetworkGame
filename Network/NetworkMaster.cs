@@ -14,6 +14,7 @@ namespace Network
         private readonly Dictionary<string, Network> NetworksByName;
 
         public static int PacketTTL = 100;
+        public static int AverageVarianceUpdateRate = 100;
 
         private NetworkMaster()
         {

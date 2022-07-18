@@ -13,58 +13,92 @@ namespace Network.Strategies
     {
         public RoutingTable RoutingTable { get; protected set; }
         public Guid RouterID { get; }
-        protected static Dictionary<string, Property> GetProperties(List<Tuple<string, Property.PropertyType, List<Tuple<string, object>>>> properties)
+        protected static new Dictionary<string, Property> GetProperties(List<Tuple<string, Property.PropertyType, List<Tuple<string, object>>>> properties)
         {
+            properties.AddRange(new List<Tuple<string, Property.PropertyType, List<Tuple<string, object>>>>()
+            {
+                new Tuple<string, Property.PropertyType, List<Tuple<string, object>>>(Property.MinProbability, Property.PropertyType.Decimal,
+                    new List<Tuple<string, object>>()
+                    {
+                        new Tuple<string, object>(Property.DECIMAL_MIN, 0m),
+                        new Tuple<string, object>(Property.DECIMAL_MAX, 0.5m)
+                    }),
+                new Tuple<string, Property.PropertyType, List<Tuple<string, object>>>(Property.MaxProbability, Property.PropertyType.Decimal,
+                    new List<Tuple<string, object>>()
+                    {
+                        new Tuple<string, object>(Property.DECIMAL_MIN, 0.5m),
+                        new Tuple<string, object>(Property.DECIMAL_MAX, 1m),
+                        new Tuple<string, object>(Property.INITIAL_VALUE, 1m)
+                    })
+            });
             return BaseStrategy.GetProperties(properties);
         }
         public RoutingStrategy(Guid routerID, Guid networkID, List<Tuple<string, PropertyType, List<Tuple<string, object>>>> properties) :
             base(networkID, properties)
         { 
             RouterID = routerID;
-            Properties.Add("", new Property(PropertyType.Decimal,
+            Properties.Add(Property.MinProbability, new Property(Property.PropertyType.Decimal,
+                    new List<Tuple<string, object>>()
+                    {
+                        new Tuple<string, object>(Property.DECIMAL_MIN, 0m),
+                        new Tuple<string, object>(Property.DECIMAL_MAX, 0.5m)
+                    }));
+            Properties.Add(Property.MaxProbability, new Property(Property.PropertyType.Decimal,
+                    new List<Tuple<string, object>>()
+                    {
+                        new Tuple<string, object>(Property.DECIMAL_MIN, 0.5m),
+                        new Tuple<string, object>(Property.DECIMAL_MAX, 1m),
+                        new Tuple<string, object>(Property.INITIAL_VALUE, 1m)
+                    }));
+            /*Properties.Add("", new Property(PropertyType.Decimal,
                     new List<Tuple<string, object>>()
                     {
                         new Tuple<string, object>(DECIMAL_MIN, 0m)
-                    }));
+                    }));*/
         }
+        public RoutingStrategy(Guid routerID, Guid networkID, Dictionary<string, Property> properties) :
+            base(networkID, properties)
+        {
+            RouterID = routerID;
+        }
+
         public virtual void Initialize(Network network, Router router)
         {
             RoutingTable = new RoutingTable();
-            RoutingTable.Initialize(network, router);
+            RoutingTable.Initialize(network, router, (decimal)Properties[Property.MinProbability].Value, (decimal)Properties[Property.MaxProbability].Value);
         }
         public virtual Link NextLink(Router router, Packet packet)
         {
             return router.Links[RoutingTable.GetLink(packet.Destination)];
         }
-        public virtual decimal Learn(Packet packet) { return 0; }
+        public virtual void Learn(Packet packet) { }
     }
 
     public class RoutingTable
     {
-        private decimal MaxValueMultipler = 10m;
+        private decimal MaxProbability = 1m;
+        private decimal MinProbability = 0m;
         private ConcurrentDictionary<Guid, Dictionary<Guid, decimal>> Values { get; }
-        private ConcurrentDictionary<Guid, decimal> Sum;
-        private object _valuesLock = new object();
+        private Dictionary<Guid, Dictionary<Guid, decimal>> OldValues { get; set; }
         public RoutingTable()
         {
             Values = new ConcurrentDictionary<Guid, Dictionary<Guid, decimal>>();
-            Sum = new ConcurrentDictionary<Guid, decimal>();
         }
 
-        public virtual void Initialize(Network network, Router router)
+        public virtual void Initialize(Network network, Router router, decimal minValue, decimal maxValue)
         {
+            MaxProbability = maxValue;
+            MinProbability = minValue;
             foreach(var routerID in network.RouterIDList)
             {
                 if (routerID == router.ID) continue;
-
-                Sum.TryAdd(routerID, 0);
                 
                 var routerProbabilities = new Dictionary<Guid, decimal>();
+                decimal initProb = 1m / router.Links.Keys.Count;
 
                 foreach (var link in router.Links.Keys)
                 {
-                    routerProbabilities.Add(link, 1);
-                    Sum[routerID] = Sum[routerID] + 1;
+                    routerProbabilities.Add(link, initProb);
                 }
 
                 Values.TryAdd(routerID, routerProbabilities);
@@ -73,14 +107,14 @@ namespace Network.Strategies
 
         public virtual Guid GetLink(Guid router)
         {
-            int random = new Random().Next((int)Math.Ceiling(Sum[router] * 100));
-            int sum = 0;
+            decimal random = (decimal) new Random().NextDouble();
+            decimal sum = 0;
             Guid id;
 
             foreach (var i in Values[router].Keys.ToList())
             {
                 id = i;
-                sum += (int)Math.Floor(Values[router][id] * 100);
+                sum += Values[router][id];
                 if (sum > random) return id;
             }
 
@@ -88,23 +122,58 @@ namespace Network.Strategies
             return id;
         }
 
-        public virtual decimal UpdateValue(Guid destinationID, Guid link, decimal value)
+        private decimal BalanceValue(Guid destinationID, Guid link, decimal value)
         {
-            decimal initialSum = Sum[destinationID];
-            Sum[destinationID] = Sum[destinationID] + value;
+            return value * (1 - Values[destinationID][link]);
+        }
+
+        public virtual void UpdateValue(Guid destinationID, Guid link, decimal value)
+        {
+            value = BalanceValue(destinationID, link, value);
+            decimal originalValue = Values[destinationID][link];
             Values[destinationID][link] = Values[destinationID][link] + value;
 
-            if (Sum[destinationID] > Values[destinationID].Count * MaxValueMultipler)
+            if (Values[destinationID][link] > MaxProbability) Values[destinationID][link] = MaxProbability;
+            if (Values[destinationID][link] < MinProbability) Values[destinationID][link] = MinProbability;
+
+            var delta = UpdateAllOtherValues(destinationID, link, Values[destinationID][link] - originalValue);
+
+            Values[destinationID][link] = Values[destinationID][link] - delta;
+        }
+
+        private decimal UpdateAllOtherValues(Guid destinationID, Guid link, decimal delta)
+        {
+            decimal update;
+            decimal originalValue;
+            bool changed = true;
+            var listProbability = Values[destinationID].Keys.ToList();
+            listProbability.Remove(link);
+
+            while (delta != 0 && changed && listProbability.Count > 0)
             {
-                var equalizer = Sum[destinationID] / (Values[destinationID].Count * MaxValueMultipler);
-                foreach (var linkProb in Values[destinationID].Keys.ToList())
+                changed = false;
+                update = delta / listProbability.Count;
+                var listToRemove = new List<Guid>();
+                foreach (var probability in listProbability)
                 {
-                    Values[destinationID][linkProb] = Values[destinationID][linkProb] / equalizer;
+                    originalValue = Values[destinationID][probability];
+                    Values[destinationID][probability] = Values[destinationID][probability] - update;
+
+                    if (Values[destinationID][probability] > MaxProbability) Values[destinationID][probability] = MaxProbability;
+                    if (Values[destinationID][probability] < MinProbability) Values[destinationID][probability] = MinProbability;
+
+                    if (Values[destinationID][probability] != originalValue)
+                    {
+                        changed = true;
+                        delta += (Values[destinationID][probability] - originalValue);
+                    }
+                    else listToRemove.Add(probability);
                 }
-                Sum[destinationID] = Sum[destinationID] / equalizer;
+
+                foreach (var probability in listToRemove) listProbability.Remove(probability);
             }
 
-            return Sum[destinationID] / initialSum;
+            return delta;
         }
 
         public Dictionary<Guid, decimal> GetPercentageValues(Guid router)
@@ -113,10 +182,50 @@ namespace Network.Strategies
 
             foreach(var id in Values[router].Keys.ToList())
             {
-                result.Add(id, (decimal)Values[router][id] * 100 / Sum[router]);
+                result.Add(id, Values[router][id] * 100);
             }
 
             return result;
         }
+
+        public decimal GetVariance()
+        {
+            if(OldValues == null)
+            {
+                OldValues = new Dictionary<Guid, Dictionary<Guid, decimal>>();
+                UpdateOldValues();
+                return 0m;
+            }
+            decimal averageVariance = 0m;
+
+            foreach(var router in Values.Keys)
+            {
+                decimal localVariance = 0m;
+
+                foreach(var link in Values[router].Keys)
+                {
+                    localVariance += Math.Abs(Values[router][link] - OldValues[router][link]);
+                }
+                averageVariance += localVariance / Values[router].Count;
+            }
+
+            UpdateOldValues();
+            return averageVariance / Values.Count;
+        }
+
+        private void UpdateOldValues()
+        {
+            foreach(var router in Values.Keys)
+            {
+                var linkProbabilities = new Dictionary<Guid, decimal>();
+
+                foreach(var probability in Values[router])
+                {
+                    linkProbabilities[probability.Key] = probability.Value;
+                }
+
+                OldValues[router] = linkProbabilities;
+            }
+        } 
     }
 }

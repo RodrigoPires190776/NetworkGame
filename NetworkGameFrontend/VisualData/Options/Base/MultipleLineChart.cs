@@ -11,7 +11,7 @@ namespace NetworkGameFrontend.VisualData.Options.Base
     {
         protected List<List<double>> Values;
         protected List<SignalPlot> SignalPlots;
-        private double MaxValue = 1;
+        private double MaxValue = 0;
         public MultipleLineChart(string title, List<string> labels, Game game) :
             base(800, 600, title, game)
         {

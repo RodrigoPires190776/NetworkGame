@@ -39,6 +39,11 @@ namespace Network.Strategies.PacketCreation
             Properties[Property.Probability].SetValue(10m);
         }
 
+        public RandomPacketCreationStrategy(Guid networkID, Dictionary<string, Property> properties) :
+            base(networkID, properties)
+
+        { }
+
         public override Packet CreatePacket(Router router)
         {
             if (new Random().Next(100000) < (decimal)Properties[Property.Probability].Value * 1000)

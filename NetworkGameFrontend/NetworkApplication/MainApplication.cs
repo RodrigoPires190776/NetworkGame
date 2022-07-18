@@ -21,6 +21,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
 using static Network.Strategies.BaseStrategy;
+using static NetworkGameFrontend.VisualData.Options.Base.BasePlot;
 
 namespace NetworkGameFrontend.NetworkApplication
 {
@@ -32,7 +33,7 @@ namespace NetworkGameFrontend.NetworkApplication
         private DispatcherTimer FPSCounterTimer;
         private int NumberOfFrames = 0;
         private int TotalNumberOfCycles = 0;
-        private Guid LoadedNetwork;
+        public Guid LoadedNetwork { get; private set; }
         private Guid LoadedRouter;
         private Game NetworkGame;
         private NetworkUpdateStateQueue NetworkUpdateStateQueue;
@@ -80,7 +81,9 @@ namespace NetworkGameFrontend.NetworkApplication
             return NetworkMaster.GetInstance().GetNetwork(LoadedNetwork).RouterIDList.Count;
         }
 
-        public void StartDiscovery(RoutingStrategies routingStrategy, PickingStrategies pickingStrategy, CreationStrategies creationStrategy)
+        public void StartDiscovery(Tuple<RoutingStrategies, Dictionary<string, Property>> routingStrategy, 
+            Tuple<PickingStrategies, Dictionary<string, Property>> pickingStrategy, 
+            Tuple<CreationStrategies, Dictionary<string, Property>> creationStrategy)
         {
             TotalNumberOfCycles = 0;
             NetworkGame = new Game(NetworkMaster.GetInstance().GetNetwork(LoadedNetwork), 5,
@@ -101,22 +104,33 @@ namespace NetworkGameFrontend.NetworkApplication
 
         public Dictionary<string, Property> GetIntroduceAttackerProperties()
         {
-            var properties = new Dictionary<string, Property>();
-            properties.Add(Property.Attacker, new Property(Property.PropertyType.Integer, new List<Tuple<string, object>>()
+            var properties = new Dictionary<string, Property>
+            {
+                {
+                    Property.Attacker,
+                    new Property(Property.PropertyType.Integer, new List<Tuple<string, object>>()
                     {
                         new Tuple<string, object>(Property.INTEGER_MIN, 0),
                         new Tuple<string, object>(Property.INTEGER_MAX, NetworkMaster.GetInstance().GetNetwork(LoadedNetwork).Routers.Count - 1)
-                    }));
-            properties.Add(Property.Defensor, new Property(Property.PropertyType.Integer, new List<Tuple<string, object>>()
+                    })
+                },
+                {
+                    Property.Defensor,
+                    new Property(Property.PropertyType.Integer, new List<Tuple<string, object>>()
                     {
                         new Tuple<string, object>(Property.INTEGER_MIN, 0),
                         new Tuple<string, object>(Property.INTEGER_MAX, NetworkMaster.GetInstance().GetNetwork(LoadedNetwork).Routers.Count - 1)
-                    }));
-            properties.Add(Property.Destination, new Property(Property.PropertyType.Integer, new List<Tuple<string, object>>()
+                    })
+                },
+                {
+                    Property.Destination,
+                    new Property(Property.PropertyType.Integer, new List<Tuple<string, object>>()
                     {
                         new Tuple<string, object>(Property.INTEGER_MIN, 0),
                         new Tuple<string, object>(Property.INTEGER_MAX, NetworkMaster.GetInstance().GetNetwork(LoadedNetwork).Routers.Count - 1)
-                    }));
+                    })
+                }
+            };
 
             return properties;
         }

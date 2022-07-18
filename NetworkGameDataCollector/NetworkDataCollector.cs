@@ -61,5 +61,10 @@ namespace NetworkGameDataCollector
 
             return list;
         }
+
+        public List<decimal> GetPreviousAverageVariance(Guid networkID)
+        {
+            return Networks[networkID].AverageVariances;
+        }
     }
 }

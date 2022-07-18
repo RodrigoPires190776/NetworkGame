@@ -17,6 +17,10 @@ namespace Network.Strategies.PacketPicking
                 
             })
         { }
+
+        public RandomPacketPickingStrategy(Guid networkID, Dictionary<string, Property> properties) :
+            base(networkID, properties)
+        { }
         public override (Packet, bool) NextPacket(Router router)
         {
             return router.PacketQueue.Count > 0 ? (router.PacketQueue[new Random().Next(router.PacketQueue.Count)], true) : (null, true);

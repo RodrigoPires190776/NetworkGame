@@ -7,11 +7,19 @@ namespace Network.Strategies.PacketPicking
 {
     public sealed class RandomPacketPickingStrategy : PacketPickingStrategy
     {
+        public static Dictionary<string, Property> GetProperties()
+        {
+            return PacketPickingStrategy.GetProperties(new List<Tuple<string, Property.PropertyType, List<Tuple<string, object>>>>()); ;
+        }
         public RandomPacketPickingStrategy(Guid networkID) :
             base(networkID, new List<Tuple<string, Property.PropertyType, List<Tuple<string, object>>>>()
             {
                 
             })
+        { }
+
+        public RandomPacketPickingStrategy(Guid networkID, Dictionary<string, Property> properties) :
+            base(networkID, properties)
         { }
         public override (Packet, bool) NextPacket(Router router)
         {

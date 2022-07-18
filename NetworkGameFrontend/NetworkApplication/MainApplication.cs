@@ -20,6 +20,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
+using static Network.Strategies.BaseStrategy;
+using static NetworkGameFrontend.VisualData.Options.Base.BasePlot;
 
 namespace NetworkGameFrontend.NetworkApplication
 {
@@ -31,7 +33,7 @@ namespace NetworkGameFrontend.NetworkApplication
         private DispatcherTimer FPSCounterTimer;
         private int NumberOfFrames = 0;
         private int TotalNumberOfCycles = 0;
-        private Guid LoadedNetwork;
+        public Guid LoadedNetwork { get; private set; }
         private Guid LoadedRouter;
         private Game NetworkGame;
         private NetworkUpdateStateQueue NetworkUpdateStateQueue;
@@ -79,12 +81,13 @@ namespace NetworkGameFrontend.NetworkApplication
             return NetworkMaster.GetInstance().GetNetwork(LoadedNetwork).RouterIDList.Count;
         }
 
-        public void StartDiscovery()
+        public void StartDiscovery(Tuple<RoutingStrategies, Dictionary<string, Property>> routingStrategy, 
+            Tuple<PickingStrategies, Dictionary<string, Property>> pickingStrategy, 
+            Tuple<CreationStrategies, Dictionary<string, Property>> creationStrategy)
         {
-            //TODO choose strategies
             TotalNumberOfCycles = 0;
-            NetworkGame = new Game(NetworkMaster.GetInstance().GetNetwork(LoadedNetwork), 5, 
-                RoutingStrategies.LinearRewardInaction, PickingStrategies.Random, CreationStrategies.Random);
+            NetworkGame = new Game(NetworkMaster.GetInstance().GetNetwork(LoadedNetwork), 5,
+                routingStrategy, pickingStrategy, creationStrategy);
             NetworkUpdateStateQueue = new NetworkUpdateStateQueue();
             NetworkGame.GameStep += UpdateNetwork;
             NetworkDataCollector.GetInstance().AddEventHandler(LoadedNetwork, NetworkGame);
@@ -97,6 +100,39 @@ namespace NetworkGameFrontend.NetworkApplication
             FPSCounterTimer.Tick += UpdateFPSCounter;
             FPSCounterTimer.Start();
             EnableNetworkViewerControls();
+        }
+
+        public Dictionary<string, Property> GetIntroduceAttackerProperties()
+        {
+            var properties = new Dictionary<string, Property>
+            {
+                {
+                    Property.Attacker,
+                    new Property(Property.PropertyType.Integer, new List<Tuple<string, object>>()
+                    {
+                        new Tuple<string, object>(Property.INTEGER_MIN, 0),
+                        new Tuple<string, object>(Property.INTEGER_MAX, NetworkMaster.GetInstance().GetNetwork(LoadedNetwork).Routers.Count - 1)
+                    })
+                },
+                {
+                    Property.Defensor,
+                    new Property(Property.PropertyType.Integer, new List<Tuple<string, object>>()
+                    {
+                        new Tuple<string, object>(Property.INTEGER_MIN, 0),
+                        new Tuple<string, object>(Property.INTEGER_MAX, NetworkMaster.GetInstance().GetNetwork(LoadedNetwork).Routers.Count - 1)
+                    })
+                },
+                {
+                    Property.Destination,
+                    new Property(Property.PropertyType.Integer, new List<Tuple<string, object>>()
+                    {
+                        new Tuple<string, object>(Property.INTEGER_MIN, 0),
+                        new Tuple<string, object>(Property.INTEGER_MAX, NetworkMaster.GetInstance().GetNetwork(LoadedNetwork).Routers.Count - 1)
+                    })
+                }
+            };
+
+            return properties;
         }
 
         public void IntroduceAttacker(int defensor, int destination, int attacker)

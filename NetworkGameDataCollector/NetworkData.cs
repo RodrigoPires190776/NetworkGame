@@ -13,6 +13,7 @@ namespace NetworkGameDataCollector
         public Dictionary<Guid, RouterData> RouterData { get; }
         //private Network.Network Network;
         public Dictionary<int, UpdatedState> States { get; }
+        public List<decimal> AverageVariances { get; }
         private int NumberOfSteps;
 
         public NetworkData(Network.Network network)
@@ -20,6 +21,7 @@ namespace NetworkGameDataCollector
             //Network = network;
             RouterData = new Dictionary<Guid, RouterData>();
             States = new Dictionary<int, UpdatedState>();
+            AverageVariances = new List<decimal>();
             NumberOfSteps = 0;
 
             foreach(var router in network.RouterIDList)
@@ -46,6 +48,8 @@ namespace NetworkGameDataCollector
                 RouterData[packet.Destination].Update(packet);
             }
             States.Add(state.NumberOfSteps, state);
+
+            if (state.UpdatedAveragevariance) AverageVariances.Add(state.AverageVarience);
             NumberOfSteps = state.NumberOfSteps > NumberOfSteps ? state.NumberOfSteps : NumberOfSteps;
         }
 

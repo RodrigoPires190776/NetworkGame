@@ -22,9 +22,11 @@ namespace NetworkGameFrontend.VisualNetwork
         public VisualNetwork(Network.Network network)
         {
             Network = network;
-            PacketCanvas = new Canvas();
-            PacketCanvas.Height = HEIGHT;
-            PacketCanvas.Width = WIDTH;
+            PacketCanvas = new Canvas
+            {
+                Height = HEIGHT,
+                Width = WIDTH
+            };
 
             Routers = new Dictionary<Guid, VisualRouter>();
             RouterIDs = new Dictionary<int, Guid>();

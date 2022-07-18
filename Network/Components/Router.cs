@@ -1,4 +1,6 @@
 ﻿using Network.Strategies;
+using Network.Strategies.AttackerStrategies;
+using Network.Strategies.DefenderStrategies;
 using Network.Strategies.PacketCreation;
 using Network.Strategies.PacketPicking;
 using Network.Strategies.Routing;
@@ -78,9 +80,14 @@ namespace Network.Components
             return (new UpdateRouter(ID, PacketQueue.Count, newPacket != null, nextPacket.Item2, RoutingStrategy.RoutingTable), newPacket, dropped);
         }
 
-        public decimal Learn(Packet packet)
+        public void Learn(Packet packet)
         {
-            return RoutingStrategy.Learn(packet);
+            RoutingStrategy.Learn(packet);
+        }
+
+        public decimal GetVariance()
+        {
+            return RoutingStrategy.RoutingTable.GetVariance();
         }
 
         public void SetAgentNormal()

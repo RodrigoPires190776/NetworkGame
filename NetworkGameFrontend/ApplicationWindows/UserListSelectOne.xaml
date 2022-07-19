@@ -1,0 +1,36 @@
+﻿<Window x:Class="NetworkGameFrontend.ApplicationWindows.UserListSelectOne"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:NetworkGameFrontend.ApplicationWindows"
+        mc:Ignorable="d"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        Title="UserStringInput" Height="300" Width="500">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <TextBlock x:Name="DialogTitle" Text="" FontSize="20" Margin="10"/>
+        </Grid>
+        <Grid x:Name="Grid" Grid.Row="1">
+            <ComboBox x:Name="ListBox" VerticalAlignment="Center" Grid.Row="1" FontSize="20" Width="400"/>
+        </Grid>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="1" Margin="5,25,50,25" Click="Clicked_Ok">
+                <TextBlock Text="OK" FontSize="18"/>
+            </Button>
+            <Button Margin="50,25,5,25" Click="Clicked_Cancel">
+                <TextBlock Text="Cancel" FontSize="18"/>
+            </Button>
+        </Grid>
+    </Grid>
+</Window>

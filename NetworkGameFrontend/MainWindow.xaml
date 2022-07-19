@@ -1,0 +1,297 @@
+﻿<Window x:Class="NetworkGameFrontend.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:NetworkGameFrontend"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="900" Width="1600">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid x:Name="ToolBar" Grid.Row="0">
+            <Menu>
+                <MenuItem Height="25" Width="50">
+                    <MenuItem.Header>
+                        <TextBlock Margin="9,0,0,0" Text="File"/>
+                    </MenuItem.Header>
+                    <MenuItem Header="Import Network" Click="File_ImportNetwork_Click"/>
+                </MenuItem>
+                <MenuItem Height="25" Width="75">
+                    <MenuItem.Header>
+                        <TextBlock Margin="8,0,0,0" Text="Network"/>
+                    </MenuItem.Header>
+                    <MenuItem Header="Load Network" Click="Network_LoadNetwork_Click"/>
+                </MenuItem>
+            </Menu>
+
+        </Grid>
+
+        <Grid x:Name="Window" Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="4*"/>
+                <ColumnDefinition Width="*" MinWidth="170"/>
+            </Grid.ColumnDefinitions>
+            <Grid x:Name="NetworkViewer" Background="Moccasin" Grid.Column="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Slider Grid.Column="0" Orientation="Vertical"  Visibility="Hidden"
+                     HorizontalAlignment="Left" Minimum="0.5" Maximum="2" Value="1" x:Name="NetworkScrollViewerSlider"/>
+                <ScrollViewer x:Name="NetworkScrollViewer"   
+                     Grid.Column="1"
+                     VerticalScrollBarVisibility="Hidden"
+                     HorizontalScrollBarVisibility="Hidden"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center">
+                    <Grid Name="NetworkScrollViewerGrid" RenderTransformOrigin="0.5,0.5">
+                        <Grid.LayoutTransform>
+                            <TransformGroup>
+                                <ScaleTransform x:Name="NetworkScrollViewerGridScaleTransform"/>
+                            </TransformGroup>
+                        </Grid.LayoutTransform>
+                        <Viewbox Grid.Column="0" Grid.Row="0">
+                            <ContentPresenter x:Name="NetworkScrollViewerContent"/>
+                        </Viewbox>
+                    </Grid>
+                </ScrollViewer>
+                <Grid Height="90" Width="160" Background="Transparent" HorizontalAlignment="Right" VerticalAlignment="Top" Visibility="Visible" Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" x:Name="FPSCounterGrid">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="35"/>
+                            <ColumnDefinition Width="75"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="1" Text="FPS:" Foreground="Black" HorizontalAlignment="Right"/>
+                        <TextBlock x:Name="FPSCounter" Grid.Column="2" Text="..." Foreground="Black"/>
+                    </Grid>
+                    <Grid Grid.Row="1" x:Name="GameLoopCounterGrid">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="35"/>
+                            <ColumnDefinition Width="75"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="1" Text="CPS:" Foreground="Black" HorizontalAlignment="Right"/>
+                        <TextBlock x:Name="LoopCounter" Grid.Column="2" Text="..." Foreground="Black"/>
+                    </Grid>
+                    <Grid Grid.Row="2" x:Name="TotalGameLoopCounterGrid">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="75"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Total CPS:" Foreground="Black" HorizontalAlignment="Right"/>
+                        <TextBlock x:Name="TotalLoopCounter" Grid.Column="1" Text="..." Foreground="Black"/>
+                    </Grid>
+                    <Grid Grid.Row="3" x:Name="FrameControls" Background="Gray">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Click="Viewer_SlowDown_Click" x:Name="NetworkViewerSlowDown" IsEnabled="False" FontFamily="Segoe MDL2 Assets" Content="&#xEB9E;" Width="40" Background="White" Foreground="Black" HorizontalAlignment="Center"/>
+                        <Button Grid.Column="1" Click="Viewer_StartPause_Click" x:Name="NetworkViewerStartPause" IsEnabled="False" FontFamily="Segoe MDL2 Assets" Content="&#xE102;" Width="40" Background="White" Foreground="Black"/>
+                        <Button Grid.Column="2" Click="Viewer_SpeedUp_Click" x:Name="NetworkViewerSpeedUp" IsEnabled="False" FontFamily="Segoe MDL2 Assets" Content="&#xEB9D;" Width="40" Background="White" Foreground="Black" HorizontalAlignment="Center"/>
+                    </Grid>
+                </Grid>
+            </Grid>
+
+            <Grid x:Name="NetworkControls" Background="PaleTurquoise" Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="200" MinHeight="50"/>
+                    <RowDefinition Height="250" MinHeight="50"/>
+                    <RowDefinition Height="100" MinHeight="50"/>
+                    <RowDefinition Height="100" MinHeight="50"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Routing Strategy:" FontSize="10" VerticalAlignment="Bottom" Margin="25,0,0,0"/>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="5*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <ComboBox x:Name="RoutingStrategyListBox" Grid.Row="1" MaxWidth="250" Margin="25,0,0,5" IsEnabled="False" SelectionChanged="Controls_UpdateRoutingStrategy"/>
+                            <Button Grid.Column="1" Height="20" Width="30" VerticalAlignment="Top" HorizontalAlignment="Left" Content="..." 
+                                    Click="Controls_RoutingStrategyPropertiesEditor_Click" IsEnabled="{Binding ElementName=RoutingStrategyListBox, Path=IsEnabled, Mode=OneWay}"/>
+                        </Grid>
+                    </Grid>
+                    <Grid Grid.Row="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Packet Picking Strategy:" FontSize="10" VerticalAlignment="Bottom" Margin="25,0,0,0"/>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="5*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <ComboBox x:Name="PickingStrategyListBox" Grid.Row="1" MaxWidth="250" Margin="25,0,0,5" IsEnabled="False" SelectionChanged="Controls_PacketPickingStrategy"/>
+                            <Button Grid.Column="1" Height="20" Width="30" VerticalAlignment="Top" HorizontalAlignment="Left" Content="..."
+                                    Click="Controls_PacketPickingPropertiesEditor_Click" IsEnabled="{Binding ElementName=PickingStrategyListBox, Path=IsEnabled, Mode=OneWay}"/>
+                        </Grid>
+                    </Grid>
+                    <Grid Grid.Row="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Packet Creation Strategy:" FontSize="10" VerticalAlignment="Bottom" Margin="25,0,0,0"/>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="5*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <ComboBox x:Name="CreationStrategyListBox" Grid.Row="1" MaxWidth="250" Margin="25,0,0,5" IsEnabled="False" SelectionChanged="Controls_PacketCreationStrategy"/>
+                            <Button Grid.Column="1" Height="20" Width="30" VerticalAlignment="Top" HorizontalAlignment="Left" Content="..."
+                                    Click="Controls_PacketCreationPropertiesEditor_Click" IsEnabled="{Binding ElementName=CreationStrategyListBox, Path=IsEnabled, Mode=OneWay}"/>
+                        </Grid>
+                    </Grid>
+                    <Button x:Name="StartDiscoveryButton" Background="Gray" Grid.Row="3" Click="Controls_StartDiscovery_Click" IsEnabled="False" Height="40" MaxWidth="125" Margin="5">
+                        <TextBlock Text="Start Discovery" TextWrapping="Wrap"/>
+                    </Button>
+                    
+                </Grid>
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="2*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width ="*"/>
+                            <ColumnDefinition Width ="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Average Variance:" Foreground="Black" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        <TextBox x:Name="AverageVarianceTextBox" Text="0" Grid.Column="1" Height="30" Background="White" VerticalAlignment="Center" IsEnabled="False" VerticalContentAlignment="Center"/>
+                    </Grid>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Router Number:" Foreground="Black" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        <TextBox x:Name="RouterNumberTextBox" Grid.Column="1" Height="30" Width="50" HorizontalAlignment="Left" Foreground="Black" Background="White" IsEnabled="False"/>
+                    </Grid>
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Packets Created:" Foreground="Black" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        <TextBox x:Name="PacketsCreatedTextBox" Grid.Column="1" Height="30" Width="50" HorizontalAlignment="Left" Foreground="Black" Background="White" IsEnabled="False"/>
+                    </Grid>
+                    <Grid Grid.Row="3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Packets Sent:" Foreground="Black" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        <TextBox x:Name="PacketsSentTextBox" Grid.Column="1" Height="30" Width="50" HorizontalAlignment="Left" Foreground="Black" Background="White" IsEnabled="False"/>
+                    </Grid>
+                    <Grid Grid.Row="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Packets Delivered:" Foreground="Black" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        <TextBox x:Name="PacketsDeliveredTextBox" Grid.Column="1" Height="30" Width="50" HorizontalAlignment="Left" Foreground="Black" Background="White" IsEnabled="False"/>
+                    </Grid>
+                    <Grid Grid.Row="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Packets Dropped:" Foreground="Black" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        <TextBox x:Name="PacketsDroppedTextBox" Grid.Column="1" Height="30" Width="50" HorizontalAlignment="Left" Foreground="Black" Background="White" IsEnabled="False"/>
+                    </Grid>
+                    <Grid Grid.Row="6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Packets in Transit:" Foreground="Black" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        <TextBox x:Name="PacketsInTransitTextBox" Grid.Column="1" Height="30" Width="50" HorizontalAlignment="Left" Foreground="Black" Background="White" IsEnabled="False"/>
+                    </Grid>
+                    <Grid Grid.Row="7">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Packets in Queue:" Foreground="Black" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        <TextBox x:Name="PacketsInQueueTextBox" Grid.Column="1" Height="30" Width="50" HorizontalAlignment="Left" Foreground="Black" Background="White" IsEnabled="False"/>
+                    </Grid>
+                    <Grid Grid.Row="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Packets Received:" Foreground="Black" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        <TextBox x:Name="PacketsReceivedTextBox" Grid.Column="1" Height="30" Width="50" HorizontalAlignment="Left" Foreground="Black" Background="White" IsEnabled="False"/>
+                    </Grid>
+                    <Grid Grid.Row="9">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Average Deliver Time:" Foreground="Black" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        <TextBox x:Name="PacketAverageDeliverTimeTextBox" Grid.Column="1" Height="30" Width="50" HorizontalAlignment="Left" Foreground="Black" Background="White" IsEnabled="False"/>
+                    </Grid>
+                </Grid>
+                <Grid Grid.Row="2">
+                    <Button x:Name="IntroduceAttackerButton" Background="Gray" Grid.Column="0" Click="Controls_IntroduceAttacker_Click" IsEnabled="False" Height="40" Width="150">
+                        <TextBlock Text="Introduce Attacker" TextWrapping="Wrap"/>
+                    </Button>
+                </Grid>
+                <Grid Grid.Row="3">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="3*"/>
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="1" x:Name="PlotViewerButton" Background="Gray" Grid.Column="0" Click="Controls_PlotViewer_Click" VerticalAlignment="Top" IsEnabled="False" Height="40" Width="150">
+                        <TextBlock Text="Plot Viewer" TextWrapping="Wrap"/>
+                    </Button>
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="5*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <ComboBox x:Name="PlotTypeListBox" Grid.Row="1" MaxWidth="250" Margin="25,0,0,5" IsEnabled="False" SelectionChanged="Controls_UpdatePlotSelected"/>
+                        <Button Grid.Column="1" Height="20" Width="30" VerticalAlignment="Top" HorizontalAlignment="Left" Content="..." 
+                                    Click="Controls_PlotPropertiesEditor_Click" IsEnabled="{Binding ElementName=PlotTypeListBox, Path=IsEnabled, Mode=OneWay}"/>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

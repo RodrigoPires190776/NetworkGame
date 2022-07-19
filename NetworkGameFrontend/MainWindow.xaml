@@ -19,6 +19,7 @@
                         <TextBlock Margin="9,0,0,0" Text="File"/>
                     </MenuItem.Header>
                     <MenuItem Header="Import Network" Click="File_ImportNetwork_Click"/>
+                    <MenuItem Header="Generate Network" Click="File_GenerateNetwork_Click"/>
                 </MenuItem>
                 <MenuItem Height="25" Width="75">
                     <MenuItem.Header>
@@ -41,7 +42,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Slider Grid.Column="0" Orientation="Vertical"  Visibility="Hidden"
-                     HorizontalAlignment="Left" Minimum="0.5" Maximum="2" Value="1" x:Name="NetworkScrollViewerSlider"/>
+                     HorizontalAlignment="Left" Minimum="0.25" Maximum="4" Value="1" x:Name="NetworkScrollViewerSlider"/>
                 <ScrollViewer x:Name="NetworkScrollViewer"   
                      Grid.Column="1"
                      VerticalScrollBarVisibility="Hidden"

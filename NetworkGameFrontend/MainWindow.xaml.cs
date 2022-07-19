@@ -77,6 +77,19 @@ namespace NetworkGameFrontend
             }
         }
 
+        void File_GenerateNetwork_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                app.GenerateNetwork();
+                _ = MessageBox.Show("NetworkGenerated!");
+            }
+            catch(Exception ex)
+            {
+                _ = MessageBox.Show(ex.Message);
+            }
+        }
+
         void Network_LoadNetwork_Click(object sender, RoutedEventArgs e)
         {
             var networkSelectDialog = new UserListSelectOne(app.GetAllNetworksName(), this);

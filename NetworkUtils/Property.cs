@@ -171,5 +171,8 @@ namespace NetworkUtils
         public const string Destination = "Destination";
         public const string MinProbability = "MinProbability";
         public const string MaxProbability = "MaxProbability";
+        public const string NumberOfNodes = "NumberOfNodes";
+        public const string ProbabilityOfLink = "ProbabilityOfLink";
+        public const string ShortestLinkLength = "ShortestLinkLength";
     }
 }

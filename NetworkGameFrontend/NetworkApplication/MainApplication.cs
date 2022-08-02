@@ -61,10 +61,10 @@ namespace NetworkGameFrontend.NetworkApplication
             NetworkDataCollector.GetInstance().AddNetwork(network);
         }
 
-        public void GenerateNetwork()
+        public void GenerateNetwork(Dictionary<string, Property> properties)
         {
             var generator = new NetworkGenerator.Generator.NetworkGenerator();
-            var network = generator.GenerateNetwork();
+            var network = generator.GenerateNetwork(properties);
 
             NetworkMaster.GetInstance().AddNetwork(network, "GeneratedNetwork");
             NetworkDataCollector.GetInstance().AddNetwork(network);

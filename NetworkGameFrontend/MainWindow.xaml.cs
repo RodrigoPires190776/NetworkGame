@@ -42,7 +42,7 @@ namespace NetworkGameFrontend
             app = new MainApplication(NetworkViewer, NetworkControls);
             InitializeStrategies();           
         }
-
+        #region File
         void File_ImportNetwork_Click(object sender, RoutedEventArgs e)
         {
             var picker = new OpenFileDialog
@@ -81,7 +81,12 @@ namespace NetworkGameFrontend
         {
             try
             {
-                app.GenerateNetwork();
+                var propertiesEditor = new UserPropertyConfiguration(
+                    "Network Generation Settings", 
+                    NetworkGenerator.Generator.NetworkGenerator.GetProperties()
+                    );
+                propertiesEditor.ShowDialog();
+                app.GenerateNetwork(propertiesEditor.Properties);
                 _ = MessageBox.Show("NetworkGenerated!");
             }
             catch(Exception ex)
@@ -89,7 +94,8 @@ namespace NetworkGameFrontend
                 _ = MessageBox.Show(ex.Message);
             }
         }
-
+        #endregion
+        #region Network
         void Network_LoadNetwork_Click(object sender, RoutedEventArgs e)
         {
             var networkSelectDialog = new UserListSelectOne(app.GetAllNetworksName(), this);
@@ -117,7 +123,8 @@ namespace NetworkGameFrontend
                 _ = MessageBox.Show("Load Cancelled!");
             }
         }
-
+        #endregion
+        #region Network Viewer Controls
         void Controls_StartDiscovery_Click(object sender, RoutedEventArgs e)
         {
             var strategies = GetStrategies();
@@ -144,12 +151,12 @@ namespace NetworkGameFrontend
 
         void Controls_PlotViewer_Click(object sender, RoutedEventArgs e)
         {
-            var plot = app.GetPlot(PlotType.AverageVarianceLineChart);
+            var plot = app.GetPlot(BasePlot.GetPlotTypeEnum(PlotTypeListBox.Items.GetItemAt(PlotTypeListBox.SelectedIndex).ToString()));
 
-            var propertiesEditor = new UserPropertyConfiguration(PlotType.AverageVarianceLineChart.ToString() + " Properties", plot.Properties);
-            propertiesEditor.ShowDialog();
+            //var propertiesEditor = new UserPropertyConfiguration(PlotTypeListBox.Items.GetItemAt(PlotTypeListBox.SelectedIndex).ToString() + " Properties", plot.Properties);
+            //propertiesEditor.ShowDialog();
 
-            plot = app.InitializePlot(plot, propertiesEditor.Properties);
+            plot = app.InitializePlot(plot, PlotProperties);
 
             var plotViewer = new PlotViewer(this, plot);
             plotViewer.Show();
@@ -168,8 +175,8 @@ namespace NetworkGameFrontend
         {
             app.GameSpeedChange(1);
         }
-
-    #region Strategies
+        #endregion
+        #region Strategies
         void Controls_RoutingStrategyPropertiesEditor_Click(object sender, RoutedEventArgs e)
         {
             var propertiesEditor = new UserPropertyConfiguration(
@@ -240,7 +247,7 @@ namespace NetworkGameFrontend
             return (routing, picking, creation);
         }
         #endregion
-
+        #region Plot Viewer
         private void InitializePlotTypes()
         {
             PlotTypeListBox.ItemsSource = BasePlot.PlotTypeList;
@@ -261,5 +268,6 @@ namespace NetworkGameFrontend
             PlotProperties = BasePlot.GetPlotProperties(
                 PlotTypeListBox.Items.GetItemAt(PlotTypeListBox.SelectedIndex).ToString(), app.LoadedNetwork);
         }
+        #endregion
     }
 }

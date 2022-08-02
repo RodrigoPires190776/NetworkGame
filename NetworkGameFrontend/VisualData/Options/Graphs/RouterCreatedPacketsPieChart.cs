@@ -53,7 +53,7 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
 
         public override BasePlot Initialize(VisualNetwork.VisualNetwork visualNetwork, Dictionary<string, Property> properties)
         {
-            Router = visualNetwork.RouterIDs[(int)Properties[Property.Router].Value];
+            Router = visualNetwork.RouterIDs[(int)properties[Property.Router].Value];
              
             SetRouterValues(NetworkDataCollector.GetInstance().GetRouterData(Network, Router));
             
@@ -61,6 +61,7 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
             PiePlot.ShowValues = true;
             PiePlot.ShowLabels = true;
             Plot.Legend();
+            Plot.Title($"Router {(int)properties[Property.Router].Value} Created Packets Line Chart");
 
             base.Initialize(visualNetwork, properties);
 

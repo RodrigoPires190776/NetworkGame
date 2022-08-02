@@ -43,5 +43,5 @@ def gnp_random_connected_graph(num_nodes, prob_edge):
 
 if __name__ == "__main__":
     n = int(sys.argv[1])
-    p = float(sys.argv[2])
+    p = float(sys.argv[2].replace(',', '.'))
     main(n, p)

@@ -52,10 +52,11 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
 
         public override BasePlot Initialize(VisualNetwork.VisualNetwork visualNetwork, Dictionary<string, Property> properties)
         {
-            Router = visualNetwork.RouterIDs[(int)Properties[Property.Router].Value];
+            Router = visualNetwork.RouterIDs[(int)properties[Property.Router].Value];
             
             Plot.Legend(location: ScottPlot.Alignment.UpperLeft);
-            
+            Plot.Title($"Router {(int)properties[Property.Router].Value} Created Packets Line Chart");
+
             base.Initialize(visualNetwork, properties);
 
             return this;

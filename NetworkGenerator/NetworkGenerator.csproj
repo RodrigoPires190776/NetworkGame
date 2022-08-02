@@ -5,7 +5,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Generator\PythonScripts\GenerateNetwork.py" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Generator\PythonScripts\GenerateNetwork.py">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Network\Network.csproj" />
+    <ProjectReference Include="..\PythonIntegration\PythonIntegration.csproj" />
   </ItemGroup>
 
 </Project>

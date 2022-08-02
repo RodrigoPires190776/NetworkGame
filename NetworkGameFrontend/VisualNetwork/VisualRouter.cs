@@ -49,7 +49,14 @@ namespace NetworkGameFrontend.VisualNetwork
             UIElement.Children.Add(Ellipse);
             UIElement.Children.Add(TextBlock);
 
-            TextBlock.SetValue(Canvas.LeftProperty, (double)14);
+            int left = 14;
+            int x = id;
+            while (x > 9)
+            {
+                left -= 5;
+                x /= 10;
+            }
+            TextBlock.SetValue(Canvas.LeftProperty, (double)left);
             TextBlock.SetValue(Canvas.TopProperty, (double)6);
 
             UIElement.Width = RADIUS * 2;

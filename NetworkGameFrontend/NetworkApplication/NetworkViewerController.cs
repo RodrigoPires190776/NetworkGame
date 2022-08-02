@@ -45,8 +45,8 @@ namespace NetworkGameFrontend.NetworkApplication
             Application.Current.Dispatcher.Invoke(() => {
                 var canvas = new Canvas
                 {
-                    Height = 2000,
-                    Width = 2000
+                    Height = 2100,
+                    Width = 2100
                 };
                 canvas.Children.Add(VisualNetwork.UIElement);
                 canvas.Children.Add(VisualNetwork.PacketCanvas);

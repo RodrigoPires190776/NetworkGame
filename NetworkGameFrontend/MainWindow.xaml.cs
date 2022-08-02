@@ -52,7 +52,7 @@ namespace NetworkGameFrontend
 
             if (picker.ShowDialog() == true)
             {
-                var networkNameDialog = new UserStringInput("Choose a name for the nextwork", "Name:", picker.SafeFileName, this);
+                var networkNameDialog = new UserStringInput("Choose a name for the network", "Name:", picker.SafeFileName, this);
                 _ =  networkNameDialog.ShowDialog();
                 if (networkNameDialog.Ok)
                 {

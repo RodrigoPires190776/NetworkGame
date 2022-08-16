@@ -1,4 +1,5 @@
 ﻿using Network.Components;
+using Network.RouteDiscovery;
 using Network.Strategies;
 using Network.UpdateNetwork;
 using Network.UpdateNetwork.UpdateObjects;
@@ -53,6 +54,11 @@ namespace Network
         {
             Routers[defensorID].SetAgentDefensor(destinationID);
             Routers[attackerID].SetAgentAttacker(defensorID);
+        }
+
+        public void Initialize(BaseRouteDiscovery discovery)
+        {
+            discovery.Discovery();
         }
 
         public UpdatedState Step()

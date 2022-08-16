@@ -50,11 +50,6 @@ namespace Network.Strategies
                         new Tuple<string, object>(Property.DECIMAL_MAX, 1m),
                         new Tuple<string, object>(Property.INITIAL_VALUE, 1m)
                     }));
-            /*Properties.Add("", new Property(PropertyType.Decimal,
-                    new List<Tuple<string, object>>()
-                    {
-                        new Tuple<string, object>(DECIMAL_MIN, 0m)
-                    }));*/
         }
         public RoutingStrategy(Guid routerID, Guid networkID, Dictionary<string, Property> properties) :
             base(networkID, properties)
@@ -103,6 +98,11 @@ namespace Network.Strategies
 
                 Values.TryAdd(routerID, routerProbabilities);
             }   
+        }
+
+        public virtual void SetValues(Guid destinationNode, Dictionary<Guid, decimal> probabilities)
+        {
+            Values[destinationNode] = probabilities;
         }
 
         public virtual Guid GetLink(Guid router)

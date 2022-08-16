@@ -20,6 +20,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
+using static Network.RouteDiscovery.BaseRouteDiscovery;
 using static Network.Strategies.BaseStrategy;
 using static NetworkGameFrontend.VisualData.Options.Base.BasePlot;
 
@@ -92,11 +93,12 @@ namespace NetworkGameFrontend.NetworkApplication
 
         public void StartDiscovery(Tuple<RoutingStrategies, Dictionary<string, Property>> routingStrategy, 
             Tuple<PickingStrategies, Dictionary<string, Property>> pickingStrategy, 
-            Tuple<CreationStrategies, Dictionary<string, Property>> creationStrategy)
+            Tuple<CreationStrategies, Dictionary<string, Property>> creationStrategy,
+            Tuple<RouteDiscoveryStrategies, Dictionary<string, Property>> discoveryStrategy)
         {
             TotalNumberOfCycles = 0;
             NetworkGame = new Game(NetworkMaster.GetInstance().GetNetwork(LoadedNetwork), 5,
-                routingStrategy, pickingStrategy, creationStrategy);
+                routingStrategy, pickingStrategy, creationStrategy, discoveryStrategy);
             NetworkUpdateStateQueue = new NetworkUpdateStateQueue();
             NetworkGame.GameStep += UpdateNetwork;
             NetworkDataCollector.GetInstance().AddEventHandler(LoadedNetwork, NetworkGame);

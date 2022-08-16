@@ -165,6 +165,7 @@ namespace NetworkUtils
         public const string Router = "Router";
         public const string Probability = "Probability";
         public const string LearningWeight = "LearningWeight";
+        public const string PenaltyWeight = "PenaltyWeight";
         public const string LoadAllValues = "LoadAllValues";
         public const string Attacker = "Attacker";
         public const string Defensor = "Defensor";

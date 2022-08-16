@@ -11,6 +11,7 @@ namespace NetworkGameFrontend.NetworkApplication
     public class NetworkViewerController
     {
         public VisualNetwork.VisualNetwork VisualNetwork { get; private set; }
+        public bool UpdatePackets { get; set; }
         private readonly ScrollViewer NetworkScrollViewer;
         private readonly Slider Slider;
         private readonly Grid NetworkScrollViewerGrid;
@@ -27,6 +28,7 @@ namespace NetworkGameFrontend.NetworkApplication
             NetworkScrollViewerGrid = grid;
             NetworkScrollViewerScaleTransform = scaleTransform;
             NetworkScrollViewerContent = contentPresenter;
+            UpdatePackets = true;
         }
 
         public void LoadNetwork(string networkName)
@@ -57,7 +59,7 @@ namespace NetworkGameFrontend.NetworkApplication
         public void Update(UpdatedState state, Guid loadedRouterID)
         {
             Application.Current.Dispatcher.Invoke(() => {
-                VisualNetwork.Update(state, loadedRouterID);
+                VisualNetwork.Update(state, loadedRouterID, UpdatePackets);
             });
         }
 

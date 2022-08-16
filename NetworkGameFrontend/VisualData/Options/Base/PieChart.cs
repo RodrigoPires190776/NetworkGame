@@ -26,5 +26,9 @@ namespace NetworkGameFrontend.VisualData.Options.Base
             Values = values;
             PiePlot.Values = Values.ToArray();
         }
+        public override void ResetView()
+        {
+            WpfPlot.Render();
+        }
     }
 }

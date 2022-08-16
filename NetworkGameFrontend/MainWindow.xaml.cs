@@ -168,6 +168,12 @@ namespace NetworkGameFrontend
         {
             app.GameSpeedChange(1);
         }
+
+        void Viewer_ToggleUpdatePackets_Click(object sender, RoutedEventArgs e)
+        {
+            app.ToggleUpdatePackets();
+        }
+
         #endregion
         #region Strategies
         void Controls_RoutingStrategyPropertiesEditor_Click(object sender, RoutedEventArgs e)

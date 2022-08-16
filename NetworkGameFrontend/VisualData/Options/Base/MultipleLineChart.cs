@@ -46,8 +46,15 @@ namespace NetworkGameFrontend.VisualData.Options.Base
             }
 
             MaxValue = Math.Max(sum, MaxValue);
-            Plot.SetAxisLimitsX(0, Values[0].Count);
+            Plot.SetAxisLimitsX(0, Values[0].Count - 1);
             Plot.SetAxisLimitsY(0, MaxValue);
+        }
+
+        public override void ResetView()
+        {
+            Plot.SetAxisLimitsX(0, Values[0].Count - 1);
+            Plot.SetAxisLimitsY(0, MaxValue);
+            WpfPlot.Render();
         }
     }
 }

@@ -60,12 +60,13 @@
                         </Viewbox>
                     </Grid>
                 </ScrollViewer>
-                <Grid Height="90" Width="160" Background="Transparent" HorizontalAlignment="Right" VerticalAlignment="Top" Visibility="Visible" Grid.Column="1">
+                <Grid Height="120" Width="160" Background="Transparent" HorizontalAlignment="Right" VerticalAlignment="Top" Visibility="Visible" Grid.Column="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="20"/>
                         <RowDefinition Height="20"/>
                         <RowDefinition Height="20"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
                     </Grid.RowDefinitions>
                     <Grid Grid.Row="0" x:Name="FPSCounterGrid">
                         <Grid.ColumnDefinitions>
@@ -102,6 +103,14 @@
                         <Button Grid.Column="0" Click="Viewer_SlowDown_Click" x:Name="NetworkViewerSlowDown" IsEnabled="False" FontFamily="Segoe MDL2 Assets" Content="&#xEB9E;" Width="40" Background="White" Foreground="Black" HorizontalAlignment="Center"/>
                         <Button Grid.Column="1" Click="Viewer_StartPause_Click" x:Name="NetworkViewerStartPause" IsEnabled="False" FontFamily="Segoe MDL2 Assets" Content="&#xE102;" Width="40" Background="White" Foreground="Black"/>
                         <Button Grid.Column="2" Click="Viewer_SpeedUp_Click" x:Name="NetworkViewerSpeedUp" IsEnabled="False" FontFamily="Segoe MDL2 Assets" Content="&#xEB9D;" Width="40" Background="White" Foreground="Black" HorizontalAlignment="Center"/>
+                    </Grid>
+                    <Grid Grid.Row="4" x:Name="FrameControls2" Background="Gray">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="2" Click="Viewer_ToggleUpdatePackets_Click" x:Name="NetworkViewerUpdatePackets" IsEnabled="False" FontFamily="Segoe MDL2 Assets" Content="&#xE8F3;" FontSize="16" Width="40" Background="White" Foreground="Black" HorizontalAlignment="Center"/>
                     </Grid>
                 </Grid>
             </Grid>

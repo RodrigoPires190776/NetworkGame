@@ -234,6 +234,7 @@ namespace NetworkGameFrontend.NetworkApplication
             ((Button)NetworkFPSCounter.FindName("NetworkViewerStartPause")).IsEnabled = true;
             ((Button)NetworkFPSCounter.FindName("NetworkViewerStartPause")).Content = "\uE769";
             ((Button)NetworkFPSCounter.FindName("NetworkViewerSpeedUp")).IsEnabled = true;
+            ((Button)NetworkFPSCounter.FindName("NetworkViewerUpdatePackets")).IsEnabled = true;
         }
 
         public void ViewerStartPause()
@@ -266,6 +267,11 @@ namespace NetworkGameFrontend.NetworkApplication
             NetworkGame.ChangeSpeed(speed);
         }
 
+        public bool ToggleUpdatePackets()
+        {
+            NetworkViewerController.UpdatePackets = !NetworkViewerController.UpdatePackets;
+            return NetworkViewerController.UpdatePackets;
+        }
         public BasePlot GetPlot(PlotType type)
         {
             var plot = PlotFactory.GetPlot(type, LoadedNetwork, NetworkGame);

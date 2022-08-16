@@ -32,6 +32,11 @@ namespace NetworkGameFrontend.VisualData
             PlotGrid.Children.Add(plot.WpfPlot);
         }
 
+        void ResetView_Click(object sender, RoutedEventArgs e)
+        {
+            Plot.ResetView();
+        }
+
         void SavePlotAsImage_Click(object sender, RoutedEventArgs e)
         {
             Bitmap bmp = Plot.WpfPlot.Plot.Render();

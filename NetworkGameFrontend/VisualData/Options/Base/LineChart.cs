@@ -25,10 +25,17 @@ namespace NetworkGameFrontend.VisualData.Options.Base
             MaxValue = Math.Max(value, MaxValue);
             Values.Add(value);
             
-            Plot.SetAxisLimitsX(0, Values.Count);
+            Plot.SetAxisLimitsX(0, Values.Count - 1);
             Plot.SetAxisLimitsY(0, MaxValue);
             SignalPlot.Ys = Values.ToArray();
             SignalPlot.MaxRenderIndex = Values.Count - 1;
+        }
+
+        public override void ResetView()
+        {
+            Plot.SetAxisLimitsX(0, Values.Count - 1);
+            Plot.SetAxisLimitsY(0, MaxValue);
+            WpfPlot.Render();
         }
     }
 }

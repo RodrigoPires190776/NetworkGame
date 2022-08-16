@@ -62,23 +62,26 @@ namespace NetworkGameFrontend.VisualNetwork
             }
         }
 
-        public void Update(UpdatedState state, Guid loadedRouterID)
+        public void Update(UpdatedState state, Guid loadedRouterID, bool updatePackets)
         {
             PacketCanvas.Children.Clear();
             LastState = state;
 
-            foreach (var link in state.UpdatedLinks.Values)
+            if (updatePackets)
             {
-                foreach (var packet in link.PackagesInTransit)
+                foreach (var link in state.UpdatedLinks.Values)
                 {
-                    var vPacket = new VisualPacket(packet.Value.NrSteps);
-                    var coordinates = LinkPositions[link.ID][packet.Value.PositionInLink];
-                    vPacket.UIElement.SetValue(Canvas.LeftProperty, coordinates.X);
-                    vPacket.UIElement.SetValue(Canvas.TopProperty, coordinates.Y);
-                    PacketCanvas.Children.Add(vPacket.UIElement);
+                    foreach (var packet in link.PackagesInTransit)
+                    {
+                        var vPacket = new VisualPacket(packet.Value.NrSteps);
+                        var coordinates = LinkPositions[link.ID][packet.Value.PositionInLink];
+                        vPacket.UIElement.SetValue(Canvas.LeftProperty, coordinates.X);
+                        vPacket.UIElement.SetValue(Canvas.TopProperty, coordinates.Y);
+                        PacketCanvas.Children.Add(vPacket.UIElement);
+                    }
                 }
             }
-            
+                      
             UpdateRouterData(loadedRouterID);           
         }
 

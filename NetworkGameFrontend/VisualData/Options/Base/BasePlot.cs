@@ -91,6 +91,7 @@ namespace NetworkGameFrontend.VisualData.Options.Base
         protected abstract void Update();
         protected abstract void SaveData(UpdatedState state);
         protected abstract void LoadPreviousData();
+        public abstract void ResetView();
 
         protected static Dictionary<string, Property> GetProperties(List<Tuple<string, Property.PropertyType, List<Tuple<string, object>>>> properties)
         {

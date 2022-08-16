@@ -19,6 +19,7 @@
                         <TextBlock Margin="9,0,0,0" Text="File"/>
                     </MenuItem.Header>
                     <MenuItem Header="Import Network" Click="File_ImportNetwork_Click"/>
+                    <MenuItem Header="Generate Network" Click="File_GenerateNetwork_Click"/>
                 </MenuItem>
                 <MenuItem Height="25" Width="75">
                     <MenuItem.Header>
@@ -41,7 +42,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Slider Grid.Column="0" Orientation="Vertical"  Visibility="Hidden"
-                     HorizontalAlignment="Left" Minimum="0.5" Maximum="2" Value="1" x:Name="NetworkScrollViewerSlider"/>
+                     HorizontalAlignment="Left" Minimum="0.25" Maximum="4" Value="1" x:Name="NetworkScrollViewerSlider"/>
                 <ScrollViewer x:Name="NetworkScrollViewer"   
                      Grid.Column="1"
                      VerticalScrollBarVisibility="Hidden"
@@ -107,7 +108,7 @@
 
             <Grid x:Name="NetworkControls" Background="PaleTurquoise" Grid.Column="1">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="200" MinHeight="50"/>
+                    <RowDefinition Height="250" MinHeight="50"/>
                     <RowDefinition Height="250" MinHeight="50"/>
                     <RowDefinition Height="100" MinHeight="50"/>
                     <RowDefinition Height="100" MinHeight="50"/>
@@ -116,6 +117,7 @@
 
                 <Grid Grid.Row="0">
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
@@ -169,14 +171,30 @@
                                     Click="Controls_PacketCreationPropertiesEditor_Click" IsEnabled="{Binding ElementName=CreationStrategyListBox, Path=IsEnabled, Mode=OneWay}"/>
                         </Grid>
                     </Grid>
-                    <Button x:Name="StartDiscoveryButton" Background="Gray" Grid.Row="3" Click="Controls_StartDiscovery_Click" IsEnabled="False" Height="40" MaxWidth="125" Margin="5">
+                    <Grid Grid.Row="3">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Route Discovery Strategy:" FontSize="10" VerticalAlignment="Bottom" Margin="25,0,0,0"/>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="5*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <ComboBox x:Name="RouteDiscoveryListBox" Grid.Row="1" MaxWidth="250" Margin="25,0,0,5" IsEnabled="False" SelectionChanged="Controls_RouteDiscovery"/>
+                            <Button Grid.Column="1" Height="20" Width="30" VerticalAlignment="Top" HorizontalAlignment="Left" Content="..."
+                                    Click="Controls_RouteDiscoveryPropertiesEditor_Click" IsEnabled="{Binding ElementName=RouteDiscoveryListBox, Path=IsEnabled, Mode=OneWay}"/>
+                        </Grid>
+                    </Grid>
+                    <Button x:Name="StartDiscoveryButton" Background="Gray" Grid.Row="4" Click="Controls_StartDiscovery_Click" IsEnabled="False" Height="40" MaxWidth="125" Margin="5">
                         <TextBlock Text="Start Discovery" TextWrapping="Wrap"/>
                     </Button>
                     
                 </Grid>
                 <Grid Grid.Row="1">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="2*"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
@@ -193,7 +211,7 @@
                             <ColumnDefinition Width ="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Average Variance:" Foreground="Black" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                        <TextBox x:Name="AverageVarianceTextBox" Text="0" Grid.Column="1" Height="30" Background="White" VerticalAlignment="Top" IsEnabled="False" VerticalContentAlignment="Center"/>
+                        <TextBox x:Name="AverageVarianceTextBox" Text="0" Grid.Column="1" Height="30" Background="White" VerticalAlignment="Center" IsEnabled="False" VerticalContentAlignment="Center"/>
                     </Grid>
                     <Grid Grid.Row="1">
                         <Grid.ColumnDefinitions>
@@ -274,9 +292,22 @@
                     </Button>
                 </Grid>
                 <Grid Grid.Row="3">
-                    <Button x:Name="PlotViewerButton" Background="Gray" Grid.Column="0" Click="Controls_PlotViewer_Click" IsEnabled="False" Height="40" Width="150">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="3*"/>
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="1" x:Name="PlotViewerButton" Background="Gray" Grid.Column="0" Click="Controls_PlotViewer_Click" VerticalAlignment="Top" IsEnabled="False" Height="40" Width="150">
                         <TextBlock Text="Plot Viewer" TextWrapping="Wrap"/>
                     </Button>
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="5*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <ComboBox x:Name="PlotTypeListBox" Grid.Row="1" MaxWidth="250" Margin="25,0,0,5" IsEnabled="False" SelectionChanged="Controls_UpdatePlotSelected"/>
+                        <Button Grid.Column="1" Height="20" Width="30" VerticalAlignment="Top" HorizontalAlignment="Left" Content="..." 
+                                    Click="Controls_PlotPropertiesEditor_Click" IsEnabled="{Binding ElementName=PlotTypeListBox, Path=IsEnabled, Mode=OneWay}"/>
+                    </Grid>
                 </Grid>
             </Grid>
         </Grid>

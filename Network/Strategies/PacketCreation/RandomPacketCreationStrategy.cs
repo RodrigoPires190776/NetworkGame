@@ -15,13 +15,13 @@ namespace Network.Strategies.PacketCreation
                     new List<Tuple<string, object>>()
                     {
                         new Tuple<string, object>(Property.DECIMAL_MIN, 0m),
-                        new Tuple<string, object>(Property.DECIMAL_MAX, 100m),
+                        new Tuple<string, object>(Property.DECIMAL_MAX, 1m),
                     })
             };
 
             var dictionaryProperties = RoutingStrategy.GetProperties(properties);
 
-            dictionaryProperties[Property.Probability].SetValue(10m);
+            dictionaryProperties[Property.Probability].SetValue(0.1m);
 
             return dictionaryProperties;
         }
@@ -32,16 +32,21 @@ namespace Network.Strategies.PacketCreation
                     new List<Tuple<string, object>>()
                     {
                         new Tuple<string, object>(Property.DECIMAL_MIN, 0m),
-                        new Tuple<string, object>(Property.DECIMAL_MAX, 100m),
+                        new Tuple<string, object>(Property.DECIMAL_MAX, 1m),
                     })
             })        
         {
-            Properties[Property.Probability].SetValue(10m);
+            Properties[Property.Probability].SetValue(0.1m);
         }
+
+        public RandomPacketCreationStrategy(Guid networkID, Dictionary<string, Property> properties) :
+            base(networkID, properties)
+
+        { }
 
         public override Packet CreatePacket(Router router)
         {
-            if (new Random().Next(100000) < (decimal)Properties[Property.Probability].Value * 1000)
+            if ((decimal)new Random().NextDouble() < (decimal)Properties[Property.Probability].Value)
             {
                 Guid dstID = router.ID;
                 var network = NetworkMaster.GetInstance().GetNetwork(router.NetworkID);

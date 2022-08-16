@@ -18,6 +18,24 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
         private Guid Network;
         private Guid Router;
         private readonly List<RouterData> RouterDataOnHold;
+        public static Dictionary<string, Property> GetProperties(Guid network)
+        {
+            var properties = new List<Tuple<string, Property.PropertyType, List<Tuple<string, object>>>>()
+            {
+                new Tuple<string, Property.PropertyType, List<Tuple<string, object>>>(Property.Router, Property.PropertyType.Integer,
+                    new List<Tuple<string, object>>()
+                    {
+                        new Tuple<string, object>(Property.INTEGER_MIN, 0),
+                        new Tuple<string, object>(Property.INTEGER_MAX, NetworkMaster.GetInstance().GetNetwork(network).RouterIDList.Count - 1)
+                    })
+            };
+
+            var dictionaryProperties = BasePlot.GetProperties(properties);
+
+            dictionaryProperties[Property.Router].SetValue(0);
+
+            return dictionaryProperties;
+        }
 
         public RouterCreatedPacketsPieChart(Guid network, Game game) :
             base("Router Created Packets Pie Chart", new List<string>() { "Delivered", "InTransit", "Dropped" }, game)
@@ -35,18 +53,17 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
 
         public override BasePlot Initialize(VisualNetwork.VisualNetwork visualNetwork, Dictionary<string, Property> properties)
         {
-            Router = visualNetwork.RouterIDs[(int)Properties[Property.Router].Value];
-            base.Initialize(visualNetwork, properties);
-            
+            Router = visualNetwork.RouterIDs[(int)properties[Property.Router].Value];
+             
             SetRouterValues(NetworkDataCollector.GetInstance().GetRouterData(Network, Router));
             
             PiePlot.ShowPercentages = true;
             PiePlot.ShowValues = true;
             PiePlot.ShowLabels = true;
             Plot.Legend();
+            Plot.Title($"Router {(int)properties[Property.Router].Value} Created Packets Line Chart");
 
-            WpfPlot.Reset(Plot);
-            WpfPlot.Refresh();
+            base.Initialize(visualNetwork, properties);
 
             return this;
         }

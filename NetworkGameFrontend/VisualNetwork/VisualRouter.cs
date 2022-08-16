@@ -9,7 +9,7 @@ namespace NetworkGameFrontend.VisualNetwork
 {
     public class VisualRouter : UIElementBase
     {
-        private List<int> _offsets = new List<int>() { 0, 20, 40 };
+        private readonly List<int> _offsets = new List<int>() { 0, 20, 40 };
         private int _offset = 0;
         private int Offset
         {
@@ -19,19 +19,17 @@ namespace NetworkGameFrontend.VisualNetwork
                 return _offsets[_offset];
             }
         }
-        private Ellipse Ellipse;
-        private TextBlock TextBlock;
-        private Dictionary<Guid, Border> LinkProbabilities;
+        private readonly Ellipse Ellipse;
+        private readonly TextBlock TextBlock;
+        private readonly Dictionary<Guid, Border> LinkProbabilities;
         public const int RADIUS = 20;
         public int ID { get; }
         private Guid RouterID;
-        private RouterState State;
         public event EventHandler<ClickedRouterEventArgs> ClickedRouter;
         public VisualRouter(int id, List<Guid> links, Guid routerID)
         {
             ID = id;
             RouterID = routerID;
-            State = RouterState.Normal;
 
             Ellipse = new Ellipse()
             {
@@ -51,7 +49,14 @@ namespace NetworkGameFrontend.VisualNetwork
             UIElement.Children.Add(Ellipse);
             UIElement.Children.Add(TextBlock);
 
-            TextBlock.SetValue(Canvas.LeftProperty, (double)14);
+            int left = 14;
+            int x = id;
+            while (x > 9)
+            {
+                left -= 5;
+                x /= 10;
+            }
+            TextBlock.SetValue(Canvas.LeftProperty, (double)left);
             TextBlock.SetValue(Canvas.TopProperty, (double)6);
 
             UIElement.Width = RADIUS * 2;
@@ -138,7 +143,6 @@ namespace NetworkGameFrontend.VisualNetwork
                     Ellipse.Fill = new SolidColorBrush(Colors.Red);
                     break;
             }
-            State = state;
         }
     }
 

@@ -36,8 +36,19 @@ namespace Network.Strategies
             }
         }
 
-        public enum RoutingStrategies { Random, LinearRewardInaction };
-        public static List<string> RoutingStrategiesList = new List<string>{ "Random", "LinearRewardInaction" };
+        public BaseStrategy(Guid networkID, Dictionary<string, Property> properties)
+        {
+            NetworkID = networkID;
+            Properties = new Dictionary<string, Property>();
+
+            foreach (var property in properties)
+            {
+                Properties.Add(property.Key, property.Value);
+            }
+        }
+
+        public enum RoutingStrategies { Random, LinearRewardInaction, LinearRewardPenalty };
+        public static List<string> RoutingStrategiesList = new List<string>{ "Random", "LinearRewardInaction", "LinearRewardPenalty" };
         public enum PickingStrategies { Random };
         public static List<string> PickingStrategiesList = new List<string> { "Random" };
         public enum CreationStrategies { Random };
@@ -51,6 +62,8 @@ namespace Network.Strategies
                     return RoutingStrategies.Random;
                 case "LinearRewardInaction":
                     return RoutingStrategies.LinearRewardInaction;
+                case "LinearRewardPenalty":
+                    return RoutingStrategies.LinearRewardPenalty;
                 default:
                     throw new NotImplementedException();
             }
@@ -64,6 +77,8 @@ namespace Network.Strategies
                     return RandomRoutingStrategy.GetProperties();
                 case "LinearRewardInaction":
                     return LinearRewardInactionRoutingStrategy.GetProperties();
+                case "LinearRewardPenalty":
+                    return LinearRewardPenaltyRoutingStrategy.GetProperties();
                 default:
                     throw new NotImplementedException();
             }

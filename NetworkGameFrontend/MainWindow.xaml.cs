@@ -1,25 +1,17 @@
 ﻿using Microsoft.Win32;
+using Network.RouteDiscovery;
 using Network.Strategies;
-using NetworkGameBackend;
 using NetworkGameFrontend.ApplicationWindows;
 using NetworkGameFrontend.NetworkApplication;
 using NetworkGameFrontend.VisualData;
+using NetworkGameFrontend.VisualData.Options.Base;
 using NetworkUtils;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using static Network.RouteDiscovery.BaseRouteDiscovery;
 using static Network.Strategies.BaseStrategy;
 
 namespace NetworkGameFrontend
@@ -33,13 +25,15 @@ namespace NetworkGameFrontend
         private Dictionary<string, Property> RoutingStrategyProperties; 
         private Dictionary<string, Property> PickingStrategyProperties;
         private Dictionary<string, Property> CreationStrategyProperties;
+        private Dictionary<string, Property> RouteDiscoveryProperties;
+        private Dictionary<string, Property> PlotProperties;
         public MainWindow()
         {
             InitializeComponent();
             app = new MainApplication(NetworkViewer, NetworkControls);
             InitializeStrategies();           
         }
-
+        #region File
         void File_ImportNetwork_Click(object sender, RoutedEventArgs e)
         {
             var picker = new OpenFileDialog
@@ -49,7 +43,7 @@ namespace NetworkGameFrontend
 
             if (picker.ShowDialog() == true)
             {
-                var networkNameDialog = new UserStringInput("Choose a name for the nextwork", "Name:", picker.SafeFileName, this);
+                var networkNameDialog = new UserStringInput("Choose a name for the network", "Name:", picker.SafeFileName, this);
                 _ =  networkNameDialog.ShowDialog();
                 if (networkNameDialog.Ok)
                 {
@@ -74,6 +68,25 @@ namespace NetworkGameFrontend
             }
         }
 
+        void File_GenerateNetwork_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var propertiesEditor = new UserPropertyConfiguration(
+                    "Network Generation Settings", 
+                    NetworkGenerator.Generator.NetworkGenerator.GetProperties()
+                    );
+                propertiesEditor.ShowDialog();
+                app.GenerateNetwork(propertiesEditor.Properties);
+                _ = MessageBox.Show("NetworkGenerated!");
+            }
+            catch(Exception ex)
+            {
+                _ = MessageBox.Show(ex.Message);
+            }
+        }
+        #endregion
+        #region Network
         void Network_LoadNetwork_Click(object sender, RoutedEventArgs e)
         {
             var networkSelectDialog = new UserListSelectOne(app.GetAllNetworksName(), this);
@@ -88,6 +101,9 @@ namespace NetworkGameFrontend
                     RoutingStrategyListBox.IsEnabled = true;
                     PickingStrategyListBox.IsEnabled = true;
                     CreationStrategyListBox.IsEnabled = true;
+                    RouteDiscoveryListBox.IsEnabled = true;
+                    InitializePlotTypes();
+                    PlotTypeListBox.IsEnabled = true;
                 }
                 catch (Exception ex)
                 {
@@ -99,11 +115,15 @@ namespace NetworkGameFrontend
                 _ = MessageBox.Show("Load Cancelled!");
             }
         }
-
+        #endregion
+        #region Network Viewer Controls
         void Controls_StartDiscovery_Click(object sender, RoutedEventArgs e)
         {
             var strategies = GetStrategies();
-            app.StartDiscovery(strategies.Item1, strategies.Item2, strategies.Item3);
+            app.StartDiscovery(new Tuple<RoutingStrategies, Dictionary<string, Property>>(strategies.Item1, RoutingStrategyProperties), 
+                               new Tuple<PickingStrategies, Dictionary<string, Property>>(strategies.Item2, PickingStrategyProperties), 
+                               new Tuple<CreationStrategies, Dictionary<string, Property>>(strategies.Item3, CreationStrategyProperties),
+                               new Tuple<RouteDiscoveryStrategies, Dictionary<string, Property>>(strategies.Item4, RouteDiscoveryProperties));
             StartDiscoveryButton.IsEnabled = false;
             IntroduceAttackerButton.IsEnabled = true;
             PlotViewerButton.IsEnabled = true;
@@ -124,12 +144,12 @@ namespace NetworkGameFrontend
 
         void Controls_PlotViewer_Click(object sender, RoutedEventArgs e)
         {
-            var plot = app.GetPlot(PlotType.RouterCreatedPacketsLineChart);
+            var plot = app.GetPlot(BasePlot.GetPlotTypeEnum(PlotTypeListBox.Items.GetItemAt(PlotTypeListBox.SelectedIndex).ToString()));
 
-            var propertiesEditor = new UserPropertyConfiguration(PlotType.RouterCreatedPacketsLineChart.ToString() + " Properties", plot.Properties);
-            propertiesEditor.ShowDialog();
+            //var propertiesEditor = new UserPropertyConfiguration(PlotTypeListBox.Items.GetItemAt(PlotTypeListBox.SelectedIndex).ToString() + " Properties", plot.Properties);
+            //propertiesEditor.ShowDialog();
 
-            plot = app.InitializePlot(plot, propertiesEditor.Properties);
+            plot = app.InitializePlot(plot, PlotProperties);
 
             var plotViewer = new PlotViewer(this, plot);
             plotViewer.Show();
@@ -148,7 +168,8 @@ namespace NetworkGameFrontend
         {
             app.GameSpeedChange(1);
         }
-
+        #endregion
+        #region Strategies
         void Controls_RoutingStrategyPropertiesEditor_Click(object sender, RoutedEventArgs e)
         {
             var propertiesEditor = new UserPropertyConfiguration(
@@ -191,10 +212,19 @@ namespace NetworkGameFrontend
                 CreationStrategyListBox.Items.GetItemAt(CreationStrategyListBox.SelectedIndex).ToString());
         }
 
-        /*void TextBox_AllowOnlyInt(TextBox sender, TextBoxBeforeTextChangingEventArgs args)
+        void Controls_RouteDiscoveryPropertiesEditor_Click(object sender, RoutedEventArgs e)
         {
-            args.Cancel = args.NewText.Any(c => !char.IsDigit(c));
-        }*/
+            var propertiesEditor = new UserPropertyConfiguration(
+                RouteDiscoveryListBox.Items.GetItemAt(RouteDiscoveryListBox.SelectedIndex) + " Properties",
+                RouteDiscoveryProperties);
+            propertiesEditor.ShowDialog();
+        }
+
+        void Controls_RouteDiscovery(object sender, SelectionChangedEventArgs e)
+        {
+            RouteDiscoveryProperties = BaseRouteDiscovery.GetRouteDiscoveryProperties(
+                RouteDiscoveryListBox.Items.GetItemAt(RouteDiscoveryListBox.SelectedIndex).ToString());
+        }
 
         private void InitializeStrategies()
         {
@@ -209,14 +239,42 @@ namespace NetworkGameFrontend
             CreationStrategyListBox.ItemsSource = BaseStrategy.CreationStrategiesList;
             CreationStrategyListBox.SelectedIndex = 0;
             CreationStrategyProperties = BaseStrategy.GetCreationStrategyProperties(CreationStrategyListBox.Items[0].ToString());
+
+            RouteDiscoveryListBox.ItemsSource = BaseRouteDiscovery.RouteDiscoveryList;
+            RouteDiscoveryListBox.SelectedIndex = 0;
+            RouteDiscoveryProperties = BaseRouteDiscovery.GetRouteDiscoveryProperties(RouteDiscoveryListBox.Items[0].ToString());
         }
 
-        private (RoutingStrategies, PickingStrategies, CreationStrategies) GetStrategies()
+        private (RoutingStrategies, PickingStrategies, CreationStrategies, RouteDiscoveryStrategies) GetStrategies()
         {
             var routing = BaseStrategy.GetRoutingStrategiesEnum(RoutingStrategyListBox.SelectedItem.ToString());
             var picking = BaseStrategy.GetPickingStrategiesEnum(PickingStrategyListBox.SelectedItem.ToString());
             var creation = BaseStrategy.GetCreationStrategiesEnum(CreationStrategyListBox.SelectedItem.ToString());
-            return (routing, picking, creation);
+            var discovery = BaseRouteDiscovery.GetRouteDiscoveryEnum(RouteDiscoveryListBox.SelectedItem.ToString());
+            return (routing, picking, creation, discovery);
         }
+        #endregion
+        #region Plot Viewer
+        private void InitializePlotTypes()
+        {
+            PlotTypeListBox.ItemsSource = BasePlot.PlotTypeList;
+            PlotTypeListBox.SelectedIndex = 0;
+            PlotProperties = BasePlot.GetPlotProperties(PlotTypeListBox.Items[0].ToString(), app.LoadedNetwork);
+        }
+
+        void Controls_PlotPropertiesEditor_Click(object sender, RoutedEventArgs e)
+        {
+            var propertiesEditor = new UserPropertyConfiguration(
+                PlotTypeListBox.Items.GetItemAt(PlotTypeListBox.SelectedIndex) + " Properties",
+                PlotProperties);
+            propertiesEditor.ShowDialog();
+        }
+
+        void Controls_UpdatePlotSelected(object sender, SelectionChangedEventArgs e)
+        {
+            PlotProperties = BasePlot.GetPlotProperties(
+                PlotTypeListBox.Items.GetItemAt(PlotTypeListBox.SelectedIndex).ToString(), app.LoadedNetwork);
+        }
+        #endregion
     }
 }

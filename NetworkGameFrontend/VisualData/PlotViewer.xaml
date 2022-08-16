@@ -5,8 +5,18 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NetworkGameFrontend.VisualData"
         mc:Ignorable="d"
-        Title="PlotViewer" Height="400" Width="600">
-    <Grid x:Name="PlotGrid">
-        
+        Title="PlotViewer" Height="475" Width="600">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="400"/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+        <Grid x:Name="PlotGrid" Grid.Row="0">
+
+        </Grid>
+        <Grid Grid.Row="1">
+            <Button x:Name="SavePlotAsImage" Content="Save" Width="60" Height="20" VerticalAlignment="Top" 
+                    Click="SavePlotAsImage_Click" HorizontalAlignment="Right" Margin="5,5,20,5"/>
+        </Grid>
     </Grid>
 </Window>

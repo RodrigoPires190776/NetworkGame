@@ -14,7 +14,16 @@ namespace NetworkUtils
             ValueType = type;
             if (settings == null) Settings = new List<Tuple<string, object>>();
             else Settings = settings;
-            SetInitValue();
+            bool initSet = false;
+            foreach(var property in Settings)
+            {
+                if(property.Item1 == INITIAL_VALUE)
+                {
+                    initSet = true;
+                    SetValue(property.Item2);
+                }
+            }
+            if(!initSet) SetInitValue();
         }
 
         private void SetInitValue()
@@ -61,21 +70,24 @@ namespace NetworkUtils
                     int testInt;
                     if (int.TryParse(value.ToString(), out testInt))
                     {
-                        SetInteger(testInt); return (true, "");
+                        try { SetInteger(testInt); return (true, ""); }
+                        catch(Exception e) { return (false, e.Message); }
                     }
                     else return (false, "Property is integer type!");
                 case PropertyType.Decimal:
                     decimal testDecimal;
                     if (decimal.TryParse(value.ToString(), out testDecimal))
                     {
-                        SetDecimal(testDecimal); return (true, "");
+                        try { SetDecimal(testDecimal); return (true, ""); }
+                        catch(Exception e) { return (false, e.Message); }
                     }
                     else return (false, "Property is decimal type!");
                 case PropertyType.Bool:
                     bool testBool;
                     if(bool.TryParse(value.ToString(), out testBool))
-                    {
-                        SetBool(testBool); return (true, "");
+                    {   
+                        try { SetBool(testBool); return (true, ""); }
+                        catch (Exception e) { return (false, e.Message); }
                     }
                     else return(false, "Property is bool type!");
                 default:
@@ -85,6 +97,16 @@ namespace NetworkUtils
 
         private void SetString(string value)
         {
+            foreach (var setting in Settings)
+            {
+                switch (setting.Item1)
+                { 
+                    case INITIAL_VALUE:
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
             Value = value;
         }
         private void SetInteger(int value)
@@ -94,10 +116,12 @@ namespace NetworkUtils
                 switch (setting.Item1)
                 {
                     case INTEGER_MIN:
-                        if (value < (int)setting.Item2) throw new Exception();
+                        if (value < (int)setting.Item2) throw new Exception($"Minimum value is {(int)setting.Item2}");
                         break;
                     case INTEGER_MAX:
-                        if (value > (int)setting.Item2) throw new Exception();
+                        if (value > (int)setting.Item2) throw new Exception($"Maximum value is {(int)setting.Item2}");
+                        break;
+                    case INITIAL_VALUE:
                         break;
                     default:
                         throw new NotImplementedException();
@@ -112,10 +136,12 @@ namespace NetworkUtils
                 switch (setting.Item1)
                 {
                     case DECIMAL_MIN:
-                        if (value < (decimal)setting.Item2) throw new Exception();
+                        if (value < (decimal)setting.Item2) throw new Exception($"Minimum value is {(decimal)setting.Item2}");
                         break;
                     case DECIMAL_MAX:
-                        if (value > (decimal)setting.Item2) throw new Exception();
+                        if (value > (decimal)setting.Item2) throw new Exception($"Maximum value is {(decimal)setting.Item2}");
+                        break;
+                    case INITIAL_VALUE:
                         break;
                     default:
                         throw new NotImplementedException();
@@ -132,15 +158,22 @@ namespace NetworkUtils
         public const string DECIMAL_MAX = "Max";
         public const string INTEGER_MIN = "Min";
         public const string INTEGER_MAX = "Max";
+        public const string INITIAL_VALUE = "InitialValue";
 
         //Properties
         public const string CyclesToUpdate = "CyclesToUpdate";
         public const string Router = "Router";
         public const string Probability = "Probability";
         public const string LearningWeight = "LearningWeight";
+        public const string PenaltyWeight = "PenaltyWeight";
         public const string LoadAllValues = "LoadAllValues";
         public const string Attacker = "Attacker";
         public const string Defensor = "Defensor";
         public const string Destination = "Destination";
+        public const string MinProbability = "MinProbability";
+        public const string MaxProbability = "MaxProbability";
+        public const string NumberOfNodes = "NumberOfNodes";
+        public const string ProbabilityOfLink = "ProbabilityOfLink";
+        public const string ShortestLinkLength = "ShortestLinkLength";
     }
 }

@@ -17,6 +17,24 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
         private Guid Network;
         private Guid Router;
         private readonly List<RouterData> RouterDataOnHold;
+        public static Dictionary<string, Property> GetProperties(Guid network)
+        {
+            var properties = new List<Tuple<string, Property.PropertyType, List<Tuple<string, object>>>>()
+            {
+                new Tuple<string, Property.PropertyType, List<Tuple<string, object>>>(Property.Router, Property.PropertyType.Integer,
+                    new List<Tuple<string, object>>()
+                    {
+                        new Tuple<string, object>(Property.INTEGER_MIN, 0),
+                        new Tuple<string, object>(Property.INTEGER_MAX, NetworkMaster.GetInstance().GetNetwork(network).RouterIDList.Count - 1)
+                    })
+            };
+
+            var dictionaryProperties = BasePlot.GetProperties(properties);
+
+            dictionaryProperties[Property.Router].SetValue(0);
+
+            return dictionaryProperties;
+        }
 
         public RouterCreatedPacketsLineChart(Guid network, Game game) :
             base("Router Created Packets Line Chart", new List<string>() { "InTransit", "Dropped", "Delivered" }, game)
@@ -34,13 +52,12 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
 
         public override BasePlot Initialize(VisualNetwork.VisualNetwork visualNetwork, Dictionary<string, Property> properties)
         {
-            Router = visualNetwork.RouterIDs[(int)Properties[Property.Router].Value];
-            base.Initialize(visualNetwork, properties);
-
+            Router = visualNetwork.RouterIDs[(int)properties[Property.Router].Value];
+            
             Plot.Legend(location: ScottPlot.Alignment.UpperLeft);
+            Plot.Title($"Router {(int)properties[Property.Router].Value} Created Packets Line Chart");
 
-            WpfPlot.Reset(Plot);
-            WpfPlot.Refresh();
+            base.Initialize(visualNetwork, properties);
 
             return this;
         }

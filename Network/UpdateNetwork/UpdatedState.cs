@@ -9,6 +9,7 @@ namespace Network.UpdateNetwork
         public Guid NetworkID { get; }
         public int NumberOfSteps { get; }
         public decimal AverageVarience { get; set; }
+        public bool UpdatedAveragevariance { get; set; }
         public Dictionary<Guid, UpdateRouter> UpdatedRouters { get; }
         public Dictionary<Guid, UpdateLink> UpdatedLinks { get; }
         public Dictionary<Guid, UpdatePacket> UpdatedPackets { get; }
@@ -16,6 +17,7 @@ namespace Network.UpdateNetwork
         {
             NetworkID = networkID;
             NumberOfSteps = numberOfSteps;
+            UpdatedAveragevariance = false;
             UpdatedRouters = new Dictionary<Guid, UpdateRouter>();
             UpdatedLinks = new Dictionary<Guid, UpdateLink>();
             UpdatedPackets = new Dictionary<Guid, UpdatePacket>();

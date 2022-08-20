@@ -118,7 +118,6 @@ namespace Network.Strategies
                 if (sum > random) return id;
             }
 
-
             return id;
         }
 
@@ -165,7 +164,7 @@ namespace Network.Strategies
                     if (Values[destinationID][probability] != originalValue)
                     {
                         changed = true;
-                        delta += (Values[destinationID][probability] - originalValue);
+                        delta += Values[destinationID][probability] - originalValue;
                     }
                     else listToRemove.Add(probability);
                 }

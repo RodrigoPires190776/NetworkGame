@@ -17,6 +17,7 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
         private Guid Network;
         private Guid Router;
         private readonly List<RouterData> RouterDataOnHold;
+        private readonly object _dataOnHoldLock = new object();
         public static Dictionary<string, Property> GetProperties(Guid network)
         {
             var properties = new List<Tuple<string, Property.PropertyType, List<Tuple<string, object>>>>()
@@ -55,7 +56,7 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
             Router = visualNetwork.RouterIDs[(int)properties[Property.Router].Value];
             
             Plot.Legend(location: ScottPlot.Alignment.UpperLeft);
-            Plot.Title($"Router {(int)properties[Property.Router].Value} Created Packets Line Chart");
+            SetTitle($"Router {(int)properties[Property.Router].Value} Created Packets Line Chart");
 
             base.Initialize(visualNetwork, properties);
 
@@ -64,21 +65,32 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
 
         protected override void SaveData(UpdatedState state)
         {
-            RouterDataOnHold.Add(NetworkDataCollector.GetInstance().GetRouterData(Network, Router));
+            lock (_dataOnHoldLock)
+            {
+                RouterDataOnHold.Add(NetworkDataCollector.GetInstance().GetRouterData(Network, Router));
+            }
         }
 
         protected override void Update()
         {
-            foreach(var routerData in RouterDataOnHold)
+            lock (_dataOnHoldLock)
             {
-                SetRouterValues(routerData);
-            }
-            RouterDataOnHold.Clear();
-            Application.Current.Dispatcher.Invoke(
-                () =>
+                bool hasData = false;
+                foreach (var routerData in RouterDataOnHold)
                 {
-                    WpfPlot.Render();
-                });
+                    SetRouterValues(routerData);
+                    hasData = true;
+                }
+                RouterDataOnHold.Clear();
+                if (hasData)
+                {
+                    Application.Current.Dispatcher.Invoke(
+                    () =>
+                    {
+                        WpfPlot.Render();
+                    });
+                }               
+            }           
         }
 
         private void SetRouterValues(RouterData routerData)

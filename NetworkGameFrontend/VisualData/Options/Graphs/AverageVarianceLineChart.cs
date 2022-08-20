@@ -15,15 +15,29 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
     {
         private Guid Network;
         private ScatterPlot ScatterPlot;
+        private FunctionPlot FunctionPlot;
         private double[] SignalPlotXs;
         private int LastX;
         private int LastUpdatedX;
-        private double InterpolateStep = 0.01;
+        private double MaxY;
+        private double MinY;
+        private double PercentageXValue;
+        private readonly double InterpolateStep = 0.01;
         public static Dictionary<string, Property> GetProperties()
         {
-            var properties = new List<Tuple<string, Property.PropertyType, List<Tuple<string, object>>>>();
+            var properties = new List<Tuple<string, Property.PropertyType, List<Tuple<string, object>>>>()
+            {
+                new Tuple<string, Property.PropertyType, List<Tuple<string, object>>>(Property.Percentage, Property.PropertyType.Decimal,
+                    new List<Tuple<string, object>>()
+                    {
+                        new Tuple<string, object>(Property.DECIMAL_MIN, 0m),
+                        new Tuple<string, object>(Property.DECIMAL_MAX, 1m)
+                    })
+            };
 
             var dictionaryProperties = BasePlot.GetProperties(properties);
+
+            dictionaryProperties[Property.Percentage].SetValue(0.1m);
 
             return dictionaryProperties;
         }
@@ -31,6 +45,13 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
            base("Average Variance Line Chart", game)
         {
             Network = network;
+            Properties.Add(Property.Percentage, new Property(Property.PropertyType.Decimal,
+                    new List<Tuple<string, object>>()
+                    {
+                        new Tuple<string, object>(Property.DECIMAL_MIN, 0m),
+                        new Tuple<string, object>(Property.DECIMAL_MAX, 1m)
+                    }));
+            Properties[Property.Percentage].SetValue(0.1m);
         }
 
         public override BasePlot Initialize(VisualNetwork.VisualNetwork visualNetwork, Dictionary<string, Property> properties)
@@ -50,6 +71,14 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
                 LineWidth = 2
             };
             Plot.Add(ScatterPlot);
+
+            PercentageXValue = Decimal.ToDouble(((decimal)properties[Property.Percentage].Value));
+            FunctionPlot = new FunctionPlot(new Func<double, double?>((x) => (0)))
+            {
+                LineWidth = 2
+            };
+            FunctionPlot.Color = System.Drawing.Color.Red;           
+            Plot.Add(FunctionPlot);
 
             return this;
         }
@@ -73,6 +102,19 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
             }
         }
 
+        private new void AddValue(double value)
+        {
+            UpdatePercentageLine(value);
+            base.AddValue(value);
+        }
+
+        private void UpdatePercentageLine(double value)
+        {
+            if (value > MaxY) MaxY = value;
+            if (value < MinY) MinY = value;
+            if(FunctionPlot != null) FunctionPlot.Function = new Func<double, double?>((x) => MinY + ((MaxY - MinY) * PercentageXValue));
+        }
+
         private void AddXValue(double value)
         {
             if(SignalPlotXs.Length <= LastX + 1)
@@ -88,9 +130,6 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
             {
                 var newXs = new double[SignalPlot.Ys.Length];
                 Array.Copy(SignalPlotXs, 0, newXs, 0, newXs.Length);
-
-                //var newYs = new double[LastX - LastUpdatedX];
-                //Array.Copy(SignalPlot.Ys, LastX, newYs, 0, LastX - LastUpdatedX);
 
                 (double[] bzX, double[] bzY) = ScottPlot.Statistics.Interpolation.Bezier.InterpolateXY(newXs, SignalPlot.Ys, InterpolateStep);
 

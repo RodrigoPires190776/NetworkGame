@@ -1,7 +1,4 @@
 ﻿using Network;
-using Network.Strategies.PacketCreation;
-using Network.Strategies.PacketPicking;
-using Network.Strategies.Routing;
 using Network.UpdateNetwork;
 using NetworkGameBackend;
 using NetworkGameDataCollector;
@@ -15,7 +12,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;

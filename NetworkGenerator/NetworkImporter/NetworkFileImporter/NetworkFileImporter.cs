@@ -12,7 +12,7 @@ namespace NetworkGenerator.NetworkImporter.NetworkFile
         }
         protected override string GetNextLine()
         {
-           return Reader.ReadLine();
+            return Reader.ReadLine();
         }
 
         public override Network.Network Import(Stream networkData, int smallestLink)

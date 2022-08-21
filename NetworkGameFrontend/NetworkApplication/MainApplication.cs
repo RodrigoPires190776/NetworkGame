@@ -5,6 +5,7 @@ using NetworkGameDataCollector;
 using NetworkGameFrontend.VisualData;
 using NetworkGameFrontend.VisualData.Options.Base;
 using NetworkGameFrontend.VisualNetwork;
+using NetworkGenerator.NetworkExporter;
 using NetworkGenerator.NetworkImporter.NetworkFile;
 using NetworkUtils;
 using System;
@@ -31,6 +32,12 @@ namespace NetworkGameFrontend.NetworkApplication
         private int NumberOfFrames = 0;
         private int TotalNumberOfCycles = 0;
         public Guid LoadedNetwork { get; private set; }
+        public string LoadedNetworkName { 
+            get 
+            {
+                return NetworkMaster.GetInstance().GetNetwork(LoadedNetwork).Name;
+            } 
+        }
         private Guid LoadedRouter;
         private Game NetworkGame;
         private NetworkUpdateStateQueue NetworkUpdateStateQueue;
@@ -75,6 +82,12 @@ namespace NetworkGameFrontend.NetworkApplication
             {
                 router.ClickedRouter += UpdatedClickedRouter;
             }
+        }
+
+        public void ExportNetwork(string filePath)
+        {
+            var exporter = new NetworkExporter();
+            exporter.Export(NetworkMaster.GetInstance().GetNetwork(LoadedNetwork), filePath);
         }
 
         public List<string> GetAllNetworksName()

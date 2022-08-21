@@ -115,6 +115,46 @@ namespace NetworkGameFrontend
                 _ = MessageBox.Show("Load Cancelled!");
             }
         }
+
+        void Network_ExportNetwork_Click(object sender, RoutedEventArgs e)
+        {
+            UserStringInput networkNameDialog;
+            try
+            {
+                networkNameDialog = new UserStringInput("Choose a name for the network", "Name:", app.LoadedNetworkName, this);
+                _ = networkNameDialog.ShowDialog();
+            }
+            catch(Exception ex)
+            {
+                _ = MessageBox.Show("No loaded network!", "Something went wrong!");
+                return;
+            }
+
+            if (networkNameDialog.Ok)
+            {
+                try
+                {
+                    SaveFileDialog saveDialog = new SaveFileDialog();
+                    saveDialog.FileName = networkNameDialog.Text;
+                    saveDialog.DefaultExt = "network";
+                    saveDialog.Filter = "Network files (*.NETWORK)|*.NETWORK";
+
+                    if (saveDialog.ShowDialog() == true)
+                    {
+                        var fileName = saveDialog.FileName;
+                        app.ExportNetwork(fileName);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _ = MessageBox.Show(ex.Message, "Something went wrong!");
+                }
+            }
+            else
+            {
+                _ = MessageBox.Show("Save Cancelled!");
+            }
+        }
         #endregion
         #region Network Viewer Controls
         void Controls_StartDiscovery_Click(object sender, RoutedEventArgs e)

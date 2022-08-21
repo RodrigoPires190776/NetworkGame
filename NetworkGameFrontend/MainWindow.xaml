@@ -26,6 +26,7 @@
                         <TextBlock Margin="8,0,0,0" Text="Network"/>
                     </MenuItem.Header>
                     <MenuItem Header="Load Network" Click="Network_LoadNetwork_Click"/>
+                    <MenuItem Header="Export Network" Click="Network_ExportNetwork_Click"/>
                 </MenuItem>
             </Menu>
 

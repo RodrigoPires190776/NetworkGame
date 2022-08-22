@@ -14,7 +14,7 @@ namespace NetworkGameFrontend.VisualData.Options.Base
 
         protected int Width { get; set; }
         protected int Height { get; set; }
-        protected string Title { get; set; }
+        public string Title { get; private set; }
         protected Plot Plot { get; private set; }
         public WpfPlot WpfPlot { get; private set; }
         public Dictionary<string, Property> Properties { get; }
@@ -27,7 +27,7 @@ namespace NetworkGameFrontend.VisualData.Options.Base
             Width = width;
             Height = height;
             Plot = new Plot(width, height);
-            Plot.Title(title);
+            SetTitle(title);
             WpfPlot = new WpfPlot();
             Properties = new Dictionary<string, Property>();
             Initialized = false;
@@ -88,6 +88,13 @@ namespace NetworkGameFrontend.VisualData.Options.Base
 
             return this;
         }
+
+        protected void SetTitle(string title)
+        {
+            Plot.Title(title);
+            Title = title;
+        }
+
         protected abstract void Update();
         protected abstract void SaveData(UpdatedState state);
         protected abstract void LoadPreviousData();
@@ -120,32 +127,24 @@ namespace NetworkGameFrontend.VisualData.Options.Base
 
         public static PlotType GetPlotTypeEnum(string plotType)
         {
-            switch (plotType)
+            return plotType switch
             {
-                case "RouterCreatedPacketsPieChart":
-                    return PlotType.RouterCreatedPacketsPieChart;
-                case "RouterCreatedPacketsLineChart":
-                    return PlotType.RouterCreatedPacketsLineChart;
-                case "AverageVarianceLineChart":
-                    return PlotType.AverageVarianceLineChart;
-                default:
-                    throw new NotImplementedException();
-            }
+                "RouterCreatedPacketsPieChart" => PlotType.RouterCreatedPacketsPieChart,
+                "RouterCreatedPacketsLineChart" => PlotType.RouterCreatedPacketsLineChart,
+                "AverageVarianceLineChart" => PlotType.AverageVarianceLineChart,
+                _ => throw new NotImplementedException(),
+            };
         }
 
         public static Dictionary<string, Property> GetPlotProperties(string plotType, Guid network)
         {
-            switch (plotType)
+            return plotType switch
             {
-                case "RouterCreatedPacketsPieChart":
-                    return RouterCreatedPacketsPieChart.GetProperties(network);
-                case "RouterCreatedPacketsLineChart":
-                    return RouterCreatedPacketsLineChart.GetProperties(network);
-                case "AverageVarianceLineChart":
-                    return AverageVarianceLineChart.GetProperties();
-                default:
-                    throw new NotImplementedException();
-            }
+                "RouterCreatedPacketsPieChart" => RouterCreatedPacketsPieChart.GetProperties(network),
+                "RouterCreatedPacketsLineChart" => RouterCreatedPacketsLineChart.GetProperties(network),
+                "AverageVarianceLineChart" => AverageVarianceLineChart.GetProperties(),
+                _ => throw new NotImplementedException(),
+            };
         }
     }
 }

@@ -164,6 +164,7 @@ namespace NetworkUtils
         public const string CyclesToUpdate = "CyclesToUpdate";
         public const string Router = "Router";
         public const string Probability = "Probability";
+        public const string Percentage = "Percentage";
         public const string LearningWeight = "LearningWeight";
         public const string PenaltyWeight = "PenaltyWeight";
         public const string LoadAllValues = "LoadAllValues";

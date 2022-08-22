@@ -35,8 +35,8 @@ namespace Network.RouteDiscovery
             return dictionaryProperties;
         }
 
-        public enum RouteDiscoveryStrategies { None, BreadthFirstRouteDiscovery, DijkstraRouteDiscovery };
-        public static List<string> RouteDiscoveryList = new List<string> { "None", "BreadthFirstRouteDiscovery", "DijkstraRouteDiscovery" };
+        public enum RouteDiscoveryStrategies { None, BreadthFirstRouteDiscovery, DijkstraRouteDiscovery, BestRouteOnlyDiscovery };
+        public static List<string> RouteDiscoveryList = new List<string> { "None", "BreadthFirstRouteDiscovery", "DijkstraRouteDiscovery", "BestRouteOnlyDiscovery" };
 
         public static RouteDiscoveryStrategies GetRouteDiscoveryEnum(string strategy)
         {
@@ -48,6 +48,8 @@ namespace Network.RouteDiscovery
                     return RouteDiscoveryStrategies.BreadthFirstRouteDiscovery;
                 case "DijkstraRouteDiscovery":
                     return RouteDiscoveryStrategies.DijkstraRouteDiscovery;
+                case "BestRouteOnlyDiscovery":
+                    return RouteDiscoveryStrategies.BestRouteOnlyDiscovery;
                 default:
                     throw new NotImplementedException();
             }
@@ -63,6 +65,8 @@ namespace Network.RouteDiscovery
                     return BreadthFirstRouteDiscovery.GetProperties();
                 case "DijkstraRouteDiscovery":
                     return DijkstraRouteDiscovery.GetProperties();
+                case "BestRouteOnlyDiscovery":
+                    return BestRouteOnlyDiscovery.GetProperties();
                 default:
                     throw new NotImplementedException();
             }

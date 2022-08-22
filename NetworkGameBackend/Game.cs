@@ -20,7 +20,7 @@ namespace NetworkGameBackend
         public event EventHandler<UpdatedState> GameStep;
         public int LoopsPerSecond { get; private set; }
         private TimeSpan LoopTime { get; set; }
-        private readonly List<int> GameSpeeds = new List<int>() { 1, 2, 5, 10, 25, 50, 75, 100, 150, 250, 500 };
+        private readonly List<int> GameSpeeds = new List<int>() { 1, 2, 5, 10, 25, 50, 75, 100, 150, 250, 500, int.MaxValue };
         private int CurrentSpeed;
 
         public Game(Network.Network network, int speed,
@@ -55,7 +55,7 @@ namespace NetworkGameBackend
                 GameStep.Invoke(this, Network.Step());
 
                 elapsedTime = DateTime.Now - startLoopTime;
-                if(elapsedTime < LoopTime) System.Threading.Thread.Sleep(LoopTime - elapsedTime);
+                if (elapsedTime < LoopTime) System.Threading.Thread.Sleep(LoopTime - elapsedTime);
 
                 loopsTimeCounter += DateTime.Now - startLoopTime;
                 loopCounter++;
@@ -136,6 +136,8 @@ namespace NetworkGameBackend
                     return new BreadthFirstRouteDiscovery(Network);
                 case RouteDiscoveryStrategies.DijkstraRouteDiscovery:
                     return new DijkstraRouteDiscovery(Network, properties);
+                case RouteDiscoveryStrategies.BestRouteOnlyDiscovery:
+                    return new BestRouteOnlyDiscovery(Network, properties);
                 default:
                     throw new Exception("Invalid route discovery strategy");
             }

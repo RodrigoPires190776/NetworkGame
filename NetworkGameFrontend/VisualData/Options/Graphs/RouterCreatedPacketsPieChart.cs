@@ -61,7 +61,7 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
             PiePlot.ShowValues = true;
             PiePlot.ShowLabels = true;
             Plot.Legend();
-            Plot.Title($"Router {(int)properties[Property.Router].Value} Created Packets Line Chart");
+            SetTitle($"Router {(int)properties[Property.Router].Value} Created Packets Line Chart");
 
             base.Initialize(visualNetwork, properties);
 

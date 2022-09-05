@@ -13,11 +13,13 @@ namespace NetworkGameDataCollector
         private static readonly object InstanceLock = new object();
         private static NetworkDataCollector Instance;
         private readonly Dictionary<Guid, NetworkData> Networks;
+        private bool _saveRuntimeData;
 
         private NetworkDataCollector()
         {
             Networks = new Dictionary<Guid, NetworkData>();
             Instance = this;
+            _saveRuntimeData = false;
         }
 
         public static NetworkDataCollector GetInstance()
@@ -39,7 +41,12 @@ namespace NetworkGameDataCollector
 
         public void AddEventHandler(Guid networkID, Game game)
         {
-            Networks[networkID].AddEventHandler(game);
+            Networks[networkID].AddEventHandler(game, _saveRuntimeData);
+        }
+
+        public void SaveRuntimeData(bool? save)
+        {
+            _saveRuntimeData = save == null ? false : (bool)save;
         }
 
         public RouterData GetRouterData(Guid networkID, Guid routerID)

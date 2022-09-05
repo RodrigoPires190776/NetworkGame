@@ -1,33 +1,46 @@
 ﻿using Network.UpdateNetwork;
+using System;
+using System.Collections.Generic;
 
 namespace NetworkGameFrontend.NetworkApplication
 {
     public class NetworkUpdateStateQueue
     {
-        private UpdatedState LatestState;
+        private Dictionary<Guid,UpdatedState> LatestState;
+        private Dictionary<Guid, int> LastStateReturned;
         private object _queueLock = new object();
 
         public NetworkUpdateStateQueue()
         {
-
+            LatestState = new Dictionary<Guid, UpdatedState>();
+            LastStateReturned = new Dictionary<Guid, int>();
         }
 
         public void AddState(UpdatedState state)
         {
             lock (_queueLock)
             {
-                if (LatestState == null || state.NumberOfSteps > LatestState.NumberOfSteps)
+                if (!LatestState.ContainsKey(state.NetworkID)) 
                 {
-                    LatestState = state;
+                    LatestState.Add(state.NetworkID, state);
+                    LastStateReturned.Add(state.NetworkID, 0);
+                    return;
+                } 
+                if(state.NumberOfSteps > LatestState[state.NetworkID].NumberOfSteps)
+                {
+                    LatestState[state.NetworkID] = state;
                 }
             }           
         }
 
-        public UpdatedState GetState()
+        public UpdatedState GetState(Guid networkID)
         {
             lock (_queueLock)
             {
-                return LatestState;
+                if (!LatestState.ContainsKey(networkID)) return null;
+                if (LastStateReturned[networkID] >= LatestState[networkID].NumberOfSteps) return null;
+                LastStateReturned[networkID] = LatestState[networkID].NumberOfSteps;
+                return LatestState[networkID];
             }
         }
     }

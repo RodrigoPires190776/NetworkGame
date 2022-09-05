@@ -60,6 +60,8 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
 
             base.Initialize(visualNetwork, properties);
 
+            base.FinalizeInit();
+
             return this;
         }
 

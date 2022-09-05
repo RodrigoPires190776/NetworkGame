@@ -16,6 +16,13 @@ namespace NetworkGameFrontend.VisualNetwork
         private readonly Dictionary<Guid, List<Coordinates>> LinkPositions;
         public readonly Dictionary<int, Guid> RouterIDs;
         private readonly Network.Network Network;
+        public int NetworkID 
+        {
+            get 
+            {
+                return Network.NetworkID;
+            }
+        }
         public const int WIDTH = 2000; 
         public const int HEIGHT = 2000;
 
@@ -64,6 +71,7 @@ namespace NetworkGameFrontend.VisualNetwork
 
         public void Update(UpdatedState state, Guid loadedRouterID, bool updatePackets)
         {
+            if (state.NetworkID != Network.ID) return;
             PacketCanvas.Children.Clear();
             LastState = state;
 
@@ -91,8 +99,12 @@ namespace NetworkGameFrontend.VisualNetwork
             {
                 foreach (var router in Network.RouterIDList)
                 {
-                    if (router != loadedRouterID && LastState != null) Routers[router].UpdateProbabilities(LastState.UpdatedRouters[router].RoutingTable.GetPercentageValues(loadedRouterID));
-                    else Routers[router].UpdateProbabilities();
+                    try
+                    {
+                        if (router != loadedRouterID && LastState != null) Routers[router].UpdateProbabilities(LastState.UpdatedRouters[router].RoutingTable.GetPercentageValues(loadedRouterID));
+                        else Routers[router].UpdateProbabilities();
+                    }
+                    catch(Exception e) { }
                 }
             }
         }

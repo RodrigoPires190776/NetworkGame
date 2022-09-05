@@ -98,6 +98,8 @@ namespace NetworkGameFrontend
                 {
                     app.LoadNetwork(networkSelectDialog.Item);
                     StartDiscoveryButton.IsEnabled = true;
+                    SaveRuntimeDataCheckBox.IsEnabled = true;
+                    NumberOfGameTextBox.IsEnabled = true;
                     RoutingStrategyListBox.IsEnabled = true;
                     PickingStrategyListBox.IsEnabled = true;
                     CreationStrategyListBox.IsEnabled = true;
@@ -159,14 +161,23 @@ namespace NetworkGameFrontend
         #region Network Viewer Controls
         void Controls_StartDiscovery_Click(object sender, RoutedEventArgs e)
         {
+            int nGames;
+            if(!int.TryParse(NumberOfGameTextBox.Text, out nGames) || nGames <= 0 || nGames > 100)
+            {
+                _ = MessageBox.Show("Invalid number of games (1-100)!", "Something went wrong!");
+            }
             var strategies = GetStrategies();
-            app.StartDiscovery(new Tuple<RoutingStrategies, Dictionary<string, Property>>(strategies.Item1, RoutingStrategyProperties), 
+            app.StartDiscovery(nGames, SaveRuntimeDataCheckBox.IsChecked,
+                               new Tuple<RoutingStrategies, Dictionary<string, Property>>(strategies.Item1, RoutingStrategyProperties), 
                                new Tuple<PickingStrategies, Dictionary<string, Property>>(strategies.Item2, PickingStrategyProperties), 
                                new Tuple<CreationStrategies, Dictionary<string, Property>>(strategies.Item3, CreationStrategyProperties),
                                new Tuple<RouteDiscoveryStrategies, Dictionary<string, Property>>(strategies.Item4, RouteDiscoveryProperties));
             StartDiscoveryButton.IsEnabled = false;
+            NumberOfGameTextBox.IsEnabled = false;
             IntroduceAttackerButton.IsEnabled = true;
             PlotViewerButton.IsEnabled = true;
+            NetworkViewerChangeNetwork.IsEnabled = true;
+            NetworkChangeGameNumberTextbox.IsEnabled = true;
         }
 
         void Controls_IntroduceAttacker_Click(object sender, RoutedEventArgs e)
@@ -186,12 +197,9 @@ namespace NetworkGameFrontend
         {
             var plot = app.GetPlot(BasePlot.GetPlotTypeEnum(PlotTypeListBox.Items.GetItemAt(PlotTypeListBox.SelectedIndex).ToString()));
 
-            //var propertiesEditor = new UserPropertyConfiguration(PlotTypeListBox.Items.GetItemAt(PlotTypeListBox.SelectedIndex).ToString() + " Properties", plot.Properties);
-            //propertiesEditor.ShowDialog();
+            var initPlot = app.InitializePlot(plot, PlotProperties);
 
-            plot = app.InitializePlot(plot, PlotProperties);
-
-            var plotViewer = new PlotViewer(this, plot);
+            var plotViewer = new PlotViewer(this, initPlot.Item1, initPlot.Item2, plot.AllGames);
             plotViewer.Show();
         }
         void Viewer_StartPause_Click(object sender, RoutedEventArgs e)
@@ -214,6 +222,16 @@ namespace NetworkGameFrontend
             app.ToggleUpdatePackets();
         }
 
+        void Viewer_ChangeNetwork_Click(object sender, RoutedEventArgs e)
+        {
+            int gameID;
+            if (!int.TryParse(NetworkChangeGameNumberTextbox.Text, out gameID) || gameID <= 0 || gameID > app.NumberOfGames)
+            {
+                _ = MessageBox.Show($"Invalid game number (1-{app.NumberOfGames})!", "Something went wrong!");
+                return;
+            }
+            app.LoadNetwork(gameID);
+        }
         #endregion
         #region Strategies
         void Controls_RoutingStrategyPropertiesEditor_Click(object sender, RoutedEventArgs e)

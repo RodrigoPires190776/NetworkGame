@@ -24,7 +24,7 @@ namespace NetworkGameFrontend.VisualNetwork
         private readonly Dictionary<Guid, Border> LinkProbabilities;
         public const int RADIUS = 20;
         public int ID { get; }
-        private Guid RouterID;
+        public Guid RouterID { get; }
         public event EventHandler<ClickedRouterEventArgs> ClickedRouter;
         public VisualRouter(int id, List<Guid> links, Guid routerID)
         {

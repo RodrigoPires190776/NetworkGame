@@ -23,7 +23,7 @@ namespace Network.Components
             Destination = dst;
             CurrentRouter = src;
             RouterSentToLink = new Dictionary<Guid, Guid>();
-            NumberOfSteps = 0;
+            NumberOfSteps = 1;
         }
 
         public void Send(Guid curr)

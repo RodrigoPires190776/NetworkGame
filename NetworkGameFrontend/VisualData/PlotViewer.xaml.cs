@@ -23,13 +23,15 @@ namespace NetworkGameFrontend.VisualData
     public partial class PlotViewer : Window
     {
         private BasePlot Plot;
-        public PlotViewer(Window owner, BasePlot plot)
+        private int NetworkID;
+        public PlotViewer(Window owner, BasePlot plot, int networkID, bool allGames = false)
         {
             Owner = owner;
             Plot = plot;
             InitializeComponent();
 
             PlotGrid.Children.Add(plot.WpfPlot);
+            NetworkIDTextBlock.Text = allGames ? "ALL" : networkID.ToString();
         }
 
         void ResetView_Click(object sender, RoutedEventArgs e)

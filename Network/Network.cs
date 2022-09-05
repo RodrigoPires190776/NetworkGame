@@ -11,6 +11,7 @@ namespace Network
     public class Network
     {
         public string Name { get; set; }
+        public int NetworkID { get; set; }
         public Dictionary<Guid, Router> Routers { get; private set; }
         public List<Guid> RouterIDList { get; private set; }
         public List<Link> Links { get; private set; }
@@ -19,6 +20,7 @@ namespace Network
         public int NumberOfSteps { get; private set; }
         private decimal AverageVariance { get; set; }
         private int StepsVariance { get; set; }
+        public Dictionary<Guid,Dictionary<Guid,int>> RouterDistances { get; private set; }
 
         public Network()
         {
@@ -27,9 +29,43 @@ namespace Network
             Links = new List<Link>();
             Packets = new Dictionary<Guid, Packet>();
             ID = Guid.NewGuid();
+            NetworkID = 0;
             NumberOfSteps = 0;
             AverageVariance = 0;
             StepsVariance = 0;
+        }
+
+        public Network Copy() 
+        {
+            var network = new Network();
+            network.Name = Name;
+            
+            NetworkMaster.GetInstance().AddNetwork(network, network.Name);
+            var routerIDmapping = new Dictionary<Guid, Guid>();
+          
+            foreach(var router in Routers.Values)
+            {
+                var newRouter = new Router(network.ID, router.Coordinates);
+                network.AddRouter(newRouter);
+                routerIDmapping.Add(router.ID, newRouter.ID);
+            }
+            foreach(var link in Links)
+            {
+                network.AddLink(new Link(routerIDmapping[link.Routers.Item1], routerIDmapping[link.Routers.Item2], link.LinkLength, network.ID));
+            }
+
+            network.RouterDistances = new Dictionary<Guid, Dictionary<Guid, int>>();
+            foreach(var source in RouterDistances.Keys)
+            {
+                var dict = new Dictionary<Guid, int>();
+                foreach(var destination in RouterDistances[source].Keys)
+                {
+                    dict.Add(routerIDmapping[destination], RouterDistances[source][destination]);
+                }
+                network.RouterDistances.Add(routerIDmapping[source], dict);
+            }
+
+            return network;
         }
 
         public void AddRouter(Router router)
@@ -79,7 +115,7 @@ namespace Network
                 //Expired
                 foreach(var packet in result.Item3)
                 {
-                    state.UpdatedPackets.Add(packet.ID, new UpdatePacket(packet.ID, packet.NumberOfSteps, false, true, packet.Source, packet.Destination));
+                    state.AddUpdatePacket(new UpdatePacket(packet.ID, packet.NumberOfSteps, false, true, packet.Source, packet.Destination));
                     Packets.Remove(packet.ID);
 
                     foreach(var router in packet.RouterSentToLink.Keys)
@@ -91,7 +127,7 @@ namespace Network
                 //Reached Router
                 foreach (Packet packet in result.Item1)
                 {
-                    state.UpdatedPackets.Add(packet.ID, new UpdatePacket(packet.ID, packet.NumberOfSteps, packet.ReachedDestination, false, packet.Source, packet.Destination));
+                    state.AddUpdatePacket(new UpdatePacket(packet.ID, packet.NumberOfSteps, packet.ReachedDestination, false, packet.Source, packet.Destination));
 
                     if (!packet.ReachedDestination)
                     {
@@ -115,8 +151,8 @@ namespace Network
                 state.UpdatedRouters.Add(router.ID, updateRouter.Item1);
                 if (updateRouter.Item3 != null)
                 {
-                    state.UpdatedPackets[updateRouter.Item3.ID] = new UpdatePacket(updateRouter.Item3.ID,
-                    updateRouter.Item3.NumberOfSteps, false, true, updateRouter.Item3.Source, updateRouter.Item3.Destination);
+                    state.AddUpdatePacket(new UpdatePacket(updateRouter.Item3.ID,
+                    updateRouter.Item3.NumberOfSteps, false, true, updateRouter.Item3.Source, updateRouter.Item3.Destination));
                     foreach (var routerID in updateRouter.Item3.RouterSentToLink.Keys)
                     {
                         Routers[routerID].Learn(updateRouter.Item3);
@@ -142,6 +178,67 @@ namespace Network
             
             
             return state;
+        }
+
+        public void ComputeRouterDistances()
+        {
+            RouterDistances = new Dictionary<Guid, Dictionary<Guid, int>>();
+            foreach (var node in RouterIDList)
+            {
+                var nodeDistances = Dijkstra(node);
+                RouterDistances.Add(node, nodeDistances);
+            }
+        }
+
+        private Dictionary<Guid, int> Dijkstra(Guid node)
+        {
+            var nodeDistances = new Dictionary<Guid, int>();
+            Guid nodeMin;
+            int nodeMinValue;
+            nodeDistances.Add(node, 0);
+            var list = new List<Guid>() { node };
+
+            while (list.Count > 0)
+            {
+                nodeMin = list[0];
+                nodeMinValue = nodeDistances.ContainsKey(list[0]) ? nodeDistances[list[0]] : int.MaxValue;
+                foreach (var n in list)
+                {
+                    if (nodeDistances.ContainsKey(n) && nodeDistances[n] < nodeMinValue)
+                    {
+                        nodeMin = n;
+                        nodeMinValue = nodeDistances[n];
+                    }
+                }
+                node = nodeMin;
+                list.Remove(node);
+
+                var router = Routers[node];
+
+                foreach (var edge in router.Links.Values)
+                {
+                    var neighbour = GetOtherRouter(node, edge);
+                    var cost = nodeDistances[node] + edge.LinkLength;
+                    if (nodeDistances[node] == 0) cost -= 1;
+
+                    if (!nodeDistances.ContainsKey(neighbour))
+                    {
+                        nodeDistances.Add(neighbour, cost);
+                        list.Add(neighbour);
+                    }
+                    else if (cost < nodeDistances[neighbour])
+                    {
+                        nodeDistances[neighbour] = cost;
+                    }
+                }
+            }
+
+            return nodeDistances;
+        }
+
+        private Guid GetOtherRouter(Guid node, Link link)
+        {
+            return link.Routers.Item1 == node ? link.Routers.Item2 : link.Routers.Item1;
         }
     }
 }

@@ -43,7 +43,7 @@ namespace NetworkGameDataCollector.NetworkDataComponents
             if (data.PacketSent) { PacketsSent++;  }
         }
 
-        public void Update(UpdatePacket data)
+        public void Update(UpdatePacket data, bool saveRuntimeData)
         {
             if(data.Destination == RouterID)
             {
@@ -56,7 +56,7 @@ namespace NetworkGameDataCollector.NetworkDataComponents
                 PacketsInTransit--;
                 PacketAverageDeliverTime = (PacketAverageDeliverTime * PacketsDelivered + data.NumberOfSteps) / (PacketsDelivered + 1);
                 PacketsDelivered++;
-                PacketDeliverTimes.Add(data.ID, data.NumberOfSteps);
+                if(saveRuntimeData) PacketDeliverTimes.Add(data.ID, data.NumberOfSteps);
             }
             if (data.Dropped)
             {

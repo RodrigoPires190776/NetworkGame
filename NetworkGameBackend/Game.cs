@@ -16,12 +16,7 @@ namespace NetworkGameBackend
     public class Game
     {
         public Network.Network Network { get; } 
-        public bool IsRunning { get; private set; }
         public event EventHandler<UpdatedState> GameStep;
-        public int LoopsPerSecond { get; private set; }
-        private TimeSpan LoopTime { get; set; }
-        private readonly List<int> GameSpeeds = new List<int>() { 1, 2, 5, 10, 25, 50, 75, 100, 150, 250, 500, int.MaxValue };
-        private int CurrentSpeed;
 
         public Game(Network.Network network, int speed,
             Tuple<RoutingStrategies, Dictionary<string, Property>> routing,
@@ -37,56 +32,13 @@ namespace NetworkGameBackend
                     GetStrategy(picking.Item1, picking.Item2));
             }
             Network.Initialize(GetStrategy(discovery.Item1, discovery.Item2));
-            LoopTime = new TimeSpan(TimeSpan.TicksPerSecond / GameSpeeds[speed]);
-            CurrentSpeed = speed;
         }
 
-        public void Run()
+        public UpdatedState Loop()
         {
-            int loopCounter = 0;
-            TimeSpan loopsTimeCounter = new TimeSpan(0);
-            TimeSpan elapsedTime;
-            DateTime startLoopTime;
-            IsRunning = true;
-            while (IsRunning)
-            {
-                startLoopTime = DateTime.Now;
-
-                GameStep.Invoke(this, Network.Step());
-
-                elapsedTime = DateTime.Now - startLoopTime;
-                if (elapsedTime < LoopTime) System.Threading.Thread.Sleep(LoopTime - elapsedTime);
-
-                loopsTimeCounter += DateTime.Now - startLoopTime;
-                loopCounter++;
-                if (loopsTimeCounter > TimeSpan.FromSeconds(1))
-                {
-                    LoopsPerSecond = loopCounter;
-                    loopCounter = 0;
-                    loopsTimeCounter = new TimeSpan(0);
-                }
-            }
-            LoopsPerSecond = 0;
-        }
-
-        public void Pause()
-        {
-            LoopsPerSecond = 0;
-            IsRunning = false;
-        }
-
-        public void IntroduceAttacker(Guid defensorID, Guid destinationID, Guid attackerID)
-        {
-            Network.IntroduceAttacker(defensorID, destinationID, attackerID);
-        }
-
-        public void ChangeSpeed(int speed)
-        {
-            var newSpeed = CurrentSpeed + speed;
-            if (newSpeed < 0 || newSpeed > GameSpeeds.Count - 1) return;
-
-            LoopTime = new TimeSpan(TimeSpan.TicksPerSecond / GameSpeeds[newSpeed]);
-            CurrentSpeed = newSpeed;
+            var state = Network.Step();
+            GameStep.Invoke(this, state);
+            return state;
         }
 
         private RoutingStrategy GetStrategy(RoutingStrategies strat, Guid routerID, Dictionary<string, Property> properties)

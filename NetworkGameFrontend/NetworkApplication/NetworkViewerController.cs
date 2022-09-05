@@ -29,20 +29,25 @@ namespace NetworkGameFrontend.NetworkApplication
             NetworkScrollViewerScaleTransform = scaleTransform;
             NetworkScrollViewerContent = contentPresenter;
             UpdatePackets = true;
-        }
-
-        public void LoadNetwork(string networkName)
-        {
-            VisualNetwork = new VisualNetwork.VisualNetwork(NetworkMaster.GetInstance().GetNetworkByName(networkName));
-            VisualNetwork.Draw();
             NetworkScrollViewer.MouseLeftButtonUp += NetworkMouseReleased;
             NetworkScrollViewer.PreviewMouseLeftButtonUp += NetworkMouseReleased;
             NetworkScrollViewer.PreviewMouseLeftButtonDown += NetworkMousePressed;
             NetworkScrollViewer.MouseMove += NetworkMouseMove;
             NetworkScrollViewer.ScrollChanged += OnScrollViewerScrollChanged;
             NetworkScrollViewer.PreviewMouseWheel += ScrollMouseWheel;
-
             Slider.ValueChanged += OnSliderValueChanged;
+        }
+
+        public (VisualNetwork.VisualNetwork, Guid) LoadNetwork(Guid networkID, Guid loadedRouter)
+        {
+            var routerID = -1;
+            if (loadedRouter != Guid.Empty)
+            {
+                routerID = VisualNetwork.Routers[loadedRouter].ID;
+            }
+            NetworkScrollViewerContent.Content = null;
+            VisualNetwork = new VisualNetwork.VisualNetwork(NetworkMaster.GetInstance().GetNetwork(networkID));
+            VisualNetwork.Draw();          
 
             Application.Current.Dispatcher.Invoke(() => {
                 var canvas = new Canvas
@@ -54,12 +59,22 @@ namespace NetworkGameFrontend.NetworkApplication
                 canvas.Children.Add(VisualNetwork.PacketCanvas);
                 NetworkScrollViewerContent.Content = canvas;
             });
+            
+
+            return routerID >= 0 ? (VisualNetwork, VisualNetwork.RouterIDs[routerID]) : (VisualNetwork, Guid.Empty);
         }
 
         public void Update(UpdatedState state, Guid loadedRouterID)
         {
             Application.Current.Dispatcher.Invoke(() => {
-                VisualNetwork.Update(state, loadedRouterID, UpdatePackets);
+                try
+                {
+                    VisualNetwork.Update(state, loadedRouterID, UpdatePackets);
+                }
+                catch(Exception e)
+                {
+
+                }
             });
         }
 

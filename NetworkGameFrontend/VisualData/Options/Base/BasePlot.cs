@@ -161,11 +161,11 @@ namespace NetworkGameFrontend.VisualData.Options.Base
 
         public enum PlotType { RouterCreatedPacketsPieChart, RouterCreatedPacketsLineChart, AverageVarianceLineChart, 
             AverageVarianceLineChartCombined, RouterCreatedPacketsPercentageLineChartCombined, RouterCreatedPacketsLineChartCombined,
-            AveragePacketDeliveryTimeNormalized
+            AveragePacketDeliveryTimeNormalized, AveragePacketDeliveryTimeNormalizedCombined
         }
         public static List<string> PlotTypeList = new List<string> { "RouterCreatedPacketsPieChart", "RouterCreatedPacketsLineChart", 
             "AverageVarianceLineChart", "AverageVarianceLineChartCombined", "RouterCreatedPacketsPercentageLineChartCombined", 
-            "RouterCreatedPacketsLineChartCombined", "AveragePacketDeliveryTimeNormalized" };
+            "RouterCreatedPacketsLineChartCombined", "AveragePacketDeliveryTimeNormalized", "AveragePacketDeliveryTimeNormalizedCombined" };
 
         public static PlotType GetPlotTypeEnum(string plotType)
         {
@@ -178,6 +178,7 @@ namespace NetworkGameFrontend.VisualData.Options.Base
                 "RouterCreatedPacketsPercentageLineChartCombined" => PlotType.RouterCreatedPacketsPercentageLineChartCombined,
                 "RouterCreatedPacketsLineChartCombined" => PlotType.RouterCreatedPacketsLineChartCombined,
                 "AveragePacketDeliveryTimeNormalized" => PlotType.AveragePacketDeliveryTimeNormalized,
+                "AveragePacketDeliveryTimeNormalizedCombined" => PlotType.AveragePacketDeliveryTimeNormalizedCombined,
                 _ => throw new NotImplementedException(),
             };
         }
@@ -193,6 +194,7 @@ namespace NetworkGameFrontend.VisualData.Options.Base
                 "RouterCreatedPacketsPercentageLineChartCombined" => RouterCreatedPacketsPercentageLineChartCombined.GetProperties(),
                 "RouterCreatedPacketsLineChartCombined" => RouterCreatedPacketsLineChartCombined.GetProperties(),
                 "AveragePacketDeliveryTimeNormalized" => AveragePacketDeliveryTimeNormalized.GetProperties(),
+                "AveragePacketDeliveryTimeNormalizedCombined" => AveragePacketDeliveryTimeNormalizedCombined.GetProperties(),
                 _ => throw new NotImplementedException(),
             };
         }

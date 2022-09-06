@@ -2,6 +2,7 @@
 using Network.UpdateNetwork;
 using NetworkGameBackend;
 using NetworkGameFrontend.VisualData.Options.Base;
+using NetworkGameFrontend.VisualData.Options.BaseCombined;
 using NetworkUtils;
 using ScottPlot.Plottable;
 using System;
@@ -11,12 +12,12 @@ using System.Windows;
 
 namespace NetworkGameFrontend.VisualData.Options.Graphs
 {
-    public class AveragePacketDeliveryTimeNormalized : LineChart
+    public class AveragePacketDeliveryTimeNormalizedCombined : LineChartCombined
     {
-        private Guid Network;
+        private List<Guid> Networks;
         private ScatterPlot ScatterPlot;
         private double[] SignalPlotXs;
-        private List<double> ValuesOnHold;
+        private Dictionary<Guid, List<double>> ValuesOnHold;
         private int LastX;
         private int LastUpdatedX;
         private readonly double InterpolateStep = 0.01;
@@ -26,11 +27,12 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
 
             return dictionaryProperties;
         }
-        public AveragePacketDeliveryTimeNormalized(Guid network, Game game) :
-           base("Average Packet Delivery Time Normalized", game)
+
+        public AveragePacketDeliveryTimeNormalizedCombined(List<Guid> networks, List<Game> game) :
+           base("Average Packet Delivery Time Normalized Combined", game)
         {
-            Network = network;
-            ValuesOnHold = new List<double>();
+            Networks = networks;
+            ValuesOnHold = new Dictionary<Guid, List<double>>();
         }
 
         public override BasePlot Initialize(VisualNetwork.VisualNetwork visualNetwork, Dictionary<string, Property> properties)
@@ -55,26 +57,40 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
 
             return this;
         }
-
         protected override void LoadPreviousData()
         {
             //TODO
         }
 
-        protected override void SaveData(UpdatedState state)
-        {
-            var value = 0.0;
-            var nrValues = 0;
-            foreach(var packet in state.GetUpdatePackets().Values)
+        protected override void SaveData(List<UpdatedState> states)
+        {           
+            foreach(var state in states)
             {
-                if (packet.ReachedDestination)
+                var value = 0.0;
+                var nrValues = 0;
+                foreach (var packet in state.GetUpdatePackets().Values)
                 {
-                    value = (double)packet.NumberOfSteps / NetworkMaster.GetInstance().GetNetwork(Network).RouterDistances[packet.Source][packet.Destination];
-                    nrValues++;
+                    if (packet.ReachedDestination)
+                    {
+                        value = (double)packet.NumberOfSteps / NetworkMaster.GetInstance().GetNetwork(state.NetworkID).RouterDistances[packet.Source][packet.Destination];
+                        nrValues++;
+                    }
                 }
+                if(nrValues > 0)
+                {
+                    value = nrValues > 0 ? value / nrValues : 0;
+                    if (ValuesOnHold.ContainsKey(state.NetworkID))
+                    {
+                        ValuesOnHold[state.NetworkID].Add(value);
+                    }
+                    else
+                    {
+                        ValuesOnHold.Add(state.NetworkID, new List<double>() { value });
+                    }
+                }              
             }
-            if (nrValues > 0) ValuesOnHold.Add(value / nrValues);
         }
+
         private void AddXValue(double value)
         {
             if (SignalPlotXs.Length <= LastX + 1)
@@ -86,17 +102,22 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
 
         protected override void Update()
         {
-            var newValue = 0.0;
+            var listValues = new List<double>();
             if (ValuesOnHold.Count > 0)
             {
-                var sum = 0.0;
-                foreach(var value in ValuesOnHold)
+                foreach (var list in ValuesOnHold.Values)
                 {
-                    sum += value;
+                    var sum = 0.0;
+                    foreach (var value in list)
+                    {
+                        sum += value;
+                    }
+                    listValues.Add(sum / list.Count);
                 }
-                newValue = sum / ValuesOnHold.Count;
+                
             }
-            AddValue(newValue);
+            if (listValues.Count > 0) AddValue(listValues);
+            else AddValue(new List<double>() { 0 });
             AddXValue(LastX + 1);
             if (LastUpdatedX < LastX)
             {

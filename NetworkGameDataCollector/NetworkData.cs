@@ -15,6 +15,7 @@ namespace NetworkGameDataCollector
         public Dictionary<int, UpdatedState> States { get; }
         public List<decimal> AverageVariances { get; }
         private int NumberOfSteps;
+        public bool SaveRuntimeData { get; private set; }
 
         public NetworkData(Network.Network network)
         {
@@ -23,6 +24,7 @@ namespace NetworkGameDataCollector
             States = new Dictionary<int, UpdatedState>();
             AverageVariances = new List<decimal>();
             NumberOfSteps = 0;
+            SaveRuntimeData = false;
 
             foreach(var router in network.RouterIDList)
             {
@@ -30,8 +32,9 @@ namespace NetworkGameDataCollector
             }       
         }
 
-        public void AddEventHandler(Game game)
+        public void AddEventHandler(Game game, bool saveRuntimeData)
         {
+            SaveRuntimeData = saveRuntimeData;
             game.GameStep += Update;
         }
 
@@ -42,14 +45,14 @@ namespace NetworkGameDataCollector
                 RouterData[router.ID].Update(router);
             }
 
-            foreach(var packet in state.UpdatedPackets.Values)
+            foreach(var packet in state.GetUpdatePackets().Values)
             {
-                RouterData[packet.Source].Update(packet);
-                RouterData[packet.Destination].Update(packet);
+                RouterData[packet.Source].Update(packet, SaveRuntimeData);
+                RouterData[packet.Destination].Update(packet, SaveRuntimeData);
             }
-            States.Add(state.NumberOfSteps, state);
+            if(SaveRuntimeData) States.Add(state.NumberOfSteps, state);
 
-            if (state.UpdatedAveragevariance) AverageVariances.Add(state.AverageVarience);
+            if (SaveRuntimeData && state.UpdatedAveragevariance) AverageVariances.Add(state.AverageVarience);
             NumberOfSteps = state.NumberOfSteps > NumberOfSteps ? state.NumberOfSteps : NumberOfSteps;
         }
 
@@ -60,10 +63,10 @@ namespace NetworkGameDataCollector
                 RouterData[router.ID].Update(router);
             }
 
-            foreach (var packet in state.UpdatedPackets.Values)
+            foreach (var packet in state.GetUpdatePackets().Values)
             {
-                RouterData[packet.Source].Update(packet);
-                RouterData[packet.Destination].Update(packet);
+                RouterData[packet.Source].Update(packet, false);
+                RouterData[packet.Destination].Update(packet, false);
             }
         }
     }

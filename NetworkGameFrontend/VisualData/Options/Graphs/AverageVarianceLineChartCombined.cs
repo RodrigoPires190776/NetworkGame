@@ -2,6 +2,7 @@
 using NetworkGameBackend;
 using NetworkGameDataCollector;
 using NetworkGameFrontend.VisualData.Options.Base;
+using NetworkGameFrontend.VisualData.Options.BaseCombined;
 using NetworkUtils;
 using ScottPlot.Plottable;
 using System;
@@ -11,9 +12,9 @@ using System.Windows;
 
 namespace NetworkGameFrontend.VisualData.Options.Graphs
 {
-    public class AverageVarianceLineChart : LineChart
+    public class AverageVarianceLineChartCombined : LineChartCombined
     {
-        private Guid Network;
+        private List<Guid> Networks;
         private ScatterPlot ScatterPlot;
         private FunctionPlot FunctionPlot;
         private double[] SignalPlotXs;
@@ -41,10 +42,10 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
 
             return dictionaryProperties;
         }
-        public AverageVarianceLineChart(Guid network, Game game) :
-           base("Average Variance Line Chart", game)
+        public AverageVarianceLineChartCombined(List<Guid> networks, List<Game> games) :
+           base("Average Variance Line Chart", games)
         {
-            Network = network;
+            Networks = networks;
             Properties.Add(Property.Percentage, new Property(Property.PropertyType.Decimal,
                     new List<Tuple<string, object>>()
                     {
@@ -77,49 +78,66 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
             {
                 LineWidth = 2
             };
-            FunctionPlot.Color = System.Drawing.Color.Red;           
+            FunctionPlot.Color = System.Drawing.Color.Red;
             Plot.Add(FunctionPlot);
 
-            base.FinalizeInit();
+            base.FinalizeInit();  
 
             return this;
         }
 
         protected override void LoadPreviousData()
         {
-            var averageVariances = NetworkDataCollector.GetInstance().GetPreviousAverageVariance(Network);
+            var list = new List<List<decimal>>();
 
-            foreach(var value in averageVariances)
+            foreach(var network in Networks)
             {
-                AddValue(double.Parse(value.ToString()));
+                list.Add(NetworkDataCollector.GetInstance().GetPreviousAverageVariance(network));
+            }
+
+            for(int i = 0; i < list[0].Count; i++)
+            {
+                var values = new List<double>();
+                for(int j = 0; j < list.Count; j++) 
+                {
+                    values.Add(double.Parse(list[j][i].ToString()));
+                }
+                AddValue(values);
             }
         }
 
-        protected override void SaveData(UpdatedState state)
+        protected override void SaveData(List<UpdatedState> states)
         {
-            if (state.UpdatedAveragevariance)
+            var list = new List<double>();
+            foreach(var state in states)
             {
-                AddValue(double.Parse(state.AverageVarience.ToString()));
+                if (state.UpdatedAveragevariance)
+                {
+                    list.Add(double.Parse(state.AverageVarience.ToString()));
+                }
+            }
+            if(list.Count > 0)
+            {
+                AddValue(list);
                 AddXValue(LastX + 1);
-            }
+            }          
         }
 
-        private new void AddValue(double value)
+        private new void AddValue(List<double> value)
         {
-            UpdatePercentageLine(value);
-            base.AddValue(value);
+            UpdatePercentageLine(base.AddValue(value));
         }
 
         private void UpdatePercentageLine(double value)
         {
             if (value > MaxY) MaxY = value;
             if (value < MinY) MinY = value;
-            if(FunctionPlot != null) FunctionPlot.Function = new Func<double, double?>((x) => MinY + ((MaxY - MinY) * PercentageXValue));
+            if (FunctionPlot != null) FunctionPlot.Function = new Func<double, double?>((x) => MinY + ((MaxY - MinY) * PercentageXValue));
         }
 
         private void AddXValue(double value)
         {
-            if(SignalPlotXs.Length <= LastX + 1)
+            if (SignalPlotXs.Length <= LastX + 1)
             {
                 Array.Resize(ref SignalPlotXs, SignalPlotXs.Length * 2);
             }
@@ -128,7 +146,7 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
 
         protected override void Update()
         {
-            if(LastUpdatedX < LastX)
+            if (LastUpdatedX < LastX)
             {
                 var newXs = new double[SignalPlot.Ys.Length];
                 Array.Copy(SignalPlotXs, 0, newXs, 0, newXs.Length);
@@ -138,7 +156,7 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
                 ScatterPlot.Update(bzX, bzY);
                 LastUpdatedX = LastX;
             }
-            
+
             Application.Current.Dispatcher.Invoke(
                 () =>
                 {

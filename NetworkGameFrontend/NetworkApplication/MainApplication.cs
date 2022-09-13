@@ -27,7 +27,7 @@ namespace NetworkGameFrontend.NetworkApplication
     {
         private readonly NetworkViewerController NetworkViewerController;
         private readonly Grid NetworkControlsGrid;
-        private readonly Grid NetworkFPSCounter;
+        private readonly Grid NetworkViewerSettingsGrid;
         private DispatcherTimer FPSCounterTimer;
         private int NumberOfFrames = 0;
         private int TotalNumberOfCycles = 0;
@@ -38,8 +38,15 @@ namespace NetworkGameFrontend.NetworkApplication
                 return NetworkMaster.GetInstance().GetNetwork(LoadedNetwork).Name;
             } 
         }
+        public int NumberOfGames
+        {
+            get
+            {
+                return GameMaster.GetInstance().NumberOfGames;
+            }
+        }
         private Guid LoadedRouter;
-        private Game NetworkGame;
+        private Game LoadedNetworkGame;
         private NetworkUpdateStateQueue NetworkUpdateStateQueue;
         private readonly object _UpdateLock = new object();
 
@@ -52,7 +59,7 @@ namespace NetworkGameFrontend.NetworkApplication
                 (ScaleTransform)networkViewer.FindName("NetworkScrollViewerGridScaleTransform"),
                 (ContentPresenter)networkViewer.FindName("NetworkScrollViewerContent")
                 );
-            NetworkFPSCounter = (Grid)networkViewer.FindName("FPSCounterGrid");
+            NetworkViewerSettingsGrid = (Grid)networkViewer.FindName("NetworkViewerSettingsGrid");
             NetworkControlsGrid = networkControlsGrid;
             LoadedRouter = Guid.Empty;
         }
@@ -60,7 +67,7 @@ namespace NetworkGameFrontend.NetworkApplication
         {
             var importer = new NetworkFileImporter();
             var network = importer.Import(fileStream, 5);
-
+            network.ComputeRouterDistances();
             NetworkMaster.GetInstance().AddNetwork(network, networkName);
             NetworkDataCollector.GetInstance().AddNetwork(network);
         }
@@ -69,18 +76,36 @@ namespace NetworkGameFrontend.NetworkApplication
         {
             var generator = new NetworkGenerator.Generator.NetworkGenerator();
             var network = generator.GenerateNetwork(properties);
-
+            network.ComputeRouterDistances();
             NetworkMaster.GetInstance().AddNetwork(network, "GeneratedNetwork");
             NetworkDataCollector.GetInstance().AddNetwork(network);
         }
 
         public void LoadNetwork(string networkName)
         {
-            NetworkViewerController.LoadNetwork(networkName);
             LoadedNetwork = NetworkMaster.GetInstance().GetNetworkByName(networkName).ID;
+            NetworkViewerController.LoadNetwork(LoadedNetwork, LoadedRouter);         
             foreach(var router in NetworkViewerController.VisualNetwork.Routers.Values)
             {
                 router.ClickedRouter += UpdatedClickedRouter;
+            }
+        }
+
+        public void LoadNetwork(int gameID)
+        {
+            LoadedNetworkGame = GameMaster.GetInstance().GetGame(gameID);
+            LoadedNetwork = LoadedNetworkGame.Network.ID;
+            var x = NetworkViewerController.VisualNetwork;
+            var visualNetwork = NetworkViewerController.LoadNetwork(LoadedNetwork, LoadedRouter);
+            foreach (var router in visualNetwork.Item1.Routers.Values)
+            {
+                router.ClickedRouter += UpdatedClickedRouter;
+            }
+            ((TextBlock)NetworkViewerSettingsGrid.FindName("LoadedGameIDTextbox")).Text = gameID.ToString();
+            if(LoadedRouter != Guid.Empty)
+            {
+                LoadedRouter = visualNetwork.Item2;
+                UpdatedClickedRouter(null, new ClickedRouterEventArgs(LoadedRouter));
             }
         }
 
@@ -100,19 +125,31 @@ namespace NetworkGameFrontend.NetworkApplication
             return NetworkMaster.GetInstance().GetNetwork(LoadedNetwork).RouterIDList.Count;
         }
 
-        public void StartDiscovery(Tuple<RoutingStrategies, Dictionary<string, Property>> routingStrategy, 
+        public void StartDiscovery(int numberOfGames, bool? saveRuntimeData,
+            Tuple<RoutingStrategies, Dictionary<string, Property>> routingStrategy, 
             Tuple<PickingStrategies, Dictionary<string, Property>> pickingStrategy, 
             Tuple<CreationStrategies, Dictionary<string, Property>> creationStrategy,
             Tuple<RouteDiscoveryStrategies, Dictionary<string, Property>> discoveryStrategy)
         {
             TotalNumberOfCycles = 0;
-            NetworkGame = new Game(NetworkMaster.GetInstance().GetNetwork(LoadedNetwork), 5,
-                routingStrategy, pickingStrategy, creationStrategy, discoveryStrategy);
             NetworkUpdateStateQueue = new NetworkUpdateStateQueue();
-            NetworkGame.GameStep += UpdateNetwork;
-            NetworkDataCollector.GetInstance().AddEventHandler(LoadedNetwork, NetworkGame);
-            Thread t = new Thread(NetworkGame.Run);
-            t.Start();
+            NetworkDataCollector.GetInstance().SaveRuntimeData(saveRuntimeData);
+
+            var games = GameMaster.GetInstance().StartGames(numberOfGames, 0, NetworkMaster.GetInstance().GetNetwork(LoadedNetwork),
+                routingStrategy, pickingStrategy, creationStrategy, discoveryStrategy);
+            LoadedNetworkGame = GameMaster.GetInstance().GetGame(1);
+            LoadNetwork(1);
+            // LoadedNetwork = GameMaster.GetInstance().GetGame(1).Network.ID;
+            //NetworkViewerController.LoadNetwork(LoadedNetwork);
+            foreach (var game in games)
+            {
+                game.GameStep += UpdateNetwork;
+                NetworkDataCollector.GetInstance().AddNetwork(game.Network);
+                NetworkDataCollector.GetInstance().AddEventHandler(game.Network.ID, game);
+            }
+
+            //Thread t = new Thread(GameMaster.GetInstance().Run);
+            //t.Start();
             FPSCounterTimer = new DispatcherTimer
             {
                 Interval = TimeSpan.FromSeconds(1)
@@ -149,20 +186,25 @@ namespace NetworkGameFrontend.NetworkApplication
                         new Tuple<string, object>(Property.INTEGER_MIN, 0),
                         new Tuple<string, object>(Property.INTEGER_MAX, NetworkMaster.GetInstance().GetNetwork(LoadedNetwork).Routers.Count - 1)
                     })
+                },
+                {
+                    Property.Random,
+                    new Property(Property.PropertyType.Bool, new List<Tuple<string, object>>())
                 }
             };
 
             return properties;
         }
 
-        public void IntroduceAttacker(int defensor, int destination, int attacker)
+        public void IntroduceAttacker(int defensor, int destination, int attacker, bool random)
         {
             var defensorID = NetworkViewerController.VisualNetwork.RouterIDs[defensor];
             var destinationID = NetworkViewerController.VisualNetwork.RouterIDs[destination];
             var attackerID = NetworkViewerController.VisualNetwork.RouterIDs[attacker];
 
-            NetworkGame.IntroduceAttacker(defensorID, destinationID, attackerID);
-            NetworkViewerController.VisualNetwork.IntroduceAttacker(defensorID, destinationID, attackerID);
+            GameMaster.GetInstance().IntroduceAttacker(defensorID, destinationID, attackerID, random);
+            var agents = NetworkMaster.GetInstance().GetNetwork(LoadedNetwork).GetNetworkAgents();
+            NetworkViewerController.VisualNetwork.IntroduceAttacker(agents.Item1, agents.Item2, agents.Item3);
         }
 
         private void UpdateNetwork(object sender, UpdatedState eventArgs)
@@ -170,7 +212,7 @@ namespace NetworkGameFrontend.NetworkApplication
             NetworkUpdateStateQueue.AddState(eventArgs);
             lock (_UpdateLock)
             {
-                var state = NetworkUpdateStateQueue.GetState();
+                var state = NetworkUpdateStateQueue.GetState(LoadedNetwork);
                 if (state != null)
                 {
                     NetworkViewerController.Update(state, LoadedRouter);
@@ -230,33 +272,33 @@ namespace NetworkGameFrontend.NetworkApplication
 
         private void UpdateFPSCounter(object sender, object eventArgs)
         {
-            ((TextBlock)NetworkFPSCounter.FindName("FPSCounter")).Text = NumberOfFrames.ToString();
+            ((TextBlock)NetworkViewerSettingsGrid.FindName("FPSCounter")).Text = NumberOfFrames.ToString();
             NumberOfFrames = 0;
-            ((TextBlock)NetworkFPSCounter.FindName("LoopCounter")).Text = NetworkGame.LoopsPerSecond.ToString();
-            TotalNumberOfCycles += NetworkGame.LoopsPerSecond;
-            ((TextBlock)NetworkFPSCounter.FindName("TotalLoopCounter")).Text = TotalNumberOfCycles.ToString();
+            ((TextBlock)NetworkViewerSettingsGrid.FindName("LoopCounter")).Text = GameMaster.GetInstance().LoopsPerSecond.ToString();
+            TotalNumberOfCycles += GameMaster.GetInstance().LoopsPerSecond;
+            ((TextBlock)NetworkViewerSettingsGrid.FindName("TotalLoopCounter")).Text = TotalNumberOfCycles.ToString();
         }
 
         private void EnableNetworkViewerControls()
         {
-            ((Button)NetworkFPSCounter.FindName("NetworkViewerSlowDown")).IsEnabled = true;
-            ((Button)NetworkFPSCounter.FindName("NetworkViewerStartPause")).IsEnabled = true;
-            ((Button)NetworkFPSCounter.FindName("NetworkViewerStartPause")).Content = "\uE769";
-            ((Button)NetworkFPSCounter.FindName("NetworkViewerSpeedUp")).IsEnabled = true;
-            ((Button)NetworkFPSCounter.FindName("NetworkViewerUpdatePackets")).IsEnabled = true;
+            ((Button)NetworkViewerSettingsGrid.FindName("NetworkViewerSlowDown")).IsEnabled = true;
+            ((Button)NetworkViewerSettingsGrid.FindName("NetworkViewerStartPause")).IsEnabled = true;
+            //((Button)NetworkViewerSettingsGrid.FindName("NetworkViewerStartPause")).Content = "\uE769";
+            ((Button)NetworkViewerSettingsGrid.FindName("NetworkViewerSpeedUp")).IsEnabled = true;
+            ((Button)NetworkViewerSettingsGrid.FindName("NetworkViewerUpdatePackets")).IsEnabled = true;
         }
 
         public void ViewerStartPause()
         {
-            if (NetworkGame.IsRunning)
+            if (GameMaster.GetInstance().IsRunning)
             {
-                TotalNumberOfCycles += NetworkGame.LoopsPerSecond;
-                NetworkGame.Pause();
+                TotalNumberOfCycles += GameMaster.GetInstance().LoopsPerSecond;
+                GameMaster.GetInstance().Pause();
                 Application.Current.Dispatcher.Invoke(
                 () =>
                 {
-                    ((Button)NetworkFPSCounter.FindName("NetworkViewerStartPause")).Content = "\uE102";                    
-                    ((TextBlock)NetworkFPSCounter.FindName("TotalLoopCounter")).Text = TotalNumberOfCycles.ToString();
+                    ((Button)NetworkViewerSettingsGrid.FindName("NetworkViewerStartPause")).Content = "\uE102";                    
+                    ((TextBlock)NetworkViewerSettingsGrid.FindName("TotalLoopCounter")).Text = TotalNumberOfCycles.ToString();
                 });                    
             }
             else
@@ -264,16 +306,16 @@ namespace NetworkGameFrontend.NetworkApplication
                 Application.Current.Dispatcher.Invoke(
                 () =>
                 {
-                    Thread t = new Thread(NetworkGame.Run);
+                    Thread t = new Thread(GameMaster.GetInstance().Run);
                     t.Start();
-                    ((Button)NetworkFPSCounter.FindName("NetworkViewerStartPause")).Content = "\uE769";
+                    ((Button)NetworkViewerSettingsGrid.FindName("NetworkViewerStartPause")).Content = "\uE769";
                 });
             }
         }
 
         public void GameSpeedChange(int speed)
         {
-            NetworkGame.ChangeSpeed(speed);
+            GameMaster.GetInstance().ChangeSpeed(speed);
         }
 
         public bool ToggleUpdatePackets()
@@ -283,13 +325,14 @@ namespace NetworkGameFrontend.NetworkApplication
         }
         public BasePlot GetPlot(PlotType type)
         {
-            var plot = PlotFactory.GetPlot(type, LoadedNetwork, NetworkGame);
+            var plot = PlotFactory.GetPlot(type, LoadedNetwork, LoadedNetworkGame,
+                GameMaster.GetInstance().GetNetworkList(), GameMaster.GetInstance().GetGamesList());
             return plot;
         }
 
-        public BasePlot InitializePlot(BasePlot plot, Dictionary<string, Property> properties)
+        public (BasePlot,int) InitializePlot(BasePlot plot, Dictionary<string, Property> properties)
         {
-            return plot.Initialize(NetworkViewerController.VisualNetwork, properties);
+            return (plot.Initialize(NetworkViewerController.VisualNetwork, properties),NetworkViewerController.VisualNetwork.NetworkID);
         }
     }
 }

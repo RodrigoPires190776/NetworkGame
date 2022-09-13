@@ -12,6 +12,7 @@ namespace Network
         private static NetworkMaster Instance;
         private readonly Dictionary<Guid, Network> Networks;
         private readonly Dictionary<string, Network> NetworksByName;
+        private readonly Dictionary<string, List<string>> NetworkNames;
 
         public static int PacketTTL = 100;
         public static int AverageVarianceUpdateRate = 100;
@@ -20,6 +21,7 @@ namespace Network
         {
             Networks = new Dictionary<Guid, Network>();
             NetworksByName = new Dictionary<string, Network>();
+            NetworkNames = new Dictionary<string, List<string>>();
             Instance = this;
         }
 
@@ -38,8 +40,28 @@ namespace Network
         public void AddNetwork(Network network, string networkName)
         {
             Networks.Add(network.ID, network);
-            NetworksByName.Add(networkName, network);
+            network.NetworkID = AddNetworkName(network, networkName);
             network.Name = networkName;
+        }
+
+        private int AddNetworkName(Network network, string networkName)
+        {
+            if (!NetworksByName.ContainsKey(networkName))
+            {
+                NetworksByName.Add(networkName, network);
+                NetworkNames.Add(networkName, new List<string>());
+                return 0;
+            }
+            if (!NetworksByName.ContainsKey(networkName + "_1"))
+            {
+                NetworksByName.Add(networkName + "_1", network);
+                NetworkNames[networkName].Add(networkName + "_1");
+                return 1;
+            }
+            var newName = networkName + $"_{NetworkNames[networkName].Count + 1}";
+            NetworksByName.Add(newName, network);
+            NetworkNames[networkName].Add(newName);
+            return NetworkNames[networkName].Count;
         }
 
         public Network GetNetwork(Guid Id)

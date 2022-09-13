@@ -11,19 +11,20 @@ namespace NetworkGameFrontend.VisualData.Options.Base
 {
     public abstract class BasePlot
     {
-
+        public bool AllGames { get; protected set; }
         protected int Width { get; set; }
         protected int Height { get; set; }
         public string Title { get; private set; }
         protected Plot Plot { get; private set; }
         public WpfPlot WpfPlot { get; private set; }
         public Dictionary<string, Property> Properties { get; }
-        protected int CyclesSinceLastUpdate { get; private set; }
+        protected int CyclesSinceLastUpdate { get; set; }
         protected List<UpdatedState> StatesOnHold { get; private set; }
         private int ColorIndex;
-        private bool Initialized;
+        protected bool Initialized;
         public BasePlot(int width, int height, string title, Game game)
         {
+            AllGames = false;
             Width = width;
             Height = height;
             Plot = new Plot(width, height);
@@ -32,6 +33,23 @@ namespace NetworkGameFrontend.VisualData.Options.Base
             Properties = new Dictionary<string, Property>();
             Initialized = false;
             game.GameStep += GameUpdate;
+            StatesOnHold = new List<UpdatedState>();
+            CyclesSinceLastUpdate = 1;
+            ColorIndex = 0;
+            AddBaseProperties();
+        }
+
+        public BasePlot(int width, int height, string title, List<Game> games)
+        {
+            AllGames = true;
+            Width = width;
+            Height = height;
+            Plot = new Plot(width, height);
+            SetTitle(title);
+            WpfPlot = new WpfPlot();
+            Properties = new Dictionary<string, Property>();
+            Initialized = false;
+            GameMaster.GetInstance().AllGamesStep += GameUpdate;
             StatesOnHold = new List<UpdatedState>();
             CyclesSinceLastUpdate = 1;
             ColorIndex = 0;
@@ -66,6 +84,21 @@ namespace NetworkGameFrontend.VisualData.Options.Base
             CyclesSinceLastUpdate++;
         }
 
+        protected virtual void GameUpdate(object sender, List<UpdatedState> states)
+        {
+            if (!Initialized) return;
+            var cycles = (int)Properties[Property.CyclesToUpdate].Value;
+            SaveData(states);
+
+            if (cycles == 0 || cycles < CyclesSinceLastUpdate)
+            {
+                Update();
+                CyclesSinceLastUpdate = 0;
+                StatesOnHold.Clear();
+            }
+            CyclesSinceLastUpdate++;
+        }
+
         protected virtual Color GetColor()
         {
             ColorIndex = ColorIndex + 1 < Palette.Category10.Count() ? ColorIndex + 1 : 0;
@@ -81,12 +114,15 @@ namespace NetworkGameFrontend.VisualData.Options.Base
 
             if ((bool)Properties[Property.LoadAllValues].Value) LoadPreviousData();
 
+            return this;
+        }
+
+        protected void FinalizeInit()
+        {
             Initialized = true;
 
             WpfPlot.Reset(Plot);
             WpfPlot.Refresh();
-
-            return this;
         }
 
         protected void SetTitle(string title)
@@ -96,8 +132,9 @@ namespace NetworkGameFrontend.VisualData.Options.Base
         }
 
         protected abstract void Update();
-        protected abstract void SaveData(UpdatedState state);
-        protected abstract void LoadPreviousData();
+        protected virtual void SaveData(UpdatedState state) { }
+        protected virtual void SaveData(List<UpdatedState> state) { }
+        protected virtual void LoadPreviousData() { }
         public abstract void ResetView();
 
         protected static Dictionary<string, Property> GetProperties(List<Tuple<string, Property.PropertyType, List<Tuple<string, object>>>> properties)
@@ -122,8 +159,14 @@ namespace NetworkGameFrontend.VisualData.Options.Base
             return dictionaryProperties;
         }
 
-        public enum PlotType { RouterCreatedPacketsPieChart, RouterCreatedPacketsLineChart, AverageVarianceLineChart }
-        public static List<string> PlotTypeList = new List<string> { "RouterCreatedPacketsPieChart", "RouterCreatedPacketsLineChart", "AverageVarianceLineChart" };
+        public enum PlotType { RouterCreatedPacketsPieChart, RouterCreatedPacketsLineChart, AverageVarianceLineChart, 
+            AverageVarianceLineChartCombined, RouterCreatedPacketsPercentageLineChartCombined, RouterCreatedPacketsLineChartCombined,
+            AveragePacketDeliveryTimeNormalized, AveragePacketDeliveryTimeNormalizedCombined, DefensorCreatedPacketsPercentageLineChartCombined
+        }
+        public static List<string> PlotTypeList = new List<string> { "RouterCreatedPacketsPieChart", "RouterCreatedPacketsLineChart", 
+            "AverageVarianceLineChart", "AverageVarianceLineChartCombined", "RouterCreatedPacketsPercentageLineChartCombined", 
+            "RouterCreatedPacketsLineChartCombined", "AveragePacketDeliveryTimeNormalized", "AveragePacketDeliveryTimeNormalizedCombined",
+            "DefensorCreatedPacketsPercentageLineChartCombined" };
 
         public static PlotType GetPlotTypeEnum(string plotType)
         {
@@ -132,6 +175,12 @@ namespace NetworkGameFrontend.VisualData.Options.Base
                 "RouterCreatedPacketsPieChart" => PlotType.RouterCreatedPacketsPieChart,
                 "RouterCreatedPacketsLineChart" => PlotType.RouterCreatedPacketsLineChart,
                 "AverageVarianceLineChart" => PlotType.AverageVarianceLineChart,
+                "AverageVarianceLineChartCombined" => PlotType.AverageVarianceLineChartCombined,
+                "RouterCreatedPacketsPercentageLineChartCombined" => PlotType.RouterCreatedPacketsPercentageLineChartCombined,
+                "RouterCreatedPacketsLineChartCombined" => PlotType.RouterCreatedPacketsLineChartCombined,
+                "AveragePacketDeliveryTimeNormalized" => PlotType.AveragePacketDeliveryTimeNormalized,
+                "AveragePacketDeliveryTimeNormalizedCombined" => PlotType.AveragePacketDeliveryTimeNormalizedCombined,
+                "DefensorCreatedPacketsPercentageLineChartCombined" => PlotType.DefensorCreatedPacketsPercentageLineChartCombined,
                 _ => throw new NotImplementedException(),
             };
         }
@@ -143,6 +192,12 @@ namespace NetworkGameFrontend.VisualData.Options.Base
                 "RouterCreatedPacketsPieChart" => RouterCreatedPacketsPieChart.GetProperties(network),
                 "RouterCreatedPacketsLineChart" => RouterCreatedPacketsLineChart.GetProperties(network),
                 "AverageVarianceLineChart" => AverageVarianceLineChart.GetProperties(),
+                "AverageVarianceLineChartCombined" => AverageVarianceLineChartCombined.GetProperties(),
+                "RouterCreatedPacketsPercentageLineChartCombined" => RouterCreatedPacketsPercentageLineChartCombined.GetProperties(),
+                "RouterCreatedPacketsLineChartCombined" => RouterCreatedPacketsLineChartCombined.GetProperties(),
+                "AveragePacketDeliveryTimeNormalized" => AveragePacketDeliveryTimeNormalized.GetProperties(),
+                "AveragePacketDeliveryTimeNormalizedCombined" => AveragePacketDeliveryTimeNormalizedCombined.GetProperties(),
+                "DefensorCreatedPacketsPercentageLineChartCombined" => DefensorCreatedPacketsPercentageLineChartCombined.GetProperties(),
                 _ => throw new NotImplementedException(),
             };
         }

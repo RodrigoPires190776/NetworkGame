@@ -171,6 +171,7 @@ namespace NetworkUtils
         public const string Attacker = "Attacker";
         public const string Defensor = "Defensor";
         public const string Destination = "Destination";
+        public const string Random = "Random";
         public const string MinProbability = "MinProbability";
         public const string MaxProbability = "MaxProbability";
         public const string NumberOfNodes = "NumberOfNodes";

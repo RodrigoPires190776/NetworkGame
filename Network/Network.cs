@@ -20,6 +20,9 @@ namespace Network
         public int NumberOfSteps { get; private set; }
         private decimal AverageVariance { get; set; }
         private int StepsVariance { get; set; }
+        public Guid AttackerID { get; private set; }
+        public Guid DefensorID { get; private set; }
+        public Guid DestinationID { get; private set; }
         public Dictionary<Guid,Dictionary<Guid,int>> RouterDistances { get; private set; }
 
         public Network()
@@ -33,6 +36,9 @@ namespace Network
             NumberOfSteps = 0;
             AverageVariance = 0;
             StepsVariance = 0;
+            AttackerID = Guid.Empty;
+            DefensorID = Guid.Empty;
+            DestinationID = Guid.Empty;
         }
 
         public Network Copy() 
@@ -90,6 +96,61 @@ namespace Network
         {
             Routers[defensorID].SetAgentDefensor(destinationID);
             Routers[attackerID].SetAgentAttacker(defensorID);
+            DefensorID = defensorID;
+            DestinationID = destinationID;
+            AttackerID = attackerID;
+        }
+
+        public void IntroduceAttackerRandom()
+        {
+            int destination = new Random().Next(RouterIDList.Count);
+            int defensor = destination;
+            while(defensor == destination)
+            {
+                defensor = new Random().Next(RouterIDList.Count);
+            }
+
+            var destinationID = RouterIDList[destination];
+            var defensorID = RouterIDList[defensor];
+
+            var routerList = new List<Guid>();
+            bool foundDestination = false;
+
+            foreach(var neighbourLink in Routers[defensorID].Links.Values)
+            {
+                var neighbour = GetOtherRouter(defensorID, neighbourLink);
+                routerList.Add(neighbour);
+                if (neighbour == destinationID) foundDestination = true;
+            }
+
+            if (!foundDestination) routerList.Clear();
+            Guid currentRouter = defensorID;
+            while (!foundDestination)
+            {
+                var router = currentRouter;
+                foreach (var neighbourLink in Routers[currentRouter].Links.Values)
+                {
+                    var neighbour = GetOtherRouter(currentRouter, neighbourLink);
+                    if (neighbour == destinationID) foundDestination = true;
+                    if (RouterDistances[neighbour][destinationID] < RouterDistances[router][destinationID])
+                    {
+                        router = neighbour;
+                    }
+                }
+                routerList.Add(router);
+                currentRouter = router;
+            }
+            routerList.Remove(destinationID);
+
+            int attacker = new Random().Next(routerList.Count);
+            var attackerID = routerList[attacker];
+
+            this.IntroduceAttacker(defensorID, destinationID, attackerID);
+        }
+
+        public (Guid, Guid, Guid) GetNetworkAgents()
+        {
+            return (DefensorID, DestinationID, AttackerID);
         }
 
         public void Initialize(BaseRouteDiscovery discovery)

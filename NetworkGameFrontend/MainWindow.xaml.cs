@@ -77,8 +77,12 @@ namespace NetworkGameFrontend
                     NetworkGenerator.Generator.NetworkGenerator.GetProperties()
                     );
                 propertiesEditor.ShowDialog();
-                app.GenerateNetwork(propertiesEditor.Properties);
-                _ = MessageBox.Show("NetworkGenerated!");
+                if (propertiesEditor.Ok)
+                {
+                    app.GenerateNetwork(propertiesEditor.Properties);
+                    _ = MessageBox.Show("NetworkGenerated!");
+                }
+                else _ = MessageBox.Show("Canceled!");
             }
             catch(Exception ex)
             {
@@ -178,6 +182,7 @@ namespace NetworkGameFrontend
             PlotViewerButton.IsEnabled = true;
             NetworkViewerChangeNetwork.IsEnabled = true;
             NetworkChangeGameNumberTextbox.IsEnabled = true;
+            SaveRuntimeDataCheckBox.IsEnabled = false;
         }
 
         void Controls_IntroduceAttacker_Click(object sender, RoutedEventArgs e)
@@ -190,7 +195,8 @@ namespace NetworkGameFrontend
             app.IntroduceAttacker(
                 (int)properties[Property.Defensor].Value, 
                 (int)properties[Property.Destination].Value, 
-                (int)properties[Property.Attacker].Value);
+                (int)properties[Property.Attacker].Value,
+                (bool)properties[Property.Random].Value);
         }
 
         void Controls_PlotViewer_Click(object sender, RoutedEventArgs e)

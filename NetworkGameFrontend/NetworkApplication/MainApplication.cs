@@ -186,20 +186,25 @@ namespace NetworkGameFrontend.NetworkApplication
                         new Tuple<string, object>(Property.INTEGER_MIN, 0),
                         new Tuple<string, object>(Property.INTEGER_MAX, NetworkMaster.GetInstance().GetNetwork(LoadedNetwork).Routers.Count - 1)
                     })
+                },
+                {
+                    Property.Random,
+                    new Property(Property.PropertyType.Bool, new List<Tuple<string, object>>())
                 }
             };
 
             return properties;
         }
 
-        public void IntroduceAttacker(int defensor, int destination, int attacker)
+        public void IntroduceAttacker(int defensor, int destination, int attacker, bool random)
         {
             var defensorID = NetworkViewerController.VisualNetwork.RouterIDs[defensor];
             var destinationID = NetworkViewerController.VisualNetwork.RouterIDs[destination];
             var attackerID = NetworkViewerController.VisualNetwork.RouterIDs[attacker];
 
-            GameMaster.GetInstance().IntroduceAttacker(defensorID, destinationID, attackerID);
-            NetworkViewerController.VisualNetwork.IntroduceAttacker(defensorID, destinationID, attackerID);
+            GameMaster.GetInstance().IntroduceAttacker(defensorID, destinationID, attackerID, random);
+            var agents = NetworkMaster.GetInstance().GetNetwork(LoadedNetwork).GetNetworkAgents();
+            NetworkViewerController.VisualNetwork.IntroduceAttacker(agents.Item1, agents.Item2, agents.Item3);
         }
 
         private void UpdateNetwork(object sender, UpdatedState eventArgs)

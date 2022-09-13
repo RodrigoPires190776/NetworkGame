@@ -161,11 +161,12 @@ namespace NetworkGameFrontend.VisualData.Options.Base
 
         public enum PlotType { RouterCreatedPacketsPieChart, RouterCreatedPacketsLineChart, AverageVarianceLineChart, 
             AverageVarianceLineChartCombined, RouterCreatedPacketsPercentageLineChartCombined, RouterCreatedPacketsLineChartCombined,
-            AveragePacketDeliveryTimeNormalized, AveragePacketDeliveryTimeNormalizedCombined
+            AveragePacketDeliveryTimeNormalized, AveragePacketDeliveryTimeNormalizedCombined, DefensorCreatedPacketsPercentageLineChartCombined
         }
         public static List<string> PlotTypeList = new List<string> { "RouterCreatedPacketsPieChart", "RouterCreatedPacketsLineChart", 
             "AverageVarianceLineChart", "AverageVarianceLineChartCombined", "RouterCreatedPacketsPercentageLineChartCombined", 
-            "RouterCreatedPacketsLineChartCombined", "AveragePacketDeliveryTimeNormalized", "AveragePacketDeliveryTimeNormalizedCombined" };
+            "RouterCreatedPacketsLineChartCombined", "AveragePacketDeliveryTimeNormalized", "AveragePacketDeliveryTimeNormalizedCombined",
+            "DefensorCreatedPacketsPercentageLineChartCombined" };
 
         public static PlotType GetPlotTypeEnum(string plotType)
         {
@@ -179,6 +180,7 @@ namespace NetworkGameFrontend.VisualData.Options.Base
                 "RouterCreatedPacketsLineChartCombined" => PlotType.RouterCreatedPacketsLineChartCombined,
                 "AveragePacketDeliveryTimeNormalized" => PlotType.AveragePacketDeliveryTimeNormalized,
                 "AveragePacketDeliveryTimeNormalizedCombined" => PlotType.AveragePacketDeliveryTimeNormalizedCombined,
+                "DefensorCreatedPacketsPercentageLineChartCombined" => PlotType.DefensorCreatedPacketsPercentageLineChartCombined,
                 _ => throw new NotImplementedException(),
             };
         }
@@ -195,6 +197,7 @@ namespace NetworkGameFrontend.VisualData.Options.Base
                 "RouterCreatedPacketsLineChartCombined" => RouterCreatedPacketsLineChartCombined.GetProperties(),
                 "AveragePacketDeliveryTimeNormalized" => AveragePacketDeliveryTimeNormalized.GetProperties(),
                 "AveragePacketDeliveryTimeNormalizedCombined" => AveragePacketDeliveryTimeNormalizedCombined.GetProperties(),
+                "DefensorCreatedPacketsPercentageLineChartCombined" => DefensorCreatedPacketsPercentageLineChartCombined.GetProperties(),
                 _ => throw new NotImplementedException(),
             };
         }

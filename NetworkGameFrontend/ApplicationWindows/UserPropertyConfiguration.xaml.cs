@@ -19,11 +19,13 @@ namespace NetworkGameFrontend.ApplicationWindows
     public partial class UserPropertyConfiguration : Window
     {
         public Dictionary<string, Property>  Properties { get; private set; }
+        public bool Ok { get; private set; }
         public UserPropertyConfiguration(string title, Dictionary<string, Property> properties)
         {
             InitializeComponent();
             DialogTitle.Text = title;
             Properties = properties;
+            Ok = false;
 
             foreach(var property in Properties)
             {
@@ -33,6 +35,7 @@ namespace NetworkGameFrontend.ApplicationWindows
 
         private void Clicked_Ok(object sender, RoutedEventArgs e)
         {
+            Ok = true;
             Close();
         }
 

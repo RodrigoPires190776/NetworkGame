@@ -22,6 +22,7 @@ namespace NetworkGameFrontend.VisualData
                 PlotType.RouterCreatedPacketsLineChartCombined => new RouterCreatedPacketsLineChartCombined(networks, games),
                 PlotType.AveragePacketDeliveryTimeNormalized => new AveragePacketDeliveryTimeNormalized(network, game),
                 PlotType.AveragePacketDeliveryTimeNormalizedCombined => new AveragePacketDeliveryTimeNormalizedCombined(networks, games),
+                PlotType.DefensorCreatedPacketsPercentageLineChartCombined => new DefensorCreatedPacketsPercentageLineChartCombined(networks, games),
                 _ => throw new NotImplementedException()
             };
         }

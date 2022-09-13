@@ -156,12 +156,22 @@ namespace NetworkGameBackend
             IsRunning = false;
         }
 
-        public void IntroduceAttacker(Guid defensorID, Guid destinationID, Guid attackerID)
+        public void IntroduceAttacker(Guid defensorID, Guid destinationID, Guid attackerID, bool random)
         {
-            foreach(var game in Games.Values)
+            if (random)
             {
-                game.Network.IntroduceAttacker(defensorID, destinationID, attackerID);
-            }          
+                foreach (var game in Games.Values)
+                {
+                    game.Network.IntroduceAttackerRandom();
+                }
+            }
+            else
+            {
+                foreach (var game in Games.Values)
+                {
+                    game.Network.IntroduceAttacker(defensorID, destinationID, attackerID);
+                }
+            }                   
         }
 
         public void ChangeSpeed(int speed)

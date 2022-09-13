@@ -47,7 +47,12 @@ namespace NetworkGameFrontend.NetworkApplication
             }
             NetworkScrollViewerContent.Content = null;
             VisualNetwork = new VisualNetwork.VisualNetwork(NetworkMaster.GetInstance().GetNetwork(networkID));
-            VisualNetwork.Draw();          
+            VisualNetwork.Draw();
+            var agents = NetworkMaster.GetInstance().GetNetwork(networkID).GetNetworkAgents();
+            if(agents.Item1 != Guid.Empty && agents.Item2 != Guid.Empty && agents.Item3 != Guid.Empty)
+            {
+                VisualNetwork.IntroduceAttacker(agents.Item1, agents.Item2, agents.Item3);
+            }
 
             Application.Current.Dispatcher.Invoke(() => {
                 var canvas = new Canvas

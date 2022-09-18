@@ -241,6 +241,32 @@ namespace Network
             return state;
         }
 
+        public NetworkInfo GetNetworkInfo()
+        {
+            int maxLenght = 0;
+            int numberOfPaths = 0;
+            int lenghtSum = 0;
+
+            foreach(var router in RouterDistances.Keys)
+            {
+                foreach(var destination in RouterDistances[router].Keys)
+                {
+                    if(router != destination)
+                    {
+                        if (RouterDistances[router][destination] > maxLenght) maxLenght = RouterDistances[router][destination];
+                        numberOfPaths++;
+                        lenghtSum += RouterDistances[router][destination];
+                    }                   
+                }
+            }
+
+            return new NetworkInfo()
+            {
+                LongestPathLenght = maxLenght,
+                AveragePathLenght = (decimal)lenghtSum / numberOfPaths
+            };
+        }
+
         public void ComputeRouterDistances()
         {
             RouterDistances = new Dictionary<Guid, Dictionary<Guid, int>>();
@@ -301,5 +327,11 @@ namespace Network
         {
             return link.Routers.Item1 == node ? link.Routers.Item2 : link.Routers.Item1;
         }
+    }
+
+    public class NetworkInfo
+    {
+        public int LongestPathLenght { get; set; }
+        public decimal AveragePathLenght { get; set; }
     }
 }

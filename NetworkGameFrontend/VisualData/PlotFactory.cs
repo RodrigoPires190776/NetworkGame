@@ -2,6 +2,8 @@
 using NetworkGameBackend;
 using NetworkGameFrontend.VisualData.Options.Base;
 using NetworkGameFrontend.VisualData.Options.Graphs;
+using NetworkGameFrontend.VisualData.Options.Graphs.Combined;
+using NetworkGameFrontend.VisualData.Options.Graphs.Single;
 using System;
 using System.Collections.Generic;
 using static NetworkGameFrontend.VisualData.Options.Base.BasePlot;
@@ -23,6 +25,7 @@ namespace NetworkGameFrontend.VisualData
                 PlotType.AveragePacketDeliveryTimeNormalized => new AveragePacketDeliveryTimeNormalized(network, game),
                 PlotType.AveragePacketDeliveryTimeNormalizedCombined => new AveragePacketDeliveryTimeNormalizedCombined(networks, games),
                 PlotType.DefensorCreatedPacketsPercentageLineChartCombined => new DefensorCreatedPacketsPercentageLineChartCombined(networks, games),
+                PlotType.AveragePacketQueueTimeCombined => new AveragePacketQueueTimeCombined(networks, games),
                 _ => throw new NotImplementedException()
             };
         }

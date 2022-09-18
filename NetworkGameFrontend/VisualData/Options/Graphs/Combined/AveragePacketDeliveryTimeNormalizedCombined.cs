@@ -10,14 +10,13 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows;
 
-namespace NetworkGameFrontend.VisualData.Options.Graphs
+namespace NetworkGameFrontend.VisualData.Options.Graphs.Combined
 {
     public class AveragePacketDeliveryTimeNormalizedCombined : LineChartCombined
     {
-        private List<Guid> Networks;
         private ScatterPlot ScatterPlot;
         private double[] SignalPlotXs;
-        private Dictionary<Guid, List<double>> ValuesOnHold;
+        private readonly Dictionary<Guid, List<double>> ValuesOnHold;
         private int LastX;
         private int LastUpdatedX;
         private readonly double InterpolateStep = 0.01;
@@ -31,7 +30,6 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs
         public AveragePacketDeliveryTimeNormalizedCombined(List<Guid> networks, List<Game> game) :
            base("Average Packet Delivery Time Normalized Combined", game)
         {
-            Networks = networks;
             ValuesOnHold = new Dictionary<Guid, List<double>>();
         }
 

@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows;
 
-namespace NetworkGameFrontend.VisualData.Options.Graphs
+namespace NetworkGameFrontend.VisualData.Options.Graphs.Combined
 {
     public class RouterCreatedPacketsPercentageLineChartCombined : PercentageLineChartCombined
     {

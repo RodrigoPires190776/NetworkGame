@@ -104,7 +104,7 @@ namespace NetworkGameFrontend.VisualNetwork
                         if (router != loadedRouterID && LastState != null) Routers[router].UpdateProbabilities(LastState.UpdatedRouters[router].RoutingTable.GetPercentageValues(loadedRouterID));
                         else Routers[router].UpdateProbabilities();
                     }
-                    catch(Exception e) { }
+                    catch(Exception) { }
                 }
             }
         }

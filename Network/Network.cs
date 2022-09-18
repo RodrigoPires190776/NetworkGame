@@ -43,9 +43,11 @@ namespace Network
 
         public Network Copy() 
         {
-            var network = new Network();
-            network.Name = Name;
-            
+            var network = new Network
+            {
+                Name = Name
+            };
+
             NetworkMaster.GetInstance().AddNetwork(network, network.Name);
             var routerIDmapping = new Dictionary<Guid, Guid>();
           
@@ -207,18 +209,19 @@ namespace Network
             
             foreach(Router router in Routers.Values)
             {
-                var updateRouter = router.Step(); //UpdateRouter, NewPacket, DroppedPacket
+                var updateRouter = router.Step(); //UpdateRouter, NewPacket, ListDroppedPacket
                 if (updateRouter.Item2 != null) Packets.Add(updateRouter.Item2.ID, updateRouter.Item2);
                 state.UpdatedRouters.Add(router.ID, updateRouter.Item1);
-                if (updateRouter.Item3 != null)
+                foreach(var droppedPacket in updateRouter.Item3)
                 {
-                    state.AddUpdatePacket(new UpdatePacket(updateRouter.Item3.ID,
-                    updateRouter.Item3.NumberOfSteps, false, true, updateRouter.Item3.Source, updateRouter.Item3.Destination));
-                    foreach (var routerID in updateRouter.Item3.RouterSentToLink.Keys)
+                    state.AddUpdatePacket(new UpdatePacket(droppedPacket.ID,
+                    droppedPacket.NumberOfSteps, false, true, droppedPacket.Source, droppedPacket.Destination));
+                    foreach (var routerID in droppedPacket.RouterSentToLink.Keys)
                     {
-                        Routers[routerID].Learn(updateRouter.Item3);
+                        Routers[routerID].Learn(droppedPacket);
                     }
                 }
+                
 
             }
 

@@ -24,10 +24,14 @@ namespace NetworkGameFrontend.VisualData.Options.BaseCombined
             MaxValues = new List<double>();
             MinValues = new List<double>();
             SignalPlot = new SignalPlot();
-            MaxValuesPlot = new SignalPlot();
-            MaxValuesPlot.Color = Color.DarkBlue;
-            MinValuesPlot = new SignalPlot();
-            MinValuesPlot.Color = Color.DarkRed;
+            MaxValuesPlot = new SignalPlot
+            {
+                Color = Color.DarkBlue
+            };
+            MinValuesPlot = new SignalPlot
+            {
+                Color = Color.DarkRed
+            };
 
             AddValue(new List<double> { 0 });
             Plot.Add(SignalPlot);

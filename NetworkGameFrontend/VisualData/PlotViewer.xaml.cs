@@ -24,7 +24,7 @@ namespace NetworkGameFrontend.VisualData
     public partial class PlotViewer : Window
     {
         private BasePlot Plot;
-        private int NetworkID;
+        //private int NetworkID;
         public PlotViewer(Window owner, BasePlot plot, int networkID, bool allGames = false)
         {
             Owner = owner;

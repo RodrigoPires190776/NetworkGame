@@ -1,6 +1,8 @@
 ﻿using Network.UpdateNetwork;
 using NetworkGameBackend;
 using NetworkGameFrontend.VisualData.Options.Graphs;
+using NetworkGameFrontend.VisualData.Options.Graphs.Combined;
+using NetworkGameFrontend.VisualData.Options.Graphs.Single;
 using NetworkUtils;
 using ScottPlot;
 using System;
@@ -161,12 +163,13 @@ namespace NetworkGameFrontend.VisualData.Options.Base
 
         public enum PlotType { RouterCreatedPacketsPieChart, RouterCreatedPacketsLineChart, AverageVarianceLineChart, 
             AverageVarianceLineChartCombined, RouterCreatedPacketsPercentageLineChartCombined, RouterCreatedPacketsLineChartCombined,
-            AveragePacketDeliveryTimeNormalized, AveragePacketDeliveryTimeNormalizedCombined, DefensorCreatedPacketsPercentageLineChartCombined
+            AveragePacketDeliveryTimeNormalized, AveragePacketDeliveryTimeNormalizedCombined, DefensorCreatedPacketsPercentageLineChartCombined,
+            AveragePacketQueueTimeCombined
         }
         public static List<string> PlotTypeList = new List<string> { "RouterCreatedPacketsPieChart", "RouterCreatedPacketsLineChart", 
             "AverageVarianceLineChart", "AverageVarianceLineChartCombined", "RouterCreatedPacketsPercentageLineChartCombined", 
             "RouterCreatedPacketsLineChartCombined", "AveragePacketDeliveryTimeNormalized", "AveragePacketDeliveryTimeNormalizedCombined",
-            "DefensorCreatedPacketsPercentageLineChartCombined" };
+            "DefensorCreatedPacketsPercentageLineChartCombined", "AveragePacketQueueTimeCombined" };
 
         public static PlotType GetPlotTypeEnum(string plotType)
         {
@@ -181,6 +184,7 @@ namespace NetworkGameFrontend.VisualData.Options.Base
                 "AveragePacketDeliveryTimeNormalized" => PlotType.AveragePacketDeliveryTimeNormalized,
                 "AveragePacketDeliveryTimeNormalizedCombined" => PlotType.AveragePacketDeliveryTimeNormalizedCombined,
                 "DefensorCreatedPacketsPercentageLineChartCombined" => PlotType.DefensorCreatedPacketsPercentageLineChartCombined,
+                "AveragePacketQueueTimeCombined" => PlotType.AveragePacketQueueTimeCombined,
                 _ => throw new NotImplementedException(),
             };
         }
@@ -198,6 +202,7 @@ namespace NetworkGameFrontend.VisualData.Options.Base
                 "AveragePacketDeliveryTimeNormalized" => AveragePacketDeliveryTimeNormalized.GetProperties(),
                 "AveragePacketDeliveryTimeNormalizedCombined" => AveragePacketDeliveryTimeNormalizedCombined.GetProperties(),
                 "DefensorCreatedPacketsPercentageLineChartCombined" => DefensorCreatedPacketsPercentageLineChartCombined.GetProperties(),
+                "AveragePacketQueueTimeCombined" => AveragePacketQueueTimeCombined.GetProperties(),
                 _ => throw new NotImplementedException(),
             };
         }

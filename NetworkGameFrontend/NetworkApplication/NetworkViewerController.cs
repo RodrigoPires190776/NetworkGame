@@ -76,7 +76,7 @@ namespace NetworkGameFrontend.NetworkApplication
                 {
                     VisualNetwork.Update(state, loadedRouterID, UpdatePackets);
                 }
-                catch(Exception e)
+                catch(Exception)
                 {
 
                 }

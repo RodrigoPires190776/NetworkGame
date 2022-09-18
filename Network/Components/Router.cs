@@ -55,13 +55,26 @@ namespace Network.Components
             PacketPickingStrategy = packetPicking ?? PacketPickingStrategy;
         }
 
-        public (UpdateRouter, Packet, Packet) Step()
+        public (UpdateRouter, Packet, List<Packet>) Step()
         {
+            var dropped = new List<Packet>();
+            foreach (var packet in PacketQueue)
+            {
+                if(packet.NumberOfSteps >= NetworkMaster.PacketTTL)
+                {
+                    dropped.Add(packet);
+                }
+            }
+
+            foreach(var packet in dropped)
+            {
+                PacketQueue.Remove(packet);
+            }
+
             var newPacket = PacketCreationStrategy.CreatePacket(this);
             if (newPacket != null) PacketQueue.Add(newPacket);
 
             (Packet, bool) nextPacket = (null, false);
-            Packet dropped = null;
             if (PacketQueue.Count > 0)
             {
                 nextPacket = PacketPickingStrategy.NextPacket(this);
@@ -73,7 +86,7 @@ namespace Network.Components
                 else
                 {
                     PacketQueue.Remove(nextPacket.Item1);
-                    dropped = nextPacket.Item1;
+                    dropped.Add(nextPacket.Item1);
                 }
             }
            

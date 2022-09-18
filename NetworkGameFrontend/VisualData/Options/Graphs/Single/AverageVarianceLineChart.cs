@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows;
 
-namespace NetworkGameFrontend.VisualData.Options.Graphs
+namespace NetworkGameFrontend.VisualData.Options.Graphs.Single
 {
     public class AverageVarianceLineChart : LineChart
     {

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using Network;
 using Network.RouteDiscovery;
 using Network.Strategies;
 using NetworkGameFrontend.ApplicationWindows;
@@ -50,7 +51,8 @@ namespace NetworkGameFrontend
                     try
                     {
                         var stream = new FileStream(picker.FileName, FileMode.Open, FileAccess.Read);
-                        app.ImportNetwork(stream, networkNameDialog.Text);
+                        var info = app.ImportNetwork(stream, networkNameDialog.Text);
+                        SetNetworkInfo(info);
                     }
                     catch (Exception ex)
                     {
@@ -79,7 +81,8 @@ namespace NetworkGameFrontend
                 propertiesEditor.ShowDialog();
                 if (propertiesEditor.Ok)
                 {
-                    app.GenerateNetwork(propertiesEditor.Properties);
+                    var info = app.GenerateNetwork(propertiesEditor.Properties);
+                    SetNetworkInfo(info);
                     _ = MessageBox.Show("NetworkGenerated!");
                 }
                 else _ = MessageBox.Show("Canceled!");
@@ -88,6 +91,12 @@ namespace NetworkGameFrontend
             {
                 _ = MessageBox.Show(ex.Message);
             }
+        }
+
+        private void SetNetworkInfo(NetworkInfo info)
+        {
+            LongestPathLenghtTextBox.Text = info.LongestPathLenght.ToString();
+            AveragePathLenghtTextBox.Text = info.AveragePathLenght.ToString();
         }
         #endregion
         #region Network
@@ -104,6 +113,7 @@ namespace NetworkGameFrontend
                     StartDiscoveryButton.IsEnabled = true;
                     SaveRuntimeDataCheckBox.IsEnabled = true;
                     NumberOfGameTextBox.IsEnabled = true;
+                    PacketTTLTextBox.IsEnabled = true;
                     RoutingStrategyListBox.IsEnabled = true;
                     PickingStrategyListBox.IsEnabled = true;
                     CreationStrategyListBox.IsEnabled = true;
@@ -130,7 +140,7 @@ namespace NetworkGameFrontend
                 networkNameDialog = new UserStringInput("Choose a name for the network", "Name:", app.LoadedNetworkName, this);
                 _ = networkNameDialog.ShowDialog();
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 _ = MessageBox.Show("No loaded network!", "Something went wrong!");
                 return;
@@ -140,10 +150,12 @@ namespace NetworkGameFrontend
             {
                 try
                 {
-                    SaveFileDialog saveDialog = new SaveFileDialog();
-                    saveDialog.FileName = networkNameDialog.Text;
-                    saveDialog.DefaultExt = "network";
-                    saveDialog.Filter = "Network files (*.NETWORK)|*.NETWORK";
+                    SaveFileDialog saveDialog = new SaveFileDialog
+                    {
+                        FileName = networkNameDialog.Text,
+                        DefaultExt = "network",
+                        Filter = "Network files (*.NETWORK)|*.NETWORK"
+                    };
 
                     if (saveDialog.ShowDialog() == true)
                     {
@@ -165,19 +177,25 @@ namespace NetworkGameFrontend
         #region Network Viewer Controls
         void Controls_StartDiscovery_Click(object sender, RoutedEventArgs e)
         {
-            int nGames;
-            if(!int.TryParse(NumberOfGameTextBox.Text, out nGames) || nGames <= 0 || nGames > 100)
+            if (!int.TryParse(NumberOfGameTextBox.Text, out int nGames) || nGames <= 0 || nGames > 100)
             {
                 _ = MessageBox.Show("Invalid number of games (1-100)!", "Something went wrong!");
+                return;
+            }
+            if (!int.TryParse(PacketTTLTextBox.Text, out int ttl) || ttl <= 0)
+            {
+                _ = MessageBox.Show("Invalid packet TTL (0-...)!", "Something went wrong!");
+                return;
             }
             var strategies = GetStrategies();
-            app.StartDiscovery(nGames, SaveRuntimeDataCheckBox.IsChecked,
+            app.StartDiscovery(nGames, ttl, SaveRuntimeDataCheckBox.IsChecked,
                                new Tuple<RoutingStrategies, Dictionary<string, Property>>(strategies.Item1, RoutingStrategyProperties), 
                                new Tuple<PickingStrategies, Dictionary<string, Property>>(strategies.Item2, PickingStrategyProperties), 
                                new Tuple<CreationStrategies, Dictionary<string, Property>>(strategies.Item3, CreationStrategyProperties),
                                new Tuple<RouteDiscoveryStrategies, Dictionary<string, Property>>(strategies.Item4, RouteDiscoveryProperties));
             StartDiscoveryButton.IsEnabled = false;
             NumberOfGameTextBox.IsEnabled = false;
+            PacketTTLTextBox.IsEnabled = false;
             IntroduceAttackerButton.IsEnabled = true;
             PlotViewerButton.IsEnabled = true;
             NetworkViewerChangeNetwork.IsEnabled = true;
@@ -230,8 +248,7 @@ namespace NetworkGameFrontend
 
         void Viewer_ChangeNetwork_Click(object sender, RoutedEventArgs e)
         {
-            int gameID;
-            if (!int.TryParse(NetworkChangeGameNumberTextbox.Text, out gameID) || gameID <= 0 || gameID > app.NumberOfGames)
+            if (!int.TryParse(NetworkChangeGameNumberTextbox.Text, out int gameID) || gameID <= 0 || gameID > app.NumberOfGames)
             {
                 _ = MessageBox.Show($"Invalid game number (1-{app.NumberOfGames})!", "Something went wrong!");
                 return;

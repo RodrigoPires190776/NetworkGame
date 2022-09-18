@@ -63,22 +63,26 @@ namespace NetworkGameFrontend.NetworkApplication
             NetworkControlsGrid = networkControlsGrid;
             LoadedRouter = Guid.Empty;
         }
-        public void ImportNetwork(Stream fileStream, string networkName)
+        public NetworkInfo ImportNetwork(Stream fileStream, string networkName)
         {
             var importer = new NetworkFileImporter();
             var network = importer.Import(fileStream, 5);
             network.ComputeRouterDistances();
             NetworkMaster.GetInstance().AddNetwork(network, networkName);
             NetworkDataCollector.GetInstance().AddNetwork(network);
+
+            return network.GetNetworkInfo();
         }
 
-        public void GenerateNetwork(Dictionary<string, Property> properties)
+        public NetworkInfo GenerateNetwork(Dictionary<string, Property> properties)
         {
             var generator = new NetworkGenerator.Generator.NetworkGenerator();
             var network = generator.GenerateNetwork(properties);
             network.ComputeRouterDistances();
             NetworkMaster.GetInstance().AddNetwork(network, "GeneratedNetwork");
             NetworkDataCollector.GetInstance().AddNetwork(network);
+
+            return network.GetNetworkInfo();
         }
 
         public void LoadNetwork(string networkName)
@@ -125,12 +129,13 @@ namespace NetworkGameFrontend.NetworkApplication
             return NetworkMaster.GetInstance().GetNetwork(LoadedNetwork).RouterIDList.Count;
         }
 
-        public void StartDiscovery(int numberOfGames, bool? saveRuntimeData,
+        public void StartDiscovery(int numberOfGames, int ttl, bool? saveRuntimeData,
             Tuple<RoutingStrategies, Dictionary<string, Property>> routingStrategy, 
             Tuple<PickingStrategies, Dictionary<string, Property>> pickingStrategy, 
             Tuple<CreationStrategies, Dictionary<string, Property>> creationStrategy,
             Tuple<RouteDiscoveryStrategies, Dictionary<string, Property>> discoveryStrategy)
         {
+            NetworkMaster.PacketTTL = ttl;
             TotalNumberOfCycles = 0;
             NetworkUpdateStateQueue = new NetworkUpdateStateQueue();
             NetworkDataCollector.GetInstance().SaveRuntimeData(saveRuntimeData);

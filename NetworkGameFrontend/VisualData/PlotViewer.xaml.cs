@@ -43,7 +43,8 @@ namespace NetworkGameFrontend.VisualData
 
         void SavePlotAsImage_Click(object sender, RoutedEventArgs e)
         {
-            Bitmap bmp = Plot.WpfPlot.Plot.Render();
+            Bitmap bmp = new Bitmap(2400,1600);
+            Plot.WpfPlot.Plot.Render(bmp, false, 4);
             var networkNameDialog = new UserStringInput("Choose a name for the plot", "Name:", Plot.Title, this);
             _ = networkNameDialog.ShowDialog();
 
@@ -53,14 +54,14 @@ namespace NetworkGameFrontend.VisualData
                 {                   
                     SaveFileDialog saveDialog = new SaveFileDialog();
                     saveDialog.FileName = networkNameDialog.Text;
-                    saveDialog.DefaultExt = "jpg";
-                    saveDialog.Filter = "JPG images (*.jpg)|*.jpg";
+                    saveDialog.DefaultExt = "Png";
+                    saveDialog.Filter = "Png images (*.Png)|*.Png";
 
                     if (saveDialog.ShowDialog() == true)
                     { 
                         var fileName = saveDialog.FileName;
 
-                        bmp.Save(fileName, System.Drawing.Imaging.ImageFormat.Jpeg);
+                        bmp.Save(fileName, System.Drawing.Imaging.ImageFormat.Png);
                     }
                 }
                 catch (Exception ex)

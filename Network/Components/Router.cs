@@ -5,6 +5,7 @@ using Network.Strategies.PacketCreation;
 using Network.Strategies.PacketPicking;
 using Network.Strategies.Routing;
 using Network.UpdateNetwork.UpdateObjects;
+using NetworkUtils;
 using System;
 using System.Collections.Generic;
 
@@ -110,8 +111,8 @@ namespace Network.Components
 
         public void SetAgentDefensor(Guid destinationID)
         {
-            PacketCreationStrategy = new OneDestinationPacketCreationStrategy(NetworkID, destinationID);
-            PacketCreationStrategy.Properties["Probability"].SetValue(20m);
+            PacketCreationStrategy = new OneDestinationPacketCreationStrategy(NetworkID, destinationID, 
+                (decimal)PacketCreationStrategy.Properties[Property.Probability].Value);
             RouterAgent = RouterAgent.Defensor;
         }
 

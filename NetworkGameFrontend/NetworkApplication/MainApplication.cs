@@ -194,7 +194,10 @@ namespace NetworkGameFrontend.NetworkApplication
                 },
                 {
                     Property.Random,
-                    new Property(Property.PropertyType.Bool, new List<Tuple<string, object>>())
+                    new Property(Property.PropertyType.Bool, new List<Tuple<string, object>>()
+                    {
+                        new Tuple<string, object>(Property.INITIAL_VALUE, true)
+                    })
                 }
             };
 

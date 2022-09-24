@@ -37,7 +37,7 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs.Single
 
             var dictionaryProperties = BasePlot.GetProperties(properties);
 
-            dictionaryProperties[Property.Percentage].SetValue(0.1m);
+            dictionaryProperties[Property.Percentage].SetValue(0.3m);
 
             return dictionaryProperties;
         }

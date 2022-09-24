@@ -65,10 +65,10 @@ namespace NetworkGameFrontend.VisualData.Options.Base
                     {
                         new Tuple<string, object>(Property.INTEGER_MIN, 0)
                     }));
-            Properties[Property.CyclesToUpdate].SetValue(1);
+            Properties[Property.CyclesToUpdate].SetValue(100);
             Properties.Add(Property.LoadAllValues, new Property(Property.PropertyType.Bool,
                     new List<Tuple<string, object>>()));
-            Properties[Property.LoadAllValues].SetValue(true);
+            Properties[Property.LoadAllValues].SetValue(false);
         }
 
         protected virtual void GameUpdate(object sender, UpdatedState state)
@@ -153,10 +153,10 @@ namespace NetworkGameFrontend.VisualData.Options.Base
                    {
                         new Tuple<string, object>(Property.INTEGER_MIN, 0)
                    }));
-            dictionaryProperties[Property.CyclesToUpdate].SetValue(1);
+            dictionaryProperties[Property.CyclesToUpdate].SetValue(100);
             dictionaryProperties.Add(Property.LoadAllValues, new Property(Property.PropertyType.Bool,
                     new List<Tuple<string, object>>()));
-            dictionaryProperties[Property.LoadAllValues].SetValue(true);
+            dictionaryProperties[Property.LoadAllValues].SetValue(false);
 
             return dictionaryProperties;
         }

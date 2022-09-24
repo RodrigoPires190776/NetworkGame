@@ -362,11 +362,15 @@
                 </Grid>
                 <Grid Grid.Row="3">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="2*"/>
+                        <RowDefinition Height="3*"/>
                         <RowDefinition Height="3*"/>
                     </Grid.RowDefinitions>
-                    <Button Grid.Row="1" x:Name="PlotViewerButton" Background="Gray" Grid.Column="0" Click="Controls_PlotViewer_Click" VerticalAlignment="Top" IsEnabled="False" Height="40" Width="150">
+                    <Button Grid.Row="1" x:Name="PlotViewerButton" Background="Gray" Grid.Column="0" Click="Controls_PlotViewer_Click" VerticalAlignment="Top" IsEnabled="False" Height="35" Width="150">
                         <TextBlock Text="Plot Viewer" TextWrapping="Wrap"/>
+                    </Button>
+                    <Button Grid.Row="2" x:Name="StartDefaultPlotsButton" Background="Gray" Click="Controls_PlotViewerDefaults_Click" VerticalAlignment="Top" IsEnabled="False" Height="35" Width="150">
+                        <TextBlock Text="Default Plots" TextWrapping="Wrap"/>
                     </Button>
                     <Grid Grid.Row="0">
                         <Grid.ColumnDefinitions>

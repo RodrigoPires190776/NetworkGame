@@ -70,7 +70,8 @@ namespace NetworkGameFrontend.VisualData.Options.Graphs.Combined
                 {
                     if (packet.ReachedDestination)
                     {
-                        value = (double)packet.NumberOfSteps / NetworkMaster.GetInstance().GetNetwork(state.NetworkID).RouterDistances[packet.Source][packet.Destination];
+                        var distances = NetworkMaster.GetInstance().GetNetwork(state.NetworkID).RouterDistances;
+                        value += (double)packet.NumberOfSteps / NetworkMaster.GetInstance().GetNetwork(state.NetworkID).RouterDistances[packet.Source][packet.Destination];
                         nrValues++;
                     }
                 }

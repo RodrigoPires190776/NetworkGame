@@ -13,7 +13,7 @@ namespace NetworkGameBackend
 {
     public class GameMaster
     {
-        private const int MAX_NUMBER_OF_TASKS = 16;
+        private const int MAX_NUMBER_OF_TASKS = 32;
         public event EventHandler<List<UpdatedState>> AllGamesStep;
         public int NumberOfGames 
         {

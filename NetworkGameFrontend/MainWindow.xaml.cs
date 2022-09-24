@@ -198,6 +198,7 @@ namespace NetworkGameFrontend
             PacketTTLTextBox.IsEnabled = false;
             IntroduceAttackerButton.IsEnabled = true;
             PlotViewerButton.IsEnabled = true;
+            StartDefaultPlotsButton.IsEnabled = true;
             NetworkViewerChangeNetwork.IsEnabled = true;
             NetworkChangeGameNumberTextbox.IsEnabled = true;
             SaveRuntimeDataCheckBox.IsEnabled = false;
@@ -209,12 +210,15 @@ namespace NetworkGameFrontend
 
             var propertiesEditor = new UserPropertyConfiguration("IntroduceAttacker", properties);
             propertiesEditor.ShowDialog();
-            
-            app.IntroduceAttacker(
-                (int)properties[Property.Defensor].Value, 
-                (int)properties[Property.Destination].Value, 
+
+            if (propertiesEditor.Ok)
+            {
+                app.IntroduceAttacker(
+                (int)properties[Property.Defensor].Value,
+                (int)properties[Property.Destination].Value,
                 (int)properties[Property.Attacker].Value,
                 (bool)properties[Property.Random].Value);
+            }      
         }
 
         void Controls_PlotViewer_Click(object sender, RoutedEventArgs e)
@@ -226,6 +230,33 @@ namespace NetworkGameFrontend
             var plotViewer = new PlotViewer(this, initPlot.Item1, initPlot.Item2, plot.AllGames);
             plotViewer.Show();
         }
+        void Controls_PlotViewerDefaults_Click(object sender, RoutedEventArgs e)
+        {
+            var defaults = new List<BasePlot.PlotType>()
+            {
+                BasePlot.PlotType.AverageVarianceLineChartCombined,
+                BasePlot.PlotType.AveragePacketDeliveryTimeNormalizedCombined,
+                BasePlot.PlotType.AveragePacketQueueTimeCombined,
+                BasePlot.PlotType.DefensorCreatedPacketsPercentageLineChartCombined,
+                BasePlot.PlotType.RouterCreatedPacketsPercentageLineChartCombined,
+                BasePlot.PlotType.RouterCreatedPacketsLineChartCombined
+            };
+
+            foreach(var plotType in defaults)
+            {
+                InitPlot(plotType);
+            }           
+        }
+
+        private void InitPlot(BasePlot.PlotType type)
+        {
+            var plot = app.GetPlot(type);
+            var plotProperties = PlotProperties = BasePlot.GetPlotProperties(type.ToString(), app.LoadedNetwork);
+            var initPlot = app.InitializePlot(plot, plotProperties);
+            var plotViewer = new PlotViewer(this, initPlot.Item1, initPlot.Item2, plot.AllGames);
+            plotViewer.Show();
+        }
+
         void Viewer_StartPause_Click(object sender, RoutedEventArgs e)
         {
             app.ViewerStartPause();

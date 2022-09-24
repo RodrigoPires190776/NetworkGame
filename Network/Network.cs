@@ -202,6 +202,7 @@ namespace Network
                         {
                             Routers[router].Learn(packet);
                         }
+                        Packets.Remove(packet.ID);
                     }
                 }                 
             }
@@ -220,6 +221,7 @@ namespace Network
                     {
                         Routers[routerID].Learn(droppedPacket);
                     }
+                    Packets.Remove(droppedPacket.ID);
                 }
                 
 

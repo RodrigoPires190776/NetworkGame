@@ -20,5 +20,6 @@ namespace Network.Strategies
             base(networkID, properties)
         { }
         public abstract (Packet, bool) NextPacket(Router router);
+        public abstract void AddPacket(Packet packet);
     }
 }

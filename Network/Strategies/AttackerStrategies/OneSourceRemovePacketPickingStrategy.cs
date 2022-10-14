@@ -42,5 +42,8 @@ namespace Network.Strategies.AttackerStrategies
             }
             return (null, true);
         }
+
+        public override void AddPacket(Packet packet)
+        { }
     }
 }

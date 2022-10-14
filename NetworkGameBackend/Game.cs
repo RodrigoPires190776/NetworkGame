@@ -62,6 +62,10 @@ namespace NetworkGameBackend
             {
                 case PickingStrategies.Random:
                     return new RandomPacketPickingStrategy(Network.ID, properties);
+                case PickingStrategies.FIFO:
+                    return new FIFOPacketPickingStrategy(Network.ID, properties);
+                case PickingStrategies.RandomRemoveUnreachable:
+                    return new RandomRemoveUnreachablePacketsStrategy(Network.ID, properties);
                 default:
                     throw new Exception("Invalid packet picking strategy");
             }

@@ -18,6 +18,7 @@ namespace Network.Components
         public Guid NetworkID { get; }
         public Dictionary<Guid, Link> Links { get; }
         public List<Packet> PacketQueue { get;  }
+        public List<Packet> PacketsToDrop { get; }
         public RoutingStrategy RoutingStrategy { get; private set; }
         public PacketPickingStrategy PacketPickingStrategy { get; private set; }
         public PacketCreationStrategy PacketCreationStrategy { get; private set; }
@@ -30,6 +31,7 @@ namespace Network.Components
             NetworkID = networkID;
             Links = new Dictionary<Guid, Link>();
             PacketQueue = new List<Packet>();
+            PacketsToDrop = new List<Packet>();
             RoutingStrategy = new RandomRoutingStrategy(ID, networkID);
             PacketPickingStrategy = new RandomPacketPickingStrategy(networkID);
             PacketCreationStrategy = new RandomPacketCreationStrategy(networkID);
@@ -46,6 +48,7 @@ namespace Network.Components
         public void AddPacket(Packet packet)
         {
             PacketQueue.Add(packet);
+            PacketPickingStrategy.AddPacket(packet);
         }
 
         public void SetStrategies(RoutingStrategy routing, PacketCreationStrategy packetCreation, PacketPickingStrategy packetPicking)
@@ -73,30 +76,40 @@ namespace Network.Components
             }
 
             var newPacket = PacketCreationStrategy.CreatePacket(this);
-            if (newPacket != null) PacketQueue.Add(newPacket);
+            if (newPacket != null) AddPacket(newPacket);
 
             (Packet, bool) nextPacket = (null, false);
             if (PacketQueue.Count > 0)
             {
                 nextPacket = PacketPickingStrategy.NextPacket(this);
-                if(nextPacket.Item2)
+                if(nextPacket.Item1 != null)
                 {
-                    RoutingStrategy.NextLink(this, nextPacket.Item1).Send(this, nextPacket.Item1);
-                    PacketQueue.Remove(nextPacket.Item1);
-                }
-                else
-                {
-                    PacketQueue.Remove(nextPacket.Item1);
-                    dropped.Add(nextPacket.Item1);
-                }
+                    if (nextPacket.Item2)
+                    {
+                        RoutingStrategy.NextLink(this, nextPacket.Item1).Send(this, nextPacket.Item1);
+                        PacketQueue.Remove(nextPacket.Item1);
+                    }
+                    else
+                    {
+                        PacketQueue.Remove(nextPacket.Item1);
+                        dropped.Add(nextPacket.Item1);
+                    }
+                }               
             }
-           
+
+            foreach (var packet in PacketsToDrop)
+            {
+                PacketQueue.Remove(packet);
+                dropped.Add(packet);
+            }
+            PacketsToDrop.Clear();
+
             return (new UpdateRouter(ID, PacketQueue.Count, newPacket != null, nextPacket.Item2, RoutingStrategy.RoutingTable), newPacket, dropped);
         }
 
-        public void Learn(Packet packet)
+        public void Learn(Packet packet, Guid linkID)
         {
-            RoutingStrategy.Learn(packet);
+            RoutingStrategy.Learn(packet, linkID);
         }
 
         public decimal GetVariance()

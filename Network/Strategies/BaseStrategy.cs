@@ -49,8 +49,8 @@ namespace Network.Strategies
 
         public enum RoutingStrategies { Random, LinearRewardInaction, LinearRewardPenalty };
         public static List<string> RoutingStrategiesList = new List<string>{ "Random", "LinearRewardInaction", "LinearRewardPenalty" };
-        public enum PickingStrategies { Random };
-        public static List<string> PickingStrategiesList = new List<string> { "Random" };
+        public enum PickingStrategies { Random, FIFO, RandomRemoveUnreachable };
+        public static List<string> PickingStrategiesList = new List<string> { "Random", "FIFO", "RandomRemoveUnreachable" };
         public enum CreationStrategies { Random };
         public static List<string> CreationStrategiesList = new List<string> { "Random" };
 
@@ -90,6 +90,10 @@ namespace Network.Strategies
             {
                 case "Random":
                     return PickingStrategies.Random;
+                case "FIFO":
+                    return PickingStrategies.FIFO;
+                case "RandomRemoveUnreachable":
+                    return PickingStrategies.RandomRemoveUnreachable;
                 default:
                     throw new NotImplementedException();
             }
@@ -101,6 +105,10 @@ namespace Network.Strategies
             {
                 case "Random":
                     return RandomPacketPickingStrategy.GetProperties();
+                case "FIFO":
+                    return FIFOPacketPickingStrategy.GetProperties();
+                case "RandomRemoveUnreachable":
+                    return RandomRemoveUnreachablePacketsStrategy.GetProperties();
                 default:
                     throw new NotImplementedException();
             }

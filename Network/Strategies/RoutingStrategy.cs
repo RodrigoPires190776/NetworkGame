@@ -66,7 +66,7 @@ namespace Network.Strategies
         {
             return router.Links[RoutingTable.GetLink(packet.Destination)];
         }
-        public virtual void Learn(Packet packet) { }
+        public virtual void Learn(Packet packet, Guid linkID) { }
     }
 
     public class RoutingTable
@@ -123,7 +123,8 @@ namespace Network.Strategies
 
         private decimal BalanceValue(Guid destinationID, Guid link, decimal value)
         {
-            return value * (1 - Values[destinationID][link]);
+            return value > 0 ? value * (1 - Values[destinationID][link]) :
+                value * Values[destinationID][link];
         }
 
         public virtual void UpdateValue(Guid destinationID, Guid link, decimal value)

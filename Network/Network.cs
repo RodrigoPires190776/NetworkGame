@@ -181,9 +181,11 @@ namespace Network
                     state.AddUpdatePacket(new UpdatePacket(packet.ID, packet.NumberOfSteps, false, true, packet.Source, packet.Destination));
                     Packets.Remove(packet.ID);
 
-                    foreach(var router in packet.RouterSentToLink.Keys)
+                    while(packet.Route.Count > 0)
                     {
-                        Routers[router].Learn(packet);                       
+                        (var router, var linkTaken) = packet.Route.Pop();
+                        Routers[router].Learn(packet, linkTaken);
+                        if (router == packet.Source) break;
                     }
                 }
 
@@ -198,9 +200,11 @@ namespace Network
                     }
                     else
                     {
-                        foreach (var router in packet.RouterSentToLink.Keys)
+                        while (packet.Route.Count > 0)
                         {
-                            Routers[router].Learn(packet);
+                            (var router, var linkTaken) = packet.Route.Pop();
+                            Routers[router].Learn(packet, linkTaken);
+                            if (router == packet.Source) break;
                         }
                         Packets.Remove(packet.ID);
                     }
@@ -217,9 +221,12 @@ namespace Network
                 {
                     state.AddUpdatePacket(new UpdatePacket(droppedPacket.ID,
                     droppedPacket.NumberOfSteps, false, true, droppedPacket.Source, droppedPacket.Destination));
-                    foreach (var routerID in droppedPacket.RouterSentToLink.Keys)
+                    droppedPacket.Route.Pop(); //Because it was dropped in the waiting queue, has no link
+                    while (droppedPacket.Route.Count > 0)
                     {
-                        Routers[routerID].Learn(droppedPacket);
+                        (var routerRoute, var linkTaken) = droppedPacket.Route.Pop();
+                        Routers[routerRoute].Learn(droppedPacket, linkTaken);
+                        if (routerRoute == droppedPacket.Source) break;
                     }
                     Packets.Remove(droppedPacket.ID);
                 }

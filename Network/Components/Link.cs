@@ -58,7 +58,16 @@ namespace Network.Components
         {
             TransitInfo info = router.ID == Routers.Item1 ? 
                 new TransitInfo(0, 1, packet.NumberOfSteps) : new TransitInfo(LinkLength - 1, -1, packet.NumberOfSteps);
-            packet.RouterSentToLink[router.ID] = ID;
+            (var routerID, var link) = packet.Route.Pop();
+            if(routerID == router.ID)
+            {
+                packet.Route.Push((router.ID, ID));
+            }
+            else
+            {
+                throw new Exception();
+            }
+            //packet.RouterSentToLink[router.ID] = ID;
             PackagesInTransit.Add(packet, info);
         }
 

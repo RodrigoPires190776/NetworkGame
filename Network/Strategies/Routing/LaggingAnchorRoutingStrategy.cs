@@ -43,7 +43,7 @@ namespace Network.Strategies.Routing
             base(routerID, networkID, properties)
         { }
 
-        public override void Learn(Packet packet)
+        public override void Learn(Packet packet, Guid linkID)
         {
             /*if (!packet.ReachedDestination)
             {

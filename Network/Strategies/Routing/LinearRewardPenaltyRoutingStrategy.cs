@@ -56,16 +56,16 @@ namespace Network.Strategies.Routing
             base(routerID, networkID, properties)
         { }
 
-        public override void Learn(Packet packet)
+        public override void Learn(Packet packet, Guid linkID)
         {
             if (!packet.ReachedDestination) 
             {
-                RoutingTable.UpdateValue(packet.Destination, packet.RouterSentToLink[RouterID],
+                RoutingTable.UpdateValue(packet.Destination, linkID, //packet.RouterSentToLink[RouterID],
                 -(decimal)Properties[Property.PenaltyWeight].Value / NetworkMaster.PacketTTL );
             }
             else
             {
-                RoutingTable.UpdateValue(packet.Destination, packet.RouterSentToLink[RouterID],
+                RoutingTable.UpdateValue(packet.Destination, linkID, //packet.RouterSentToLink[RouterID],
                 ((decimal)Properties[Property.LearningWeight].Value) / (packet.NumberOfSteps * packet.NumberOfSteps));
             }          
         }
